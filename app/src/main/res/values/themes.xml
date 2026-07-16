@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base application theme. -->
+    <style name="Theme.TemiShoeStore" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <item name="colorPrimary">@color/coral_primary</item>
+        <item name="colorOnPrimary">@color/text_on_primary</item>
+        <item name="android:windowBackground">@color/bg_warm_peach</item>
+        <item name="android:statusBarColor">@color/bg_warm_peach</item>
+        <item name="android:windowLightStatusBar">true</item>
+        
+        <!-- Navigation bar config for standard tablet layout -->
+        <item name="android:navigationBarColor">@color/bg_warm_peach</item>
+        <item name="android:windowLightNavigationBar">true</item>
+    </style>
+</resources>

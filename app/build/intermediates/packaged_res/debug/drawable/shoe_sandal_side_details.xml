@@ -1,0 +1,42 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+    
+    <!-- Outer boundary stroke -->
+    <path
+        android:strokeColor="#2C2C2A"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M25,130 C25,130 50,118 70,118 C90,118 100,85 110,85 C118,85 122,118 135,118 C145,118 152,90 160,90 C165,90 170,118 175,122 C180,126 175,130 175,130 C175,130 25,130 25,130 Z" />
+
+    <!-- Sole lines (Cork bed details) -->
+    <path
+        android:strokeColor="#2C2C2A"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:pathData="M25,130 L175,130 M28,135 L172,135" />
+
+    <!-- Buckle details for rear strap -->
+    <path
+        android:strokeColor="#2C2C2A"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:pathData="M102,95 L106,105" />
+
+    <!-- Buckle details for front strap -->
+    <path
+        android:strokeColor="#2C2C2A"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:pathData="M152,98 L156,106" />
+
+    <!-- Inner foot contour lines (shows the footbed) -->
+    <path
+        android:strokeColor="#2C2C2A"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:pathData="M35,124 C60,123 90,123 115,124 C130,124 150,124 165,125" />
+</vector>

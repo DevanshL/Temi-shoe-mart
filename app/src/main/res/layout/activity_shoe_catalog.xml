@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://tools.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_warm_peach"
+    android:padding="20dp">
+
+    <!-- TOOLBAR HEADER -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/catalog_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- Back Button -->
+        <ImageButton
+            android:id="@+id/btn_catalog_back"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_revert"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/text_primary" />
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/text_catalog_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Select Shoes"
+            android:textColor="@color/text_primary"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Cart Icon Container -->
+        <FrameLayout
+            android:id="@+id/btn_catalog_cart"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_shopping_cart"
+                app:tint="@color/text_primary" />
+
+            <!-- Badge Count -->
+            <TextView
+                android:id="@+id/text_cart_badge"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="top|end"
+                android:layout_marginTop="6dp"
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/glass_card_bg"
+                android:backgroundTint="@color/coral_primary"
+                android:gravity="center"
+                android:text="0"
+                android:textColor="@color/white"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:visibility="gone"
+                tools:visibility="visible" />
+        </FrameLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- GRID RECYCLER VIEW -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_catalog"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:clipToPadding="false"
+        android:paddingBottom="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/catalog_toolbar"
+        tools:listitem="@layout/item_shoe_card" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,47 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+    
+    <!-- Footbed outer boundary stroke -->
+    <path
+        android:strokeColor="#2C2C2A"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M100,35 C80,35 70,55 70,95 C70,135 80,165 100,165 C120,165 130,135 130,95 C130,55 120,35 100,35 Z" />
+
+    <!-- Forefoot strap -->
+    <path
+        android:strokeColor="#2C2C2A"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:pathData="M70,65 L130,65 M70,80 L130,80" />
+    <!-- Forefoot strap buckle -->
+    <path
+        android:strokeColor="#2C2C2A"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:pathData="M76,62 L76,83" />
+
+    <!-- Midfoot strap -->
+    <path
+        android:strokeColor="#2C2C2A"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:pathData="M71,105 L129,105 M71,120 L129,120" />
+    <!-- Midfoot strap buckle -->
+    <path
+        android:strokeColor="#2C2C2A"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:pathData="M77,102 L77,123" />
+
+    <!-- Footbed heel pad outline -->
+    <path
+        android:strokeColor="#2C2C2A"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M85,145 C85,138 115,138 115,145 C115,158 85,158 85,145 Z" />
+</vector>

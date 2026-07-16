@@ -1,0 +1,35 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+    
+    <!-- Outer boundary stroke -->
+    <path
+        android:strokeColor="#2C2C2A"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M100,30 C75,30 65,65 65,100 C65,135 75,170 100,170 C125,170 135,135 135,100 C135,65 125,30 100,30 Z" />
+
+    <!-- Shoe opening (collar) -->
+    <path
+        android:strokeColor="#2C2C2A"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:pathData="M85,115 C85,100 80,140 100,140 C120,140 115,100 115,115 C115,130 85,130 85,115 Z" />
+
+    <!-- Toe cap boundary -->
+    <path
+        android:strokeColor="#2C2C2A"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:pathData="M80,48 C90,55 110,55 120,48" />
+
+    <!-- Laces / Eyelets -->
+    <path
+        android:strokeColor="#2C2C2A"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:pathData="M85,75 L115,85 M115,75 L85,85 M85,90 L115,100 M115,90 L85,100" />
+</vector>

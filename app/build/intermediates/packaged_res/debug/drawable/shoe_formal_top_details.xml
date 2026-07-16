@@ -1,0 +1,40 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+    
+    <!-- Outer boundary stroke -->
+    <path
+        android:strokeColor="#2C2C2A"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M100,28 C80,28 72,55 72,100 C72,135 80,168 100,168 C120,168 128,135 128,100 C128,55 120,28 100,28 Z" />
+
+    <!-- Dress collar/opening -->
+    <path
+        android:strokeColor="#2C2C2A"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:pathData="M86,120 C84,105 82,142 100,142 C118,142 116,105 114,120 C114,132 86,132 86,120 Z" />
+
+    <!-- Pointed cap-toe stitch line -->
+    <path
+        android:strokeColor="#2C2C2A"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:pathData="M78,48 C88,52 112,52 122,48" />
+
+    <!-- Closed lacing panel (oxford parallel bar laces) -->
+    <path
+        android:strokeColor="#2C2C2A"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:pathData="M88,78 L112,78 M88,88 L112,88 M88,98 L112,98" />
+    <path
+        android:strokeColor="#2C2C2A"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M100,75 L100,105" />
+</vector>

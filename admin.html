@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temi Shoe Store - Admin Dashboard</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDK (compat mode for ease of static html deployment) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #FDF8F5;
+            --brand-primary: #D85A30;
+            --brand-light: #F8ECE6;
+            --brand-dark: #A83C19;
+            --text-primary: #2C2C2A;
+            --text-secondary: #727270;
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.8);
+            --glass-shadow: 0 8px 32px 0 rgba(216, 90, 48, 0.08);
+            --radius: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        html {
+            background: linear-gradient(135deg, #FDF8F5 0%, #F5DEC9 100%);
+            min-height: 100vh;
+        }
+
+        body {
+            background: transparent;
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            padding: 20px 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--glass-shadow);
+        }
+
+        h1 {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--brand-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-badge {
+            font-size: 14px;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+        }
+        .status-badge.online {
+            color: #2E7D32;
+            border-color: rgba(46, 125, 50, 0.4);
+            background: #EAF8EA;
+        }
+
+        /* Top Action Card */
+        .cardx {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--glass-shadow);
+            margin-bottom: 24px;
+        }
+
+        /* Horizontal Tab Selection */
+        .nav-btn {
+            display: inline-block;
+            padding: 8px 18px;
+            border: 1px solid rgba(216, 90, 48, 0.3);
+            background: transparent;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 8px;
+            margin-right: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: var(--brand-primary);
+            color: white;
+            border-color: transparent;
+        }
+
+        /* Status Pills */
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 99px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.5);
+            font-size: 13px;
+            margin-left: 6px;
+        }
+
+        .pill .muted {
+            color: var(--text-secondary);
+        }
+
+        .pill .fw-semibold {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Manual Override Row */
+        .input-group-custom {
+            display: inline-flex;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .input-label {
+            padding: 8px 12px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            background: rgba(216, 90, 48, 0.08);
+            display: flex;
+            align-items: center;
+        }
+
+        #select-destination-manual {
+            background: transparent;
+            color: var(--text-primary);
+            border: none;
+            padding: 6px 12px;
+            font-size: 13px;
+            outline: none;
+            width: auto;
+            cursor: pointer;
+        }
+
+        .btn-go {
+            background: var(--brand-primary);
+            color: white;
+            border: none;
+            padding: 6px 16px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 0;
+            transition: background-color 0.2s;
+        }
+        .btn-go:hover {
+            background: var(--brand-dark);
+        }
+
+        .btn-reset {
+            background: transparent;
+            color: #C24119;
+            border: 1px solid rgba(194, 65, 25, 0.4);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-reset:hover {
+            background: rgba(194, 65, 25, 0.08);
+            border-color: #C24119;
+        }
+
+        /* Content Area */
+        .content {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 30px;
+            box-shadow: var(--glass-shadow);
+            min-height: 480px;
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(216, 90, 48, 0.15);
+            padding-bottom: 10px;
+            color: var(--brand-primary);
+        }
+
+        textarea, input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+            font-size: 15px;
+            outline: none;
+            color: var(--text-primary);
+        }
+
+        textarea:focus, input:focus, select:focus {
+            border-color: var(--brand-primary);
+        }
+
+        .btn {
+            background: var(--brand-primary);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: var(--brand-dark);
+            box-shadow: 0 4px 12px rgba(216, 90, 48, 0.25);
+        }
+
+        .btn-secondary {
+            background: #E0E0E0;
+            color: var(--text-primary);
+        }
+        .btn-secondary:hover {
+            background: #D2D2D2;
+            box-shadow: none;
+        }
+
+        /* Orders Listing Cards */
+        .order-card {
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .order-details h4 {
+            font-size: 18px;
+            color: var(--brand-primary);
+            margin-bottom: 6px;
+        }
+
+        .order-details p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .order-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Inventory Expansion Matrix */
+        .shoe-item {
+            background: rgba(255, 255, 255, 0.3);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .shoe-header {
+            padding: 16px 20px;
+            font-weight: 600;
+            font-size: 18px;
+            background: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .shoe-matrix {
+            padding: 20px;
+            display: none;
+            overflow-x: auto;
+        }
+
+        .shoe-matrix.open {
+            display: block;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        th {
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+
+        td input {
+            width: 60px;
+            padding: 6px;
+            text-align: center;
+            margin: 0;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid var(--glass-border);
+            border-radius: 6px;
+            color: var(--text-primary);
+        }
+
+        /* --- Toast Notification --- */
+        .toast-message {
+            display: none;
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(44, 44, 42, 0.95);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 14px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            z-index: 9999;
+            animation: toastSlideUp 0.3s ease-out;
+        }
+
+        @keyframes toastSlideUp {
+            from { transform: translate(-50%, 20px); opacity: 0; }
+            to { transform: translate(-50%, 0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+<div id="toast-message" class="toast-message">Welcome!</div>
+<div class="container">
+
+    <header>
+        <h1>👟 Temi Shoe Store - Staff Console</h1>
+        <div id="connection-status" class="status-badge">Mode: Simulator (Offline)</div>
+    </header>
+
+    <!-- Top Action Card containing Navigation and Manual controls -->
+    <div class="cardx">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <!-- Tabs selection -->
+            <div style="display: flex; gap: 8px;">
+                <button class="nav-btn active" id="btn-tab-orders" onclick="switchTab('orders')">Orders Queue</button>
+                <button class="nav-btn" id="btn-tab-inventory" onclick="switchTab('inventory')">Inventory Matrix</button>
+            </div>
+            
+            <!-- Real-time Status Pills -->
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                <span class="pill"><span class="muted">Temi:</span><span id="tel-status" class="fw-semibold">—</span></span>
+                <span class="pill"><span class="muted">State:</span><span id="tel-state" class="fw-semibold">—</span></span>
+                <span class="pill"><span class="muted">Location:</span><span id="tel-location" class="fw-semibold">—</span></span>
+                <span class="pill"><span class="muted">Active Order:</span><span id="tel-active-order" class="fw-semibold">—</span></span>
+            </div>
+        </div>
+        
+        <!-- Manual controls row (Always visible) -->
+        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(216, 90, 48, 0.15); margin-top: 16px; padding-top: 16px;">
+            <div class="muted small" style="color: var(--text-secondary); font-size: 13px; font-weight: 600;">Manual controls</div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div class="input-group-custom">
+                    <span class="input-label">Send Temi to</span>
+                    <select id="select-destination-manual">
+                        <option value="store_room">store_room</option>
+                        <option value="pickup_zone">pickup_zone</option>
+                        <option value="home base">home base</option>
+                    </select>
+                    <button class="btn-go" onclick="manualDispatchManual()">Go</button>
+                </div>
+                <button class="btn-reset" onclick="resetRobotState()">Reset (idle)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dynamic Content Panels -->
+    <main class="content">
+
+        <!-- TAB: ORDERS -->
+        <section id="tab-orders" class="tab-panel active">
+            <h2>Incoming Orders Queue</h2>
+            <div id="orders-list">
+                <p style="color: var(--text-secondary);">No active orders at this time.</p>
+            </div>
+        </section>
+
+        <!-- TAB: INVENTORY -->
+        <section id="tab-inventory" class="tab-panel">
+            <h2>Shoe Model Inventory Matrix</h2>
+            
+            <!-- Add New Shoe Form -->
+            <div style="background: rgba(216, 90, 48, 0.05); border: 1px solid rgba(216, 90, 48, 0.15); border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+                <h3 style="font-size: 16px; margin-bottom: 15px; color: var(--brand-primary); font-weight: 700;">+ Add New Shoe Model</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label for="add-id" style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">SKU / ID (e.g., nike_pegasus)</label>
+                        <input id="add-id" type="text" placeholder="nike_pegasus" style="width: 100%; padding: 8px 12px; font-size: 13px; border: 1px solid var(--glass-border); border-radius: 6px; color: var(--text-primary);">
+                    </div>
+                    <div>
+                        <label for="add-brand" style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">Brand</label>
+                        <input id="add-brand" type="text" placeholder="Nike" style="width: 100%; padding: 8px 12px; font-size: 13px; border: 1px solid var(--glass-border); border-radius: 6px; color: var(--text-primary);">
+                    </div>
+                    <div>
+                        <label for="add-name" style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">Model Name</label>
+                        <input id="add-name" type="text" placeholder="Pegasus 40" style="width: 100%; padding: 8px 12px; font-size: 13px; border: 1px solid var(--glass-border); border-radius: 6px; color: var(--text-primary);">
+                    </div>
+                    <div>
+                        <label for="add-price" style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">Price ($)</label>
+                        <input id="add-price" type="number" step="0.01" value="120.00" style="width: 100%; padding: 8px 12px; font-size: 13px; border: 1px solid var(--glass-border); border-radius: 6px; color: var(--text-primary);">
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label for="add-category" style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">Category</label>
+                        <select id="add-category" style="width: 100%; padding: 8px 12px; font-size: 13px; border: 1px solid var(--glass-border); border-radius: 6px; color: var(--text-primary); background: rgba(255, 255, 255, 0.8);">
+                            <option value="Athletic & Basketball">Athletic & Basketball</option>
+                            <option value="Casual & Sandals">Casual & Sandals</option>
+                            <option value="Formal Classics">Formal Classics</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="add-shape" style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">Shape Design</label>
+                        <select id="add-shape" style="width: 100%; padding: 8px 12px; font-size: 13px; border: 1px solid var(--glass-border); border-radius: 6px; color: var(--text-primary); background: rgba(255, 255, 255, 0.8);">
+                            <option value="sneaker_low">Low-Top Sneaker</option>
+                            <option value="sneaker_high">High-Top Sneaker</option>
+                            <option value="sneaker_sport">Sport Runner</option>
+                            <option value="boot">Classic Boot</option>
+                            <option value="sandal">Sandal / Slide</option>
+                            <option value="formal">Formal Shoe</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="add-colors" style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">Colors (comma-separated)</label>
+                        <input id="add-colors" type="text" placeholder="black, white, red" style="width: 100%; padding: 8px 12px; font-size: 13px; border: 1px solid var(--glass-border); border-radius: 6px; color: var(--text-primary);">
+                    </div>
+                    <div>
+                        <label for="add-sizes" style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">Sizes (comma-separated)</label>
+                        <input id="add-sizes" type="text" placeholder="7, 8, 9, 10" style="width: 100%; padding: 8px 12px; font-size: 13px; border: 1px solid var(--glass-border); border-radius: 6px; color: var(--text-primary);">
+                    </div>
+                </div>
+                <button class="btn" style="padding: 10px 24px; font-size: 13px; font-weight: 600;" onclick="addNewShoeModel()">Add Shoe Model</button>
+            </div>
+
+            <p style="margin-bottom: 20px; color: var(--text-secondary);">Click on a shoe model below to expand its color/size stock adjustment grid.</p>
+            
+            <div id="inventory-list">
+                <!-- Dynamic Matrix insertion -->
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<script>
+    // Tab switching logic
+    function switchTab(tabId) {
+        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+        
+        document.getElementById('btn-tab-' + tabId).classList.add('active');
+        document.getElementById('tab-' + tabId).classList.add('active');
+    }
+
+    // Expanded Shoe Matrix state tracker
+    const openShoes = {};
+    function toggleShoeMatrix(shoeId) {
+        const matrixDiv = document.getElementById('matrix-' + shoeId);
+        if (matrixDiv.classList.contains('open')) {
+            matrixDiv.classList.remove('open');
+            openShoes[shoeId] = false;
+        } else {
+            matrixDiv.classList.add('open');
+            openShoes[shoeId] = true;
+        }
+    }
+
+    // Global State & Data Cache
+    let firebaseApp = null;
+    let db = null;
+    let isFirebaseConnected = false;
+
+    // Hardcoded Firebase Config (just like Temi Butler Admin page)
+    const firebaseConfig = {
+        apiKey: "AIzaSyBFdlZdScE_rxWYWXQA-qdLDplvB5iG18Q",
+        authDomain: "temi-shoe-mart.firebaseapp.com",
+        databaseURL: "https://temi-shoe-mart-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "temi-shoe-mart",
+        storageBucket: "temi-shoe-mart.firebasestorage.app",
+        messagingSenderId: "687134425338",
+        appId: "1:687134425338:web:6bcc905a71ac1a97c24943",
+        measurementId: "G-X0Q3J9PP85"
+    };
+
+    // In-memory offline mockup state (matches default seed)
+    let mockData = {
+        location: "none",
+        status: "idle",
+        robot_state: "idle",
+        active_order_id: "",
+        admin: {
+            notification_pending: false,
+            latest_order_id: ""
+        },
+        catalog: {
+            air_runner_2: {
+                name: "Air Runner 2", brand: "Nova", price: 89.99,
+                colors: ["black", "white", "coral", "blue"],
+                sizes: [7, 8, 9, 10, 11],
+                stock: {
+                    "black_7": 4, "black_8": 0, "black_9": 3, "black_10": 5, "black_11": 2,
+                    "white_7": 0, "white_8": 3, "white_9": 4, "white_10": 0, "white_11": 1,
+                    "coral_7": 2, "coral_8": 4, "coral_9": 0, "coral_10": 2, "coral_11": 3,
+                    "blue_7": 1, "blue_8": 2, "blue_9": 6, "blue_10": 4, "blue_11": 0
+                }
+            },
+            rugged_hiker_x: {
+                name: "Rugged Hiker X", brand: "Timber", price: 149.99,
+                colors: ["wheat", "black", "rust_brown"],
+                sizes: [8, 9, 10, 11, 12],
+                stock: {
+                    "wheat_8": 3, "wheat_9": 0, "wheat_10": 5, "wheat_11": 2, "wheat_12": 1,
+                    "black_8": 2, "black_9": 4, "black_10": 1, "black_11": 0, "black_12": 3,
+                    "rust_brown_8": 0, "rust_brown_9": 3, "rust_brown_10": 4, "rust_brown_11": 2, "rust_brown_12": 0
+                }
+            },
+            breeze_slide_z: {
+                name: "Breeze Slide Z", brand: "Cove", price: 49.99,
+                colors: ["black", "mocha", "taupe"],
+                sizes: [6, 7, 8, 9, 10],
+                stock: {
+                    "black_6": 5, "black_7": 2, "black_8": 4, "black_9": 0, "black_10": 3,
+                    "mocha_6": 0, "mocha_7": 4, "mocha_8": 2, "mocha_9": 3, "mocha_10": 1,
+                    "taupe_6": 2, "taupe_7": 0, "taupe_8": 0, "taupe_9": 4, "taupe_10": 2
+                }
+            },
+            classic_oxford: {
+                name: "Classic Oxford", brand: "Aurelius", price: 119.99,
+                colors: ["black", "mahogany"],
+                sizes: [7, 8, 9, 10, 11],
+                stock: {
+                    "black_7": 3, "black_8": 4, "black_9": 5, "black_10": 0, "black_11": 2,
+                    "mahogany_7": 2, "mahogany_8": 0, "mahogany_9": 3, "mahogany_10": 4, "mahogany_11": 1
+                }
+            },
+            air_jordan_1: {
+                name: "Air Jordan 1 Retro", brand: "Jordan", price: 170.00,
+                colors: ["red", "black", "blue"],
+                sizes: [8, 9, 10, 11],
+                stock: {
+                    "red_8": 3, "red_9": 4, "red_10": 0, "red_11": 2,
+                    "black_8": 1, "black_9": 0, "black_10": 3, "black_11": 1,
+                    "blue_8": 0, "blue_9": 2, "blue_10": 4, "blue_11": 0
+                }
+            },
+            rs_x_runner: {
+                name: "RS-X Runner", brand: "Puma", price: 110.00,
+                colors: ["white", "black", "red"],
+                sizes: [7, 8, 9, 10, 11],
+                stock: {
+                    "white_7": 3, "white_8": 4, "white_9": 0, "white_10": 2, "white_11": 1,
+                    "black_7": 2, "black_8": 0, "black_9": 3, "black_10": 4, "black_11": 0,
+                    "red_7": 0, "red_8": 2, "red_9": 1, "red_10": 0, "red_11": 3
+                }
+            },
+            stan_smith_classic: {
+                name: "Stan Smith Classic", brand: "Adidas", price: 95.00,
+                colors: ["white", "green"],
+                sizes: [6, 7, 8, 9, 10],
+                stock: {
+                    "white_6": 4, "white_7": 2, "white_8": 5, "white_9": 3, "white_10": 1,
+                    "green_6": 1, "green_7": 0, "green_8": 3, "green_9": 4, "green_10": 0
+                }
+            }
+        },
+        orders: {}
+    };
+
+    // Initialize connection automatically
+    function initApp() {
+        try {
+            firebaseApp = firebase.initializeApp(firebaseConfig);
+            db = firebaseApp.database();
+            isFirebaseConnected = true;
+            document.getElementById('connection-status').innerText = "Mode: Firebase (Online)";
+            document.getElementById('connection-status').className = "status-badge online";
+            
+            // Bind Firebase Real-Time Listeners
+            bindFirebaseListeners();
+        } catch(e) {
+            console.error("Failed to initialize Firebase connection.", e);
+            loadMockMode();
+        }
+    }
+
+    // Fallback Mock Mode Setup
+    function loadMockMode() {
+        isFirebaseConnected = false;
+        document.getElementById('connection-status').innerText = "Mode: Simulator (Offline)";
+        document.getElementById('connection-status').className = "status-badge";
+        
+        // Load custom catalog from localStorage if available
+        const savedCatalog = localStorage.getItem('shoe_catalog');
+        if (savedCatalog) {
+            try {
+                mockData.catalog = JSON.parse(savedCatalog);
+            } catch(e) {
+                console.error("Failed to parse local storage catalog", e);
+            }
+        }
+        
+        // Load default mock values
+        updateUI();
+    }
+
+    // Firebase Listener bindings
+    function bindFirebaseListeners() {
+        // Robot telemetry
+        db.ref('location').on('value', (snap) => {
+            mockData.location = snap.val() || "none";
+            document.getElementById('tel-location').innerText = mockData.location;
+        });
+
+        db.ref('status').on('value', (snap) => {
+            mockData.status = snap.val() || "idle";
+            document.getElementById('tel-status').innerText = mockData.status;
+        });
+
+        db.ref('robot_state').on('value', (snap) => {
+            mockData.robot_state = snap.val() || "idle";
+            document.getElementById('tel-state').innerText = mockData.robot_state;
+        });
+
+        db.ref('active_order_id').on('value', (snap) => {
+            mockData.active_order_id = snap.val() || "";
+            document.getElementById('tel-active-order').innerText = mockData.active_order_id || "-";
+        });
+
+        // Catalog listeners
+        db.ref('catalog').on('value', (snap) => {
+            const data = snap.val();
+            if (data && Object.keys(data).length >= 7) {
+                mockData.catalog = data;
+                renderInventoryList();
+            } else {
+                // Seed or update database with the full 7-item catalog
+                db.ref('catalog').update(mockData.catalog);
+            }
+        });
+
+        // Incoming orders
+        db.ref('orders').on('value', (snap) => {
+            mockData.orders = snap.val() || {};
+            renderOrdersList();
+        });
+    }
+
+    // Render incoming orders queue
+    function renderOrdersList() {
+        const listDiv = document.getElementById('orders-list');
+        listDiv.innerHTML = "";
+
+        const ordersArr = Object.entries(mockData.orders);
+        
+        // Filter active/ongoing/placed orders
+        const activeOrders = ordersArr.filter(([id, order]) => {
+            const st = (order.status || "").toLowerCase();
+            return st === "placed" || st === "ongoing" || st === "arrived";
+        });
+
+        if (activeOrders.length === 0) {
+            listDiv.innerHTML = `<p style="color: var(--text-secondary);">No active orders at this time.</p>`;
+            return;
+        }
+
+        activeOrders.forEach(([id, order]) => {
+            const card = document.createElement('div');
+            card.className = "order-card";
+
+            let itemsHTML = "";
+            if (order.items) {
+                Object.values(order.items).forEach(item => {
+                    const itemName = item.name || item.shoeName || "Unknown Shoe";
+                    itemsHTML += `<p>• ${itemName} (Color: ${item.color}, Size: ${item.size}) x ${item.qty}</p>`;
+                });
+            }
+
+            const isArrived = (order.status || "").toLowerCase() === "arrived";
+            const isOngoing = (order.status || "").toLowerCase() === "ongoing";
+
+            let actionButtonsHTML = "";
+            if (isArrived) {
+                actionButtonsHTML = `<button class="btn btn-secondary" onclick="completeOrder('${id}')">Complete Delivery</button>`;
+            } else if (!isOngoing) {
+                actionButtonsHTML = `<button class="btn" onclick="startDelivery('${id}')">Start Round</button>`;
+            } else {
+                actionButtonsHTML = `<span style="color: var(--brand-primary); font-weight: 600; font-size: 14px;">En Route...</span>`;
+            }
+
+            card.innerHTML = `
+                <div class="order-details">
+                    <h4>Order ID: ${id}</h4>
+                    <p style="margin-bottom: 8px;"><strong>Status:</strong> ${order.status.toUpperCase()}</p>
+                    ${itemsHTML}
+                </div>
+                <div class="order-actions">
+                    ${actionButtonsHTML}
+                </div>
+            `;
+            listDiv.appendChild(card);
+        });
+    }
+
+    // Keep track of focused element ID before rendering
+    let activeInputId = null;
+
+    // Render inventory matrix
+    function renderInventoryList() {
+        // Save currently active input ID
+        const activeEl = document.activeElement;
+        if (activeEl && activeEl.tagName === 'INPUT') {
+            activeInputId = activeEl.id;
+        }
+
+        const container = document.getElementById('inventory-list');
+        container.innerHTML = "";
+
+        for (let shoeId in mockData.catalog) {
+            const shoe = mockData.catalog[shoeId];
+            const itemDiv = document.createElement('div');
+            itemDiv.className = "shoe-item";
+
+            // Headers
+            const header = document.createElement('div');
+            header.className = "shoe-header";
+            header.onclick = () => toggleShoeMatrix(shoeId);
+            header.innerHTML = `
+                <span style="font-weight: 600; color: var(--text-primary);">${shoe.brand} - ${shoe.name}</span>
+                <span style="font-size: 14px; color: var(--brand-primary); font-weight: 600;">Click to Toggle Matrix</span>
+            `;
+            itemDiv.appendChild(header);
+
+            // Matrix Grid
+            const matrixDiv = document.createElement('div');
+            matrixDiv.className = "shoe-matrix";
+            matrixDiv.id = "matrix-" + shoeId;
+            if (openShoes[shoeId]) {
+                matrixDiv.classList.add('open');
+            }
+
+            // Draw stock table
+            let tableHTML = `
+                <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 20px; background: rgba(216, 90, 48, 0.04); padding: 12px 20px; border-radius: 8px; border: 1px solid rgba(216, 90, 48, 0.15);">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <label style="margin: 0; font-size: 14px; font-weight: 700; color: var(--text-primary);" for="price-${shoeId}">Model Price ($):</label>
+                        <input id="price-${shoeId}" type="number" step="0.01" min="0" style="width: 100px; padding: 6px 10px; font-weight: 600; border-radius: 6px; border: 1px solid var(--glass-border); background: rgba(255, 255, 255, 0.9); color: var(--text-primary);" value="${shoe.price}" onchange="updatePriceValue('${shoeId}', this.value)">
+                    </div>
+                    <button onclick="deleteShoeModel('${shoeId}')" style="margin-left: auto; background: #ef4444; color: white; border: none; padding: 6px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px;">Delete Model</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Color / Size</th>
+            `;
+            shoe.sizes.forEach(size => {
+                tableHTML += `<th>Size ${size}</th>`;
+            });
+            tableHTML += `
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            shoe.colors.forEach(color => {
+                tableHTML += `
+                    <tr>
+                        <td style="text-transform: capitalize; font-weight: 600; color: var(--text-primary);">${color}</td>
+                `;
+                shoe.sizes.forEach(size => {
+                    const key = color + "_" + size;
+                    const stockVal = shoe.stock[key] !== undefined ? shoe.stock[key] : 0;
+                    const inputId = `stock-${shoeId}-${color}-${size}`;
+                    tableHTML += `
+                        <td>
+                            <input id="${inputId}" type="number" min="0" max="999" value="${stockVal}" 
+                                   onchange="updateStockValue('${shoeId}', '${color}', ${size}, this.value)">
+                        </td>
+                    `;
+                });
+                tableHTML += `</tr>`;
+            });
+
+            tableHTML += `
+                    </tbody>
+                </table>
+            `;
+
+            matrixDiv.innerHTML = tableHTML;
+            itemDiv.appendChild(matrixDiv);
+            container.appendChild(itemDiv);
+        }
+
+        // Restore focus to active input
+        if (activeInputId) {
+            const restoreEl = document.getElementById(activeInputId);
+            if (restoreEl) {
+                restoreEl.focus();
+                // Move cursor to the end of value
+                const val = restoreEl.value;
+                restoreEl.value = "";
+                restoreEl.value = val;
+            }
+        }
+    }
+
+    // Add brand new shoe model to the catalog
+    function addNewShoeModel() {
+        const idRaw = document.getElementById('add-id').value.trim().toLowerCase().replace(/[^a-z0-9_]/g, '_');
+        const brand = document.getElementById('add-brand').value.trim();
+        const name = document.getElementById('add-name').value.trim();
+        const price = parseFloat(document.getElementById('add-price').value) || 0.0;
+        const category = document.getElementById('add-category').value;
+        const shape = document.getElementById('add-shape').value;
+        const colorsRaw = document.getElementById('add-colors').value;
+        const sizesRaw = document.getElementById('add-sizes').value;
+
+        if (!idRaw) { showToast("ID/SKU is required."); return; }
+        if (!brand) { showToast("Brand is required."); return; }
+        if (!name) { showToast("Model Name is required."); return; }
+
+        // Parse colors
+        const colors = colorsRaw.split(',').map(c => c.trim().toLowerCase()).filter(c => c.length > 0);
+        if (colors.length === 0) { showToast("At least one color is required."); return; }
+
+        // Parse sizes
+        const sizes = sizesRaw.split(',').map(s => parseInt(s.trim())).filter(s => !isNaN(s));
+        if (sizes.length === 0) { showToast("At least one size is required."); return; }
+
+        // Generate colorHex mapping automatically
+        const defaultHexMap = {
+            "black": "#1A1A1A",
+            "white": "#EAEAEA",
+            "red": "#D32F2F",
+            "blue": "#1976D2",
+            "green": "#388E3C",
+            "coral": "#D85A30",
+            "orange": "#FF9800",
+            "yellow": "#FFEB3B",
+            "grey": "#9E9E9E",
+            "gray": "#9E9E9E",
+            "brown": "#795548",
+            "wheat": "#F5DEB3"
+        };
+        const colorHex = {};
+        colors.forEach(color => {
+            colorHex[color] = defaultHexMap[color] || "#888888";
+        });
+
+        // Generate default stock mapping (10 items each)
+        const stock = {};
+        colors.forEach(color => {
+            sizes.forEach(size => {
+                stock[color + "_" + size] = 10;
+            });
+        });
+
+        const newShoe = {
+            id: idRaw,
+            brand: brand,
+            name: name,
+            price: price,
+            category: category,
+            shapeSet: shape,
+            colors: colors,
+            colorHex: colorHex,
+            sizes: sizes,
+            stock: stock
+        };
+
+        // Save new shoe
+        if (isFirebaseConnected) {
+            db.ref('catalog/' + idRaw).set(newShoe).then(() => {
+                showToast(`Successfully added ${brand} ${name} to database!`);
+            }).catch(e => {
+                showToast("Failed to save to database.");
+            });
+        } else {
+            mockData.catalog[idRaw] = newShoe;
+            localStorage.setItem('shoe_catalog', JSON.stringify(mockData.catalog));
+            updateUI();
+            showToast(`Successfully added ${brand} ${name} to mock storage!`);
+        }
+
+        // Clear Form inputs
+        document.getElementById('add-id').value = "";
+        document.getElementById('add-brand').value = "";
+        document.getElementById('add-name').value = "";
+        document.getElementById('add-price').value = "120.00";
+        document.getElementById('add-colors').value = "";
+        document.getElementById('add-sizes').value = "";
+    }
+
+    // Delete a shoe model from the catalog
+    function deleteShoeModel(shoeId) {
+        if (!confirm(`Are you sure you want to delete this shoe model (${shoeId})?`)) {
+            return;
+        }
+        if (isFirebaseConnected) {
+            db.ref('catalog/' + shoeId).remove().then(() => {
+                showToast("Successfully deleted shoe model!");
+            }).catch(e => {
+                showToast("Failed to delete from database.");
+            });
+        } else {
+            delete mockData.catalog[shoeId];
+            localStorage.setItem('shoe_catalog', JSON.stringify(mockData.catalog));
+            updateUI();
+            showToast("Successfully deleted shoe model!");
+        }
+    }
+
+    // Update Stock Value directly in database/simulator state
+    function updateStockValue(shoeId, color, size, val) {
+        const numericVal = Math.max(0, parseInt(val) || 0);
+        const key = color + "_" + size;
+
+        mockData.catalog[shoeId].stock[key] = numericVal;
+        localStorage.setItem('shoe_catalog', JSON.stringify(mockData.catalog));
+
+        if (isFirebaseConnected) {
+            db.ref('catalog/' + shoeId + '/stock/' + key).set(numericVal).catch(e => {
+                console.warn("Firebase stock update failed, fallback to local storage.", e);
+            });
+        }
+    }
+
+    // Update Shoe Price directly in database/simulator state
+    function updatePriceValue(shoeId, val) {
+        const numericVal = Math.max(0, parseFloat(val) || 0.0);
+
+        mockData.catalog[shoeId].price = numericVal;
+        localStorage.setItem('shoe_catalog', JSON.stringify(mockData.catalog));
+
+        if (isFirebaseConnected) {
+            db.ref('catalog/' + shoeId + '/price').set(numericVal).catch(e => {
+                console.warn("Firebase price update failed, fallback to local storage.", e);
+            });
+        }
+    }
+
+    // Manual dispatch controls (from top card dropdown)
+    function manualDispatchManual() {
+        const dest = document.getElementById('select-destination-manual').value;
+        if (isFirebaseConnected) {
+            db.ref('location').set(dest);
+            db.ref('status').set("manual_override_to_" + dest);
+            showToast(`Manual override sent: navigating to '${dest}'`);
+        } else {
+            mockData.location = dest;
+            mockData.status = "manual_override_to_" + dest;
+            updateUI();
+            showToast(`[Simulator Mode] Navigating mock robot to '${dest}'`);
+        }
+    }
+
+    // Reset robot back to idle
+    function resetRobotState() {
+        if (isFirebaseConnected) {
+            db.ref('location').set("none");
+            db.ref('status').set("idle");
+            db.ref('robot_state').set("idle");
+            db.ref('active_order_id').set("");
+            db.ref('current_delivering_round').set("");
+            showToast("Robot state reset successfully!");
+        } else {
+            mockData.location = "none";
+            mockData.status = "idle";
+            mockData.robot_state = "idle";
+            mockData.active_order_id = "";
+            mockData.current_delivering_round = "";
+            updateUI();
+            showToast("[Simulator Mode] Mock robot state reset to idle!");
+        }
+    }
+
+    // Order Actions
+    function startDelivery(orderId) {
+        if (isFirebaseConnected) {
+            db.ref('active_order_id').set(orderId);
+            db.ref('orders/' + orderId + '/status').set("ongoing");
+            db.ref('location').set("store_room");
+            db.ref('status').set("navigating_to_storeroom");
+        } else {
+            mockData.active_order_id = orderId;
+            mockData.orders[orderId].status = "ongoing";
+            mockData.location = "store_room";
+            mockData.status = "navigating_to_storeroom";
+            updateUI();
+        }
+    }
+
+    // Complete delivery
+    function completeOrder(orderId) {
+        if (isFirebaseConnected) {
+            db.ref('orders/' + orderId + '/status').set("complete");
+            db.ref('active_order_id').set("");
+            db.ref('location').set("pickup_zone");
+            db.ref('status').set("returning_to_pickup_zone");
+        } else {
+            mockData.orders[orderId].status = "complete";
+            mockData.active_order_id = "";
+            mockData.location = "pickup_zone";
+            mockData.status = "returning_to_pickup_zone";
+            updateUI();
+        }
+    }
+
+    // UI Local Render for Simulator fallbacks
+    function updateUI() {
+        document.getElementById('tel-location').innerText = mockData.location;
+        document.getElementById('tel-status').innerText = mockData.status;
+        document.getElementById('tel-state').innerText = mockData.robot_state;
+        document.getElementById('tel-active-order').innerText = mockData.active_order_id || "-";
+        
+        renderOrdersList();
+        renderInventoryList();
+    }
+
+    // Custom Toast Notification display
+    function showToast(message) {
+        const toast = document.getElementById('toast-message');
+        toast.innerText = message;
+        toast.style.display = 'block';
+        
+        if (window.toastTimeout) {
+            clearTimeout(window.toastTimeout);
+        }
+        
+        window.toastTimeout = setTimeout(() => {
+            toast.style.display = 'none';
+        }, 3000);
+    }
+
+    // Main Init
+    window.onload = () => {
+        // Pre-render local mockup catalog immediately so the UI is never blank
+        updateUI();
+        initApp();
+    };
+</script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+    <!-- Outer boundary stroke -->
+    <path
+        android:strokeColor="#2C2C2A"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M35,130 C35,130 32,75 42,65 C52,55 65,58 72,62 C80,66 85,82 95,92 C105,102 122,100 138,98 C154,96 172,105 180,115 C188,125 184,130 184,130 Z" />
+
+    <!-- Cupsole lines -->
+    <path
+        android:strokeColor="#2C2C2A"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:pathData="M32,130 L186,130 M34,135 L184,135" />
+
+    <!-- Side Panel / Swoosh wave -->
+    <path
+        android:strokeColor="#2C2C2A"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M95,92 C105,98 125,102 145,102 M76,96 L95,120 L130,110" />
+
+    <!-- Lacing panel -->
+    <path
+        android:strokeColor="#2C2C2A"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:pathData="M68,70 L80,78 M64,82 L76,90 M62,94 L74,102" />
+
+    <!-- Collar stitch and ankle padding detail -->
+    <path
+        android:strokeColor="#2C2C2A"
+        android:strokeWidth="2.0"
+        android:strokeLineCap="round"
+        android:pathData="M42,65 C50,68 62,68 72,62 M40,78 C46,80 54,80 58,78" />
+</vector>

@@ -1,0 +1,10 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+    <!-- Base fill layer representing the sneaker body (colored dynamically) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M30,120 C30,120 40,85 65,85 C90,85 105,70 120,65 C135,60 160,85 170,95 C180,105 185,120 185,125 C185,127 180,135 175,135 C170,135 30,135 30,135 Z" />
+</vector>

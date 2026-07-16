@@ -1,0 +1,36 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+    
+    <!-- Outer boundary stroke -->
+    <path
+        android:strokeColor="#2C2C2A"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M35,135 C35,135 30,85 30,70 C30,55 50,55 60,55 C70,55 75,70 85,85 C95,95 110,95 125,92 C140,89 165,102 173,115 C180,125 178,135 178,135 Z" />
+
+    <!-- Rugged Lug Sole and Heel Block -->
+    <path
+        android:strokeColor="#2C2C2A"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M30,135 L182,135 M30,143 L65,143 L70,135 M85,135 L88,143 L178,143 L182,135" />
+
+    <!-- Lace eyelets / Boot laces -->
+    <path
+        android:strokeColor="#2C2C2A"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:pathData="M52,65 L64,72 M48,78 L60,85 M46,92 L58,98 M48,105 L62,110" />
+
+    <!-- Leather stitching details -->
+    <path
+        android:strokeColor="#2C2C2A"
+        android:strokeWidth="2.0"
+        android:strokeLineCap="round"
+        android:pathData="M80,87 C80,87 75,105 85,120 M120,95 C120,95 130,110 145,115" />
+</vector>

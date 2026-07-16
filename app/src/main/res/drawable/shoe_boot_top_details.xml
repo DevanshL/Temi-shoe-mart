@@ -1,0 +1,35 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+    
+    <!-- Outer boundary stroke -->
+    <path
+        android:strokeColor="#2C2C2A"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M100,25 C70,25 60,60 60,100 C60,140 70,175 100,175 C130,175 140,140 140,100 C140,60 130,25 100,25 Z" />
+
+    <!-- Boot collar/opening (wider with thick padding effect) -->
+    <path
+        android:strokeColor="#2C2C2A"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:pathData="M80,120 C75,100 70,145 100,145 C130,145 125,100 120,120 C120,135 80,135 80,120 Z" />
+
+    <!-- Heavy double toe stitch -->
+    <path
+        android:strokeColor="#2C2C2A"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:pathData="M72,48 C85,58 115,58 128,48 M75,53 C85,63 115,63 125,53" />
+
+    <!-- Heavy cross laces -->
+    <path
+        android:strokeColor="#2C2C2A"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:pathData="M78,72 L122,86 M122,72 L78,86 M78,92 L122,106 M122,92 L78,106" />
+</vector>

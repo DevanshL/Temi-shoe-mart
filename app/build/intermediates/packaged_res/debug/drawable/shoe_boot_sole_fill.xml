@@ -1,0 +1,10 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+    <!-- Boot sole view fill (rugged shape) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M100,28 C80,28 66,50 66,85 C66,105 76,115 76,122 C76,130 68,148 68,160 C68,170 82,172 100,172 C118,172 132,170 132,160 C132,148 124,130 124,122 C124,115 134,105 134,85 C134,50 120,28 100,28 Z" />
+</vector>

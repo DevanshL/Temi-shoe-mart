@@ -1,0 +1,143 @@
+{
+  "location": "none",
+  "status": "idle",
+  "robot_state": "idle",
+  "active_order_id": "",
+  "admin": {
+    "notification_pending": false,
+    "latest_order_id": ""
+  },
+  "catalog": {
+    "air_runner_2": {
+      "name": "Air Runner 2",
+      "brand": "Nova",
+      "category": "Athletic & Basketball",
+      "shapeSet": "sneaker_low",
+      "price": 89.99,
+      "colors": ["black", "white", "coral", "blue"],
+      "colorHex": {
+        "black": "#2C2C2A",
+        "white": "#E8E8E8",
+        "coral": "#D85A30",
+        "blue": "#378ADD"
+      },
+      "sizes": [7, 8, 9, 10, 11],
+      "stock": {
+        "black_7": 4, "black_8": 0, "black_9": 3, "black_10": 5, "black_11": 2,
+        "white_7": 0, "white_8": 3, "white_9": 4, "white_10": 0, "white_11": 1,
+        "coral_7": 2, "coral_8": 4, "coral_9": 0, "coral_10": 2, "coral_11": 3,
+        "blue_7": 1, "blue_8": 2, "blue_9": 6, "blue_10": 4, "blue_11": 0
+      }
+    },
+    "rugged_hiker_x": {
+      "name": "Rugged Hiker X",
+      "brand": "Timber",
+      "category": "Casual & Sandals",
+      "shapeSet": "boot",
+      "price": 149.99,
+      "colors": ["wheat", "black", "rust_brown"],
+      "colorHex": {
+        "wheat": "#D2B48C",
+        "black": "#202020",
+        "rust_brown": "#8B4513"
+      },
+      "sizes": [8, 9, 10, 11, 12],
+      "stock": {
+        "wheat_8": 3, "wheat_9": 0, "wheat_10": 5, "wheat_11": 2, "wheat_12": 1,
+        "black_8": 2, "black_9": 4, "black_10": 1, "black_11": 0, "black_12": 3,
+        "rust_brown_8": 0, "rust_brown_9": 3, "rust_brown_10": 4, "rust_brown_11": 2, "rust_brown_12": 0
+      }
+    },
+    "breeze_slide_z": {
+      "name": "Breeze Slide Z",
+      "brand": "Cove",
+      "category": "Casual & Sandals",
+      "shapeSet": "sandal",
+      "price": 49.99,
+      "colors": ["black", "mocha", "taupe"],
+      "colorHex": {
+        "black": "#222222",
+        "mocha": "#5C4033",
+        "taupe": "#B38B6D"
+      },
+      "sizes": [6, 7, 8, 9, 10],
+      "stock": {
+        "black_6": 5, "black_7": 2, "black_8": 4, "black_9": 0, "black_10": 3,
+        "mocha_6": 0, "mocha_7": 4, "mocha_8": 2, "mocha_9": 3, "mocha_10": 1,
+        "taupe_6": 2, "taupe_7": 0, "taupe_8": 0, "taupe_9": 4, "taupe_10": 2
+      }
+    },
+    "classic_oxford": {
+      "name": "Classic Oxford",
+      "brand": "Aurelius",
+      "category": "Formal Classics",
+      "shapeSet": "formal",
+      "price": 119.99,
+      "colors": ["black", "mahogany"],
+      "colorHex": {
+        "black": "#1A1A1A",
+        "mahogany": "#4A0E17"
+      },
+      "sizes": [7, 8, 9, 10, 11],
+      "stock": {
+        "black_7": 3, "black_8": 4, "black_9": 5, "black_10": 0, "black_11": 2,
+        "mahogany_7": 2, "mahogany_8": 0, "mahogany_9": 3, "mahogany_10": 4, "mahogany_11": 1
+      }
+    },
+    "air_jordan_1": {
+      "name": "Air Jordan 1 Retro",
+      "brand": "Jordan",
+      "category": "Athletic & Basketball",
+      "shapeSet": "boot",
+      "price": 170.00,
+      "colors": ["red", "black", "blue"],
+      "colorHex": {
+        "red": "#D32F2F",
+        "black": "#1A1A1A",
+        "blue": "#1976D2"
+      },
+      "sizes": [8, 9, 10, 11],
+      "stock": {
+        "red_8": 3, "red_9": 4, "red_10": 0, "red_11": 2,
+        "black_8": 1, "black_9": 0, "black_10": 3, "black_11": 1,
+        "blue_8": 0, "blue_9": 2, "blue_10": 4, "blue_11": 0
+      }
+    },
+    "rs_x_runner": {
+      "name": "RS-X Runner",
+      "brand": "Puma",
+      "category": "Athletic & Basketball",
+      "shapeSet": "sneaker_low",
+      "price": 110.00,
+      "colors": ["white", "black", "red"],
+      "colorHex": {
+        "white": "#F5F5F5",
+        "black": "#2C2C2A",
+        "red": "#D85A30"
+      },
+      "sizes": [7, 8, 9, 10, 11],
+      "stock": {
+        "white_7": 3, "white_8": 4, "white_9": 0, "white_10": 2, "white_11": 1,
+        "black_7": 2, "black_8": 0, "black_9": 3, "black_10": 4, "black_11": 0,
+        "red_7": 0, "red_8": 2, "red_9": 1, "red_10": 0, "red_11": 3
+      }
+    },
+    "stan_smith_classic": {
+      "name": "Stan Smith Classic",
+      "brand": "Adidas",
+      "category": "Casual & Sandals",
+      "shapeSet": "sneaker_low",
+      "price": 95.00,
+      "colors": ["white", "green"],
+      "colorHex": {
+        "white": "#EAEAEA",
+        "green": "#2E7D32"
+      },
+      "sizes": [6, 7, 8, 9, 10],
+      "stock": {
+        "white_6": 4, "white_7": 2, "white_8": 5, "white_9": 3, "white_10": 1,
+        "green_6": 1, "green_7": 0, "green_8": 3, "green_9": 4, "green_10": 0
+      }
+    }
+  }
+}

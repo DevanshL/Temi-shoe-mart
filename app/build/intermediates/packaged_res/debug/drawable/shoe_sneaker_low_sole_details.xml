@@ -1,0 +1,41 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+    
+    <!-- Outer boundary stroke -->
+    <path
+        android:strokeColor="#2C2C2A"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M100,32 C82,32 70,55 70,85 C70,105 80,115 80,125 C80,135 73,150 73,158 C73,165 85,168 100,168 C115,168 127,165 127,158 C127,150 120,135 120,125 C120,115 130,105 130,85 C130,55 118,32 100,32 Z" />
+
+    <!-- Forefoot horizontal grip lines -->
+    <path
+        android:strokeColor="#2C2C2A"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:pathData="M78,50 L122,50 M74,60 L126,60 M72,70 L128,70 M71,80 L129,80" />
+
+    <!-- Circular Pivot point in forefoot -->
+    <path
+        android:strokeColor="#2C2C2A"
+        android:strokeWidth="2.5"
+        android:pathData="M100,50 A6,6 0 1,1 99.9,50 Z" />
+
+    <!-- Shank/Waist midfoot lines -->
+    <path
+        android:strokeColor="#2C2C2A"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:pathData="M83,105 L117,105 M81,118 L119,118" />
+
+    <!-- Heel grip pattern -->
+    <path
+        android:strokeColor="#2C2C2A"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:pathData="M76,140 L124,140 M75,150 L125,150 M78,160 L122,160" />
+</vector>

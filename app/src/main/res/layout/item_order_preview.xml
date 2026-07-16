@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://tools.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="80dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="8dp"
+    android:background="@drawable/glass_card_bg"
+    android:backgroundTint="#0A000000"
+    android:padding="10dp">
+
+    <!-- Layered Vector Shoe Preview -->
+    <FrameLayout
+        android:id="@+id/preview_image_container"
+        android:layout_width="60dp"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/preview_shoe_fill"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/shoe_sneaker_low_side_fill"
+            android:scaleType="fitCenter" />
+
+        <ImageView
+            android:id="@+id/preview_shoe_details"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/shoe_sneaker_low_side_details"
+            android:scaleType="fitCenter" />
+    </FrameLayout>
+
+    <!-- Info Column -->
+    <TextView
+        android:id="@+id/preview_item_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="14dp"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:textColor="@color/text_primary"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@id/preview_item_qty"
+        app:layout_constraintStart_toEndOf="@id/preview_image_container"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Air Runner 2" />
+
+    <TextView
+        android:id="@+id/preview_item_variant"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="14dp"
+        android:layout_marginTop="4dp"
+        android:textColor="@color/text_secondary"
+        android:textSize="13sp"
+        app:layout_constraintEnd_toStartOf="@id/preview_item_qty"
+        app:layout_constraintStart_toEndOf="@id/preview_image_container"
+        app:layout_constraintTop_toBottomOf="@id/preview_item_name"
+        tools:text="Black | Size 9" />
+
+    <!-- Quantity Indicator on Right -->
+    <TextView
+        android:id="@+id/preview_item_qty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/glass_card_bg"
+        android:backgroundTint="@color/coral_primary"
+        android:gravity="center"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Qty: 1" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
