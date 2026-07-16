@@ -237,10 +237,23 @@ public class FirebaseRepo {
         activeOrderId = orderId;
         mockActiveOrderItems = new ArrayList<>(items);
         
-        callback.onOrderSuccess(orderId);
-        
-        // Trigger mock robot travel cycle in 2 seconds
-        triggerMockRobotTrip(orderId);
+        boolean isRobot = false;
+        try {
+            com.robotemi.sdk.Robot.getInstance();
+            isRobot = true;
+        } catch (Exception ignored) {}
+
+        if (isRobot) {
+            // On physical Temi: set status immediately and let physical movements drive transitions
+            robotLocation = "stockroom";
+            robotStatus = "traveling_storeroom";
+            robotState = "moving";
+            callback.onOrderSuccess(orderId);
+        } else {
+            // On emulator: run simulator timers
+            callback.onOrderSuccess(orderId);
+            triggerMockRobotTrip(orderId);
+        }
     }
 
     public void getActiveOrderItems(String orderId, final OrderDetailsCallback callback) {

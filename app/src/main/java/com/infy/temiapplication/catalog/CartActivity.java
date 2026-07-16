@@ -24,7 +24,7 @@ import com.infy.temiapplication.data.FirebaseRepo;
 import java.util.Locale;
 
 public class CartActivity extends AppCompatActivity {
-    private static final int TIMEOUT_DELAY_MS = 90000;
+    private static final int TIMEOUT_DELAY_MS = 20000;
 
     private RecyclerView recyclerView;
     private CartAdapter adapter;

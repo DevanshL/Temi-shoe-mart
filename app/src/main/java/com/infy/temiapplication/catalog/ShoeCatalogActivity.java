@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ShoeCatalogActivity extends AppCompatActivity {
-    private static final int TIMEOUT_DELAY_MS = 90000; // 90 seconds
+    private static final int TIMEOUT_DELAY_MS = 20000; // 20 seconds
 
     private RecyclerView recyclerView;
     private ShoeCatalogAdapter adapter;

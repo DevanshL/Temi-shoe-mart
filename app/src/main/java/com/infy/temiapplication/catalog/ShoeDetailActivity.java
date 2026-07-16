@@ -31,7 +31,7 @@ import com.infy.temiapplication.model.Shoe;
 import java.util.Locale;
 
 public class ShoeDetailActivity extends AppCompatActivity {
-    private static final int TIMEOUT_DELAY_MS = 90000;
+    private static final int TIMEOUT_DELAY_MS = 20000;
 
     private Shoe shoe;
     private String selectedAngle = "side";

@@ -416,8 +416,8 @@
                 <div class="input-group-custom">
                     <span class="input-label">Send Temi to</span>
                     <select id="select-destination-manual">
-                        <option value="store_room">store_room</option>
-                        <option value="pickup_zone">pickup_zone</option>
+                        <option value="stockroom">stockroom</option>
+                        <option value="display area">display area</option>
                         <option value="home base">home base</option>
                     </select>
                     <button class="btn-go" onclick="manualDispatchManual()">Go</button>
@@ -789,7 +789,10 @@
             header.onclick = () => toggleShoeMatrix(shoeId);
             header.innerHTML = `
                 <span style="font-weight: 600; color: var(--text-primary);">${shoe.brand} - ${shoe.name}</span>
-                <span style="font-size: 14px; color: var(--brand-primary); font-weight: 600;">Click to Toggle Matrix</span>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <span style="font-size: 13px; color: var(--brand-primary); font-weight: 600;">Click to Toggle Matrix</span>
+                    <button style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; padding: 6px 12px; font-size: 12px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.2s;" onclick="event.stopPropagation(); deleteShoeModel('${shoeId}')">Delete Model</button>
+                </div>
             `;
             itemDiv.appendChild(header);
 
@@ -808,7 +811,6 @@
                         <label style="margin: 0; font-size: 14px; font-weight: 700; color: var(--text-primary);" for="price-${shoeId}">Model Price ($):</label>
                         <input id="price-${shoeId}" type="number" step="0.01" min="0" style="width: 100px; padding: 6px 10px; font-weight: 600; border-radius: 6px; border: 1px solid var(--glass-border); background: rgba(255, 255, 255, 0.9); color: var(--text-primary);" value="${shoe.price}" onchange="updatePriceValue('${shoeId}', this.value)">
                     </div>
-                    <button onclick="deleteShoeModel('${shoeId}')" style="margin-left: auto; background: #ef4444; color: white; border: none; padding: 6px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px;">Delete Model</button>
                 </div>
                 <table>
                     <thead>
@@ -953,22 +955,23 @@
         document.getElementById('add-sizes').value = "";
     }
 
-    // Delete a shoe model from the catalog
+    // Delete existing shoe model from catalog
     function deleteShoeModel(shoeId) {
-        if (!confirm(`Are you sure you want to delete this shoe model (${shoeId})?`)) {
+        if (!confirm(`Are you sure you want to delete the shoe model "${mockData.catalog[shoeId].brand} - ${mockData.catalog[shoeId].name}"?`)) {
             return;
         }
+
         if (isFirebaseConnected) {
             db.ref('catalog/' + shoeId).remove().then(() => {
-                showToast("Successfully deleted shoe model!");
+                showToast("Shoe model deleted successfully from database.");
             }).catch(e => {
-                showToast("Failed to delete from database.");
+                showToast("Failed to delete shoe model.");
             });
         } else {
             delete mockData.catalog[shoeId];
             localStorage.setItem('shoe_catalog', JSON.stringify(mockData.catalog));
             updateUI();
-            showToast("Successfully deleted shoe model!");
+            showToast("Shoe model deleted from mock storage.");
         }
     }
 
@@ -1041,12 +1044,12 @@
         if (isFirebaseConnected) {
             db.ref('active_order_id').set(orderId);
             db.ref('orders/' + orderId + '/status').set("ongoing");
-            db.ref('location').set("store_room");
+            db.ref('location').set("stockroom");
             db.ref('status').set("navigating_to_storeroom");
         } else {
             mockData.active_order_id = orderId;
             mockData.orders[orderId].status = "ongoing";
-            mockData.location = "store_room";
+            mockData.location = "stockroom";
             mockData.status = "navigating_to_storeroom";
             updateUI();
         }
@@ -1057,12 +1060,12 @@
         if (isFirebaseConnected) {
             db.ref('orders/' + orderId + '/status').set("complete");
             db.ref('active_order_id').set("");
-            db.ref('location').set("pickup_zone");
+            db.ref('location').set("display area");
             db.ref('status').set("returning_to_pickup_zone");
         } else {
             mockData.orders[orderId].status = "complete";
             mockData.active_order_id = "";
-            mockData.location = "pickup_zone";
+            mockData.location = "display area";
             mockData.status = "returning_to_pickup_zone";
             updateUI();
         }
