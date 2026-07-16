@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
             // Prevent spamming
             btnStartOrdering.setEnabled(false);
             speakTTS("Hi welcome! Please add items into cart and place order.");
-            Toast.makeText(MainActivity.this, "Welcome! Please add items into cart and place order.", Toast.LENGTH_LONG).show();
+            Toast.makeText(MainActivity.this, "Hi Welcome! Please add items into cart and place order.", Toast.LENGTH_LONG).show();
             Intent intent = new Intent(MainActivity.this, ShoeCatalogActivity.class);
             startActivity(intent);
         });
@@ -185,7 +185,7 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
                 btnStatusOk.setEnabled(true);
                 btnStatusOk.setText("Shoes Loaded");
                 textStatusTitle.setText(R.string.status_arrived_storeroom);
-                textStatusInstructions.setText("Staff: Please load the ordered shoes into Temi's tray, then press 'Shoes Loaded' below.");
+                textStatusInstructions.setText("Waiting for Staff to load the ordered shoes into Temi's tray, then press 'Shoes Loaded' button.");
                 
                 // Fetch and display items to load
                 displayActiveOrderItemsList();
@@ -199,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
                 imgArrived.setVisibility(View.GONE);
                 btnStatusOk.setVisibility(View.GONE);
                 textStatusTitle.setText(R.string.status_traveling_pickup);
-                textStatusInstructions.setText("Order loaded! Temi is traveling to the pickup zone. Please meet Temi there.");
+                textStatusInstructions.setText("Order loaded! Temi is traveling to the display zone");
                 speakTTSOnce(getString(R.string.tts_heading_to_pickup), "traveling_pickup");
                 goToLocation(LOC_PICKUP);
                 break;
@@ -211,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
                 btnStatusOk.setEnabled(true);
                 btnStatusOk.setText("Collect Shoes");
                 textStatusTitle.setText(R.string.status_arrived_pickup);
-                textStatusInstructions.setText("Customer: Please take your shoes from the tray, then press 'Collect Shoes' below to complete order.");
+                textStatusInstructions.setText("Please take your shoes from the tray, then press 'Collect Shoes' below to complete order.");
                 
                 // Fetch and display items to collect
                 displayActiveOrderItemsList();

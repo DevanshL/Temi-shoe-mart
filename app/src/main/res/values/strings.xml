@@ -32,11 +32,11 @@
     <string name="total_label">Total:</string>
     
     <!-- Robot TTS Wording -->
-    <string name="tts_start_trip">Order submitted. I am heading to the store room. See you at the pickup zone soon.</string>
-    <string name="tts_arrived_storeroom">Hello staff! Please load the ordered shoes into my storage bin and press the button on my screen when done.</string>
-    <string name="tts_heading_to_pickup">Shoes loaded. I am traveling to the pickup zone to deliver them.</string>
-    <string name="tts_arrived_pickup">Hello! I have arrived with your shoes. Please collect your order and tap the button on my screen when you are finished.</string>
-    <string name="tts_order_complete">Thank you for shopping! I am returning to my home base.</string>
+    <string name="tts_start_trip">Order submitted. I am heading to the stockroom. See you at the display zone soon.</string>
+    <string name="tts_arrived_storeroom">Hello staff! Please load the ordered shoes and press the button on screen when done</string>
+    <string name="tts_heading_to_pickup">Shoes loaded. I am traveling to the display zone to deliver them.</string>
+    <string name="tts_arrived_pickup">Hello! I have arrived with your shoes. Please collect your order and tap the button on the screen when you are done.</string>
+    <string name="tts_order_complete">Thank you for shopping!</string>
     
     <!-- Kiosk Warnings -->
     <string name="timeout_warning">Are you still ordering? Resetting in %d seconds…</string>
