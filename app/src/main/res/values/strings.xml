@@ -11,8 +11,8 @@
     <string name="status_idle">Kiosk is idle. Tap start to order.</string>
     <string name="status_traveling_storeroom">Traveling to store room for loading…</string>
     <string name="status_arrived_storeroom">Arrived at Store Room. Loading in progress.</string>
-    <string name="status_traveling_pickup">Traveling to Display Zone…</string>
-    <string name="status_arrived_pickup">Arrived at Display Zone. Please collect your shoes.</string>
+    <string name="status_traveling_pickup">Traveling to Showroom…</string>
+    <string name="status_arrived_pickup">Arrived at Showroom. Please collect your shoes.</string>
     
     <!-- Detail Screen -->
     <string name="angle_side">Side View</string>
@@ -32,9 +32,9 @@
     <string name="total_label">Total:</string>
     
     <!-- Robot TTS Wording -->
-    <string name="tts_start_trip">Order submitted. I am heading to the stockroom. See you at the display zone soon.</string>
+    <string name="tts_start_trip">Order submitted. I am heading to the stockroom. See you at the showroom soon.</string>
     <string name="tts_arrived_storeroom">Hello staff! Please load the ordered shoes and press the button on screen when done</string>
-    <string name="tts_heading_to_pickup">Shoes loaded. I am traveling to the display zone to deliver them.</string>
+    <string name="tts_heading_to_pickup">Shoes loaded. I am traveling to the showroom to deliver them.</string>
     <string name="tts_arrived_pickup">Hello! I have arrived with your shoes. Please collect your order and tap the button on the screen when you are done.</string>
     <string name="tts_order_complete">Thank you for shopping!</string>
     

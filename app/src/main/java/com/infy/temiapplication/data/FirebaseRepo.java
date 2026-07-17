@@ -217,7 +217,9 @@ public class FirebaseRepo {
                     MutableData stockVal = currentData.child(relStockPath);
                     Integer currentStock = stockVal.getValue(Integer.class);
                     if (currentStock == null) {
-                        return Transaction.abort(); // Catalog item not found
+                        // Write placeholder to force Firebase to fetch the real stock value from the server
+                        stockVal.setValue(0);
+                        currentStock = 0;
                     }
                     if (currentStock < item.getQty()) {
                         return Transaction.abort(); // Insufficient stock
@@ -230,7 +232,8 @@ public class FirebaseRepo {
                     MutableData stockVal = currentData.child(relStockPath);
                     Integer currentStock = stockVal.getValue(Integer.class);
                     if (currentStock == null) {
-                        return Transaction.abort();
+                        stockVal.setValue(0);
+                        currentStock = 0;
                     }
                     stockVal.setValue(currentStock - item.getQty());
                 }
@@ -244,7 +247,13 @@ public class FirebaseRepo {
                     // Stock transaction committed! Write order metadata directly to Firebase
                     writeOrderAndStatesToFirebase(orderId, items, callback);
                 } else {
-                    String reason = error != null ? error.getMessage() : "Insufficient stock for one or more items.";
+                    String reason;
+                    if (error != null) {
+                        reason = "Database error: " + error.getMessage();
+                    } else {
+                        reason = "Transaction aborted - stock check failed or database connection unavailable.";
+                    }
+                    Log.e(TAG, "Order transaction failed: " + reason);
                     callback.onOrderFailed(reason);
                 }
             }

@@ -28,7 +28,7 @@ import android.graphics.Color;
 import java.util.Locale;
 
 public class CartActivity extends AppCompatActivity {
-    private static final int TIMEOUT_DELAY_MS = 20000;
+    private static final int TIMEOUT_DELAY_MS = 60000; // 60 seconds
 
     private RecyclerView recyclerView;
     private CartAdapter adapter;
@@ -139,10 +139,23 @@ public class CartActivity extends AppCompatActivity {
     }
 
     private void submitOrderToRepo() {
+        // Set a timeout handler to dismiss the dialog and alert if the database server doesn't respond in 8 seconds
+        final Handler timeoutHandler = new Handler();
+        final Runnable timeoutRunnable = new Runnable() {
+            @Override
+            public void run() {
+                dismissProgressDialog();
+                btnPlaceOrder.setEnabled(true);
+                Toast.makeText(CartActivity.this, "Order Timeout: Database connection unavailable. Please check your internet.", Toast.LENGTH_LONG).show();
+            }
+        };
+        timeoutHandler.postDelayed(timeoutRunnable, 8000); // 8 seconds timeout
+
         FirebaseRepo.getInstance().submitOrder(CartSession.getCartItems(), new FirebaseRepo.OrderCallback() {
             @Override
             public void onOrderSuccess(final String orderId) {
                 runOnUiThread(() -> {
+                    timeoutHandler.removeCallbacks(timeoutRunnable);
                     dismissProgressDialog();
                     Toast.makeText(CartActivity.this, "Order placed successfully! Delivery starting.", Toast.LENGTH_LONG).show();
                     CartSession.clear();
@@ -158,6 +171,7 @@ public class CartActivity extends AppCompatActivity {
             @Override
             public void onOrderFailed(final String reason) {
                 runOnUiThread(() -> {
+                    timeoutHandler.removeCallbacks(timeoutRunnable);
                     dismissProgressDialog();
                     Toast.makeText(CartActivity.this, "Order Failed: " + reason, Toast.LENGTH_LONG).show();
                     btnPlaceOrder.setEnabled(true); // Re-enable so they can fix their cart or retry

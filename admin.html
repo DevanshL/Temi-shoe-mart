@@ -417,7 +417,7 @@
                     <span class="input-label">Send Temi to</span>
                     <select id="select-destination-manual">
                         <option value="stockroom">stockroom</option>
-                        <option value="display area">display area</option>
+                        <option value="showroom">showroom</option>
                         <option value="home base">home base</option>
                     </select>
                     <button class="btn-go" onclick="manualDispatchManual()">Go</button>
@@ -1001,24 +1001,48 @@
         if (sizes.length === 0) { showToast("At least one size is required."); return; }
 
         // Generate colorHex mapping automatically
-        const defaultHexMap = {
-            "black": "#1A1A1A",
-            "white": "#EAEAEA",
-            "red": "#D32F2F",
-            "blue": "#1976D2",
-            "green": "#388E3C",
-            "coral": "#FF6B6B",
-            "cyan": "#00BCD4",
-            "orange": "#FF9800",
-            "yellow": "#FFEB3B",
-            "grey": "#9E9E9E",
-            "gray": "#9E9E9E",
-            "brown": "#795548",
-            "wheat": "#F5DEB3"
-        };
+        // Helper to dynamically resolve any standard HTML/CSS color name using the browser engine
+        function colorNameToHex(colorName) {
+            const overrides = {
+                "mahogany": "#4A0E17",
+                "taupe": "#B38B6D",
+                "mocha": "#5C4033",
+                "wheat": "#D2B48C",
+                "rust_brown": "#8B4513",
+                "coral": "#FF6B6B", // Custom pinker coral
+                "black": "#1A1A1A",
+                "white": "#EAEAEA",
+                "red": "#D32F2F"
+            };
+            
+            const clean = colorName.trim().toLowerCase();
+            if (overrides[clean]) {
+                return overrides[clean];
+            }
+
+            try {
+                const div = document.createElement('div');
+                div.style.color = clean;
+                document.body.appendChild(div);
+                const computed = window.getComputedStyle(div).color;
+                document.body.removeChild(div);
+                
+                const match = computed.match(/\d+/g);
+                if (match && match.length >= 3) {
+                    const r = parseInt(match[0]);
+                    const g = parseInt(match[1]);
+                    const b = parseInt(match[2]);
+                    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+                }
+            } catch (e) {
+                console.error("Error parsing color: " + clean, e);
+            }
+            return "#888888"; // Fallback grey
+        }
+
         const colorHex = {};
         colors.forEach(color => {
-            colorHex[color] = defaultHexMap[color] || "#888888";
+            colorHex[color] = colorNameToHex(color);
         });
 
         // Generate default stock mapping (10 items each)
@@ -1213,12 +1237,12 @@
         if (isFirebaseConnected) {
             db.ref('orders/' + orderId + '/status').set("complete");
             db.ref('active_order_id').set("");
-            db.ref('location').set("display area");
+            db.ref('location').set("showroom");
             db.ref('status').set("returning_to_pickup_zone");
         } else {
             mockData.orders[orderId].status = "complete";
             mockData.active_order_id = "";
-            mockData.location = "display area";
+            mockData.location = "showroom";
             mockData.status = "returning_to_pickup_zone";
             updateUI();
         }

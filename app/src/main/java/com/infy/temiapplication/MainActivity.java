@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
 
     // Temi Location Name Constants (adjust to match robot map configuration)
     public static final String LOC_STOREROOM = "stockroom";
-    public static final String LOC_PICKUP = "display area";
+    public static final String LOC_PICKUP = "showroom";
     public static final String LOC_HOME = "home base";
 
     private Robot robot;
@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
     private String currentLocation = "none";
     private boolean isTemiAvailable = false;
     private String lastNavigatedLocation = "";
+    private String targetLocationBeforeBlock = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -201,7 +202,7 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
                 imgArrived.setVisibility(View.GONE);
                 btnStatusOk.setVisibility(View.GONE);
                 textStatusTitle.setText(R.string.status_traveling_pickup);
-                textStatusInstructions.setText("Order loaded! Temi is traveling to the display zone");
+                textStatusInstructions.setText("Order loaded! Temi is traveling to the showroom");
                 speakTTSOnce(getString(R.string.tts_heading_to_pickup), "traveling_pickup");
                 goToLocation(LOC_PICKUP);
                 break;
@@ -257,12 +258,12 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
                 goToLocation(LOC_STOREROOM);
                 break;
 
-            case "manual_override_to_display area":
+            case "manual_override_to_showroom":
                 progressTravel.setVisibility(View.VISIBLE);
                 imgArrived.setVisibility(View.GONE);
                 btnStatusOk.setVisibility(View.GONE);
                 textStatusTitle.setText("Manual Override");
-                textStatusInstructions.setText("Temi is navigating to the Display Area under manual control...");
+                textStatusInstructions.setText("Temi is navigating to the Showroom under manual control...");
                 goToLocation(LOC_PICKUP);
                 break;
 
@@ -436,7 +437,10 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
             String targetLoc = LOC_STOREROOM;
             String nextStatus = "traveling_storeroom";
             
-            if ("pickup_zone".equalsIgnoreCase(currentLocation) || "display area".equalsIgnoreCase(currentLocation) || LOC_PICKUP.equalsIgnoreCase(currentLocation)) {
+            // Check where the robot was heading before it got blocked
+            if (LOC_PICKUP.equalsIgnoreCase(targetLocationBeforeBlock) || 
+                "display area".equalsIgnoreCase(targetLocationBeforeBlock) || 
+                "pickup_zone".equalsIgnoreCase(targetLocationBeforeBlock)) {
                 targetLoc = LOC_PICKUP;
                 nextStatus = "traveling_pickup";
             }
@@ -453,6 +457,7 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
             return;
         }
         lastNavigatedLocation = location;
+        targetLocationBeforeBlock = location;
 
         if (isTemiAvailable) {
             try {

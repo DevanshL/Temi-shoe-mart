@@ -8,7 +8,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.infy.temiapplication"
+        applicationId = "com.infy.temishoeapplication"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
