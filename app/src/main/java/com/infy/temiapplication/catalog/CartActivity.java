@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AlertDialog;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,6 +22,9 @@ import com.infy.temiapplication.R;
 import com.infy.temiapplication.data.CartSession;
 import com.infy.temiapplication.data.FirebaseRepo;
 
+import android.widget.ProgressBar;
+import android.view.Gravity;
+import android.graphics.Color;
 import java.util.Locale;
 
 public class CartActivity extends AppCompatActivity {
@@ -34,6 +38,7 @@ public class CartActivity extends AppCompatActivity {
     private MaterialButton btnPlaceOrder;
     private LinearLayout layoutEmptyCart;
     private ConstraintLayout cardCheckoutSummary;
+    private AlertDialog progressDialog;
 
     private final Handler timeoutHandler = new Handler(Looper.getMainLooper());
     private final Runnable timeoutRunnable = new Runnable() {
@@ -76,10 +81,44 @@ public class CartActivity extends AppCompatActivity {
 
         btnPlaceOrder.setOnClickListener(v -> {
             btnPlaceOrder.setEnabled(false); // Disable to prevent double submission
+            showProgressDialog();
             submitOrderToRepo();
         });
 
         updateCartUI();
+    }
+
+    private void showProgressDialog() {
+        if (progressDialog == null) {
+            LinearLayout layout = new LinearLayout(this);
+            layout.setOrientation(LinearLayout.HORIZONTAL);
+            layout.setPadding(60, 60, 60, 60);
+            layout.setGravity(Gravity.CENTER_VERTICAL);
+
+            ProgressBar progressBar = new ProgressBar(this);
+            progressBar.setIndeterminate(true);
+            progressBar.setPadding(0, 0, 40, 0);
+
+            TextView textView = new TextView(this);
+            textView.setText("Placing your order... Please wait.");
+            textView.setTextSize(18);
+            textView.setTextColor(Color.BLACK);
+
+            layout.addView(progressBar);
+            layout.addView(textView);
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setCancelable(false);
+            builder.setView(layout);
+            progressDialog = builder.create();
+        }
+        progressDialog.show();
+    }
+
+    private void dismissProgressDialog() {
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
     }
 
     private void updateCartUI() {
@@ -104,6 +143,7 @@ public class CartActivity extends AppCompatActivity {
             @Override
             public void onOrderSuccess(final String orderId) {
                 runOnUiThread(() -> {
+                    dismissProgressDialog();
                     Toast.makeText(CartActivity.this, "Order placed successfully! Delivery starting.", Toast.LENGTH_LONG).show();
                     CartSession.clear();
                     
@@ -118,6 +158,7 @@ public class CartActivity extends AppCompatActivity {
             @Override
             public void onOrderFailed(final String reason) {
                 runOnUiThread(() -> {
+                    dismissProgressDialog();
                     Toast.makeText(CartActivity.this, "Order Failed: " + reason, Toast.LENGTH_LONG).show();
                     btnPlaceOrder.setEnabled(true); // Re-enable so they can fix their cart or retry
                 });

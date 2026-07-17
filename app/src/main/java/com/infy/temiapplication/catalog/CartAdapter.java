@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.infy.temiapplication.R;
 import com.infy.temiapplication.data.CartSession;
+import com.infy.temiapplication.data.FirebaseRepo;
 import com.infy.temiapplication.model.CartItem;
 
 import java.util.List;
@@ -91,6 +92,40 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
             }
         }
 
+        holder.textQtyValue.setText(String.valueOf(item.getQty()));
+
+        // Setup increment click (checking real-time Firebase stock limits)
+        holder.btnQtyPlus.setOnClickListener(v -> {
+            com.infy.temiapplication.model.Shoe shoe = FirebaseRepo.getInstance().getCachedShoe(item.getShoeId());
+            int stock = shoe != null ? shoe.getStockFor(item.getColor(), item.getSize()) : 999;
+            if (item.getQty() < stock) {
+                item.setQty(item.getQty() + 1);
+                notifyDataSetChanged();
+                if (listener != null) {
+                    listener.onCartUpdated();
+                }
+            } else {
+                android.widget.Toast.makeText(context, "Cannot add more. Stock limit reached.", android.widget.Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Setup decrement click (removes item if quantity drops below 1)
+        holder.btnQtyMinus.setOnClickListener(v -> {
+            if (item.getQty() > 1) {
+                item.setQty(item.getQty() - 1);
+                notifyDataSetChanged();
+                if (listener != null) {
+                    listener.onCartUpdated();
+                }
+            } else {
+                CartSession.removeItem(position);
+                notifyDataSetChanged();
+                if (listener != null) {
+                    listener.onCartUpdated();
+                }
+            }
+        });
+
         // Setup delete click
         holder.btnDelete.setOnClickListener(v -> {
             CartSession.removeItem(position);
@@ -112,6 +147,9 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
         TextView textName;
         TextView textDetails;
         TextView textSubtotal;
+        ImageButton btnQtyMinus;
+        ImageButton btnQtyPlus;
+        TextView textQtyValue;
         ImageButton btnDelete;
 
         public ViewHolder(@NonNull View itemView) {
@@ -121,6 +159,9 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
             textName = itemView.findViewById(R.id.cart_row_name);
             textDetails = itemView.findViewById(R.id.cart_row_details);
             textSubtotal = itemView.findViewById(R.id.cart_row_price);
+            btnQtyMinus = itemView.findViewById(R.id.btn_cart_qty_minus);
+            btnQtyPlus = itemView.findViewById(R.id.btn_cart_qty_plus);
+            textQtyValue = itemView.findViewById(R.id.text_cart_qty_value);
             btnDelete = itemView.findViewById(R.id.btn_delete_cart_row);
         }
     }

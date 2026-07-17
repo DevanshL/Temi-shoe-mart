@@ -301,7 +301,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@android:drawable/ic_delete"
+                android:src="@drawable/ic_minus"
                 app:tint="@color/text_primary" />
 
             <TextView
@@ -319,7 +319,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@android:drawable/ic_input_add"
+                android:src="@drawable/ic_plus"
                 app:tint="@color/text_primary" />
         </LinearLayout>
 

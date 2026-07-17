@@ -11,8 +11,8 @@
     <string name="status_idle">Kiosk is idle. Tap start to order.</string>
     <string name="status_traveling_storeroom">Traveling to store room for loading…</string>
     <string name="status_arrived_storeroom">Arrived at Store Room. Loading in progress.</string>
-    <string name="status_traveling_pickup">Traveling to Pickup Zone…</string>
-    <string name="status_arrived_pickup">Arrived at Pickup Zone. Please collect your shoes.</string>
+    <string name="status_traveling_pickup">Traveling to Display Zone…</string>
+    <string name="status_arrived_pickup">Arrived at Display Zone. Please collect your shoes.</string>
     
     <!-- Detail Screen -->
     <string name="angle_side">Side View</string>

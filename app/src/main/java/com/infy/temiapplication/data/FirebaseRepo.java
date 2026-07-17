@@ -26,11 +26,13 @@ public class FirebaseRepo {
     private static FirebaseRepo instance;
 
     // Toggle this to enable actual Firebase Realtime Database
-    private boolean useFirebase = false;
+    private boolean useFirebase = true;
 
     private DatabaseReference dbRef;
     private List<Shoe> localCatalog = new ArrayList<>();
     private final List<RobotStateCallback> robotStateCallbacks = new ArrayList<>();
+    private final List<Shoe> cachedCatalog = new ArrayList<>();
+    private final List<CatalogCallback> catalogCallbacks = new ArrayList<>();
     
     // In-memory states for offline mocking
     private String robotLocation = "none";
@@ -39,6 +41,9 @@ public class FirebaseRepo {
     private String activeOrderId = "";
     private List<CartItem> mockActiveOrderItems = new ArrayList<>();
     private final Handler mockHandler = new Handler(Looper.getMainLooper());
+
+    private ValueEventListener catalogListener;
+    private boolean rootListenerAttached = false;
 
     public interface CatalogCallback {
         void onCatalogLoaded(List<Shoe> catalog);
@@ -64,13 +69,14 @@ public class FirebaseRepo {
     }
 
     private FirebaseRepo() {
+        initLocalCatalog();
         try {
             dbRef = FirebaseDatabase.getInstance().getReference();
+            startCatalogRealtimeSync();
         } catch (Exception e) {
             Log.w(TAG, "Firebase not initialized. Defaulting to Local/Mock mode.");
             useFirebase = false;
         }
-        initLocalCatalog();
     }
 
     public static synchronized FirebaseRepo getInstance() {
@@ -85,10 +91,13 @@ public class FirebaseRepo {
         if (useFirebase && dbRef == null) {
             try {
                 dbRef = FirebaseDatabase.getInstance().getReference();
+                startCatalogRealtimeSync();
             } catch (Exception e) {
                 Log.e(TAG, "Could not initialize Firebase Reference. Falling back to local.", e);
                 this.useFirebase = false;
             }
+        } else if (useFirebase) {
+            startCatalogRealtimeSync();
         }
     }
 
@@ -96,15 +105,21 @@ public class FirebaseRepo {
         return useFirebase;
     }
 
-    // --- Catalog Loading ---
-    public void getCatalog(final CatalogCallback callback) {
-        if (!useFirebase) {
-            // Return copy of local in-memory catalog
-            callback.onCatalogLoaded(new ArrayList<>(localCatalog));
-            return;
+    public Shoe getCachedShoe(String shoeId) {
+        synchronized (cachedCatalog) {
+            for (Shoe s : cachedCatalog) {
+                if (s.getId().equals(shoeId)) {
+                    return s;
+                }
+            }
         }
+        return null;
+    }
 
-        dbRef.child("catalog").addListenerForSingleValueEvent(new ValueEventListener() {
+    private void startCatalogRealtimeSync() {
+        if (!useFirebase || dbRef == null || catalogListener != null) return;
+
+        catalogListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 List<Shoe> list = new ArrayList<>();
@@ -115,14 +130,61 @@ public class FirebaseRepo {
                         list.add(shoe);
                     }
                 }
-                callback.onCatalogLoaded(list);
+                
+                synchronized (cachedCatalog) {
+                    cachedCatalog.clear();
+                    cachedCatalog.addAll(list);
+                }
+                notifyCatalogCallbacks(list);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                callback.onError(error.toException());
+                Log.e(TAG, "Catalog sync cancelled: " + error.getMessage());
             }
-        });
+        };
+
+        dbRef.child("catalog").addValueEventListener(catalogListener);
+    }
+
+    // --- Catalog Loading ---
+    public void getCatalog(final CatalogCallback callback) {
+        if (!useFirebase) {
+            callback.onCatalogLoaded(new ArrayList<>(localCatalog));
+            return;
+        }
+
+        startCatalogRealtimeSync(); // Ensure synchronization is active
+
+        synchronized (cachedCatalog) {
+            if (!cachedCatalog.isEmpty()) {
+                // Return cache immediately for instant loading
+                callback.onCatalogLoaded(new ArrayList<>(cachedCatalog));
+            } else {
+                // Fallback to local catalog during first loading so screen is never blank
+                callback.onCatalogLoaded(new ArrayList<>(localCatalog));
+            }
+        }
+
+        if (callback != null && !catalogCallbacks.contains(callback)) {
+            catalogCallbacks.add(callback);
+        }
+    }
+
+    public void removeCatalogCallback(CatalogCallback callback) {
+        if (callback != null) {
+            catalogCallbacks.remove(callback);
+        }
+    }
+
+    private void notifyCatalogCallbacks(List<Shoe> list) {
+        for (CatalogCallback cb : new ArrayList<>(catalogCallbacks)) {
+            try {
+                cb.onCatalogLoaded(new ArrayList<>(list));
+            } catch (Exception e) {
+                Log.e(TAG, "Error notifying catalog callback", e);
+            }
+        }
     }
 
     // --- Order Placement with Real-Time Stock Verification ---
@@ -137,19 +199,22 @@ public class FirebaseRepo {
             return;
         }
 
-        // Run multi-item stock check and ordering inside a transaction to prevent race conditions
+        // Run stock check transaction ONLY on the "catalog" path to prevent root-node retry conflicts
         final String orderId = "ORD_" + System.currentTimeMillis();
         
-        // Dynamic stock checking transaction
-        dbRef.runTransaction(new Transaction.Handler() {
+        dbRef.child("catalog").runTransaction(new Transaction.Handler() {
             @NonNull
             @Override
             public Transaction.Result doTransaction(@NonNull MutableData currentData) {
-                // Verify all items are in stock
+                // If catalog snapshot is empty/null, let it proceed to allow server sync
+                if (currentData.getValue() == null) {
+                    return Transaction.success(currentData);
+                }
+
+                // Verify stock for all items
                 for (CartItem item : items) {
-                    String stockPath = "catalog/" + item.getShoeId() + "/stock/" + item.getColor().toLowerCase() + "_" + item.getSize();
-                    MutableData stockVal = currentData.child(stockPath);
-                    
+                    String relStockPath = item.getShoeId() + "/stock/" + item.getColor().toLowerCase() + "_" + item.getSize();
+                    MutableData stockVal = currentData.child(relStockPath);
                     Integer currentStock = stockVal.getValue(Integer.class);
                     if (currentStock == null) {
                         return Transaction.abort(); // Catalog item not found
@@ -159,39 +224,16 @@ public class FirebaseRepo {
                     }
                 }
 
-                // If check passes, deduct stock
+                // Deduct stock
                 for (CartItem item : items) {
-                    String stockPath = "catalog/" + item.getShoeId() + "/stock/" + item.getColor().toLowerCase() + "_" + item.getSize();
-                    MutableData stockVal = currentData.child(stockPath);
+                    String relStockPath = item.getShoeId() + "/stock/" + item.getColor().toLowerCase() + "_" + item.getSize();
+                    MutableData stockVal = currentData.child(relStockPath);
                     Integer currentStock = stockVal.getValue(Integer.class);
+                    if (currentStock == null) {
+                        return Transaction.abort();
+                    }
                     stockVal.setValue(currentStock - item.getQty());
                 }
-
-                // Write order entry
-                String orderPath = "orders/" + orderId;
-                MutableData orderData = currentData.child(orderPath);
-                
-                Map<String, Object> orderMap = new HashMap<>();
-                List<Map<String, Object>> itemMaps = new ArrayList<>();
-                for (CartItem item : items) {
-                    Map<String, Object> itemMap = new HashMap<>();
-                    itemMap.put("shoeId", item.getShoeId());
-                    itemMap.put("name", item.getShoeName());
-                    itemMap.put("color", item.getColor());
-                    itemMap.put("size", item.getSize());
-                    itemMap.put("qty", item.getQty());
-                    itemMap.put("price", item.getPrice());
-                    itemMaps.add(itemMap);
-                }
-                orderMap.put("items", itemMaps);
-                orderMap.put("status", "pending");
-                orderMap.put("createdAt", System.currentTimeMillis());
-                orderData.setValue(orderMap);
-
-                // Update active states
-                currentData.child("active_order_id").setValue(orderId);
-                currentData.child("admin/notification_pending").setValue(true);
-                currentData.child("admin/latest_order_id").setValue(orderId);
 
                 return Transaction.success(currentData);
             }
@@ -199,11 +241,48 @@ public class FirebaseRepo {
             @Override
             public void onComplete(DatabaseError error, boolean committed, DataSnapshot currentData) {
                 if (committed && error == null) {
-                    callback.onOrderSuccess(orderId);
+                    // Stock transaction committed! Write order metadata directly to Firebase
+                    writeOrderAndStatesToFirebase(orderId, items, callback);
                 } else {
                     String reason = error != null ? error.getMessage() : "Insufficient stock for one or more items.";
                     callback.onOrderFailed(reason);
                 }
+            }
+        });
+    }
+
+    private void writeOrderAndStatesToFirebase(final String orderId, final List<CartItem> items, final OrderCallback callback) {
+        Map<String, Object> orderMap = new HashMap<>();
+        List<Map<String, Object>> itemMaps = new ArrayList<>();
+        for (CartItem item : items) {
+            Map<String, Object> itemMap = new HashMap<>();
+            itemMap.put("shoeId", item.getShoeId());
+            itemMap.put("name", item.getShoeName());
+            itemMap.put("color", item.getColor());
+            itemMap.put("size", item.getSize());
+            itemMap.put("qty", item.getQty());
+            itemMap.put("price", item.getPrice());
+            itemMaps.add(itemMap);
+        }
+        orderMap.put("items", itemMaps);
+        orderMap.put("status", "pending");
+        orderMap.put("createdAt", System.currentTimeMillis());
+
+        // Perform direct writes in a single updateChildren call to prevent transaction conflicts on unrelated keys
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("orders/" + orderId, orderMap);
+        updates.put("active_order_id", orderId);
+        updates.put("location", "moving");
+        updates.put("status", "traveling_storeroom");
+        updates.put("robot_state", "moving");
+        updates.put("admin/notification_pending", true);
+        updates.put("admin/latest_order_id", orderId);
+
+        dbRef.updateChildren(updates, (databaseError, databaseReference) -> {
+            if (databaseError == null) {
+                callback.onOrderSuccess(orderId);
+            } else {
+                callback.onOrderFailed(databaseError.getMessage());
             }
         });
     }
@@ -291,6 +370,10 @@ public class FirebaseRepo {
         callback.onStateChanged(robotLocation, robotStatus, robotState, activeOrderId);
 
         if (!useFirebase) return;
+
+        // Only attach the actual Firebase listener ONCE, ever
+        if (rootListenerAttached) return;
+        rootListenerAttached = true;
 
         dbRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -384,7 +467,7 @@ public class FirebaseRepo {
         List<String> colors1 = new ArrayList<>();
         colors1.add("black"); colors1.add("white"); colors1.add("coral"); colors1.add("blue");
         Map<String, String> cHex1 = new HashMap<>();
-        cHex1.put("black", "#2C2C2A"); cHex1.put("white", "#E8E8E8"); cHex1.put("coral", "#D85A30"); cHex1.put("blue", "#378ADD");
+        cHex1.put("black", "#2C2C2A"); cHex1.put("white", "#E8E8E8"); cHex1.put("coral", "#FF6B6B"); cHex1.put("blue", "#378ADD");
         List<Integer> sizes1 = new ArrayList<>();
         sizes1.add(7); sizes1.add(8); sizes1.add(9); sizes1.add(10); sizes1.add(11);
         Map<String, Integer> stock1 = new HashMap<>();
@@ -449,7 +532,7 @@ public class FirebaseRepo {
         List<String> colors6 = new ArrayList<>();
         colors6.add("white"); colors6.add("black"); colors6.add("red");
         Map<String, String> cHex6 = new HashMap<>();
-        cHex6.put("white", "#F5F5F5"); cHex6.put("black", "#2C2C2A"); cHex6.put("red", "#D85A30");
+        cHex6.put("white", "#F5F5F5"); cHex6.put("black", "#2C2C2A"); cHex6.put("red", "#D32F2F");
         List<Integer> sizes6 = new ArrayList<>();
         sizes6.add(7); sizes6.add(8); sizes6.add(9); sizes6.add(10); sizes6.add(11);
         Map<String, Integer> stock6 = new HashMap<>();

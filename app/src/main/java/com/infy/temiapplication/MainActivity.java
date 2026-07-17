@@ -150,7 +150,9 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
     }
 
     private void updateStatusUI() {
-        if (currentActiveOrderId == null || currentActiveOrderId.isEmpty()) {
+        boolean isManualOverride = currentStatus != null && currentStatus.startsWith("manual_override_to_");
+
+        if (!isManualOverride && (currentActiveOrderId == null || currentActiveOrderId.isEmpty())) {
             // Kiosk is Idle: Show welcome screen
             containerWelcome.setVisibility(View.VISIBLE);
             containerTravelStatus.setVisibility(View.GONE);
@@ -158,7 +160,7 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
             return;
         }
 
-        // Delivery Active: Hide start order screen
+        // Delivery Active or Manual Override: Hide start order screen
         containerWelcome.setVisibility(View.GONE);
         containerTravelStatus.setVisibility(View.VISIBLE);
 
@@ -236,7 +238,16 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
                 textStatusInstructions.setText("Temi is returning to the staging area...");
                 goToLocation(LOC_PICKUP);
                 break;
-
+            case "blocked":
+                progressTravel.setVisibility(View.GONE);
+                imgArrived.setVisibility(View.VISIBLE);
+                btnStatusOk.setVisibility(View.VISIBLE);
+                btnStatusOk.setEnabled(true);
+                btnStatusOk.setText("Retry");
+                textStatusTitle.setText("Path Blocked");
+                textStatusInstructions.setText("Temi is blocked by an obstacle. Please clear the path and tap 'Retry' to continue.");
+                speakTTSOnce("Excuse me, my path is blocked. Please clear the way.", "blocked");
+                break;
             case "manual_override_to_stockroom":
                 progressTravel.setVisibility(View.VISIBLE);
                 imgArrived.setVisibility(View.GONE);
@@ -383,7 +394,7 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
         if ("arrived_storeroom".equals(currentStatus)) {
             // Staff loaded shoes, ready to head to pickup
             speakTTS(getString(R.string.tts_heading_to_pickup));
-            repo.updateRobotStateInDatabase(LOC_PICKUP, "traveling_pickup", "moving", currentActiveOrderId);
+            repo.updateRobotStateInDatabase("moving", "traveling_pickup", "moving", currentActiveOrderId);
             
             // Command physical robot to navigate
             goToLocation(LOC_PICKUP);
@@ -406,14 +417,13 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
 
             if (batteryPct <= 30) {
                 // Low battery: Go to Home Base charging dock
-                repo.updateRobotStateInDatabase(LOC_HOME, "returning_home", "moving", "");
+                repo.updateRobotStateInDatabase("moving", "returning_home", "moving", "");
                 goToLocation(LOC_HOME);
                 Toast.makeText(this, "Order completed! Battery low (" + batteryPct + "%), returning to home base.", Toast.LENGTH_LONG).show();
             } else {
-                // Battery is fine: Go back to Staging/Pickup area to wait for next order
-                repo.updateRobotStateInDatabase(LOC_PICKUP, "returning_staging", "moving", "");
-                goToLocation(LOC_PICKUP);
-                Toast.makeText(this, "Order completed! Returning to staging area.", Toast.LENGTH_LONG).show();
+                // Battery is fine: Already at Staging/Pickup area (LOC_PICKUP), so transition to idle directly!
+                repo.updateRobotStateInDatabase(LOC_PICKUP, "idle", "idle", "");
+                Toast.makeText(this, "Order completed!", Toast.LENGTH_LONG).show();
             }
 
             // Redirect back to catalog screen immediately so new users can browse
@@ -421,6 +431,19 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
             finish();
+        } else if ("blocked".equals(currentStatus)) {
+            // Obstacle cleared, retry navigation to the target zone
+            String targetLoc = LOC_STOREROOM;
+            String nextStatus = "traveling_storeroom";
+            
+            if ("pickup_zone".equalsIgnoreCase(currentLocation) || "display area".equalsIgnoreCase(currentLocation) || LOC_PICKUP.equalsIgnoreCase(currentLocation)) {
+                targetLoc = LOC_PICKUP;
+                nextStatus = "traveling_pickup";
+            }
+            
+            speakTTS("Resuming delivery round.");
+            repo.updateRobotStateInDatabase("moving", nextStatus, "moving", currentActiveOrderId);
+            goToLocation(targetLoc);
         }
     }
 
@@ -459,26 +482,33 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
     public void onGoToLocationStatusChanged(String location, String status, int descriptionId, String description) {
         Log.d(TAG, "Temi GoTo Location Status: " + location + ", status: " + status);
         
+        // Defensive: Fall back to lastNavigatedLocation if SDK returned empty string
+        String resolvedLocation = (location == null || location.isEmpty()) ? lastNavigatedLocation : location;
+
         // Handle physical arrival triggers to sync with Firebase
         if ("complete".equalsIgnoreCase(status)) {
             lastNavigatedLocation = ""; // Reset navigation cache upon arrival
-            if (LOC_STOREROOM.equalsIgnoreCase(location)) {
-                speakTTSOnce(getString(R.string.tts_arrived_storeroom), "arrived_storeroom");
-                repo.updateRobotStateInDatabase(LOC_STOREROOM, "arrived_storeroom", "arrived_store_room", currentActiveOrderId);
-            } else if (LOC_PICKUP.equalsIgnoreCase(location)) {
+            if (LOC_STOREROOM.equalsIgnoreCase(resolvedLocation)) {
+                if (currentActiveOrderId == null || currentActiveOrderId.isEmpty()) {
+                    repo.updateRobotStateInDatabase("none", "idle", "idle", "");
+                } else {
+                    speakTTSOnce(getString(R.string.tts_arrived_storeroom), "arrived_storeroom");
+                    repo.updateRobotStateInDatabase(LOC_STOREROOM, "arrived_storeroom", "arrived_store_room", currentActiveOrderId);
+                }
+            } else if (LOC_PICKUP.equalsIgnoreCase(resolvedLocation)) {
                 if (currentActiveOrderId == null || currentActiveOrderId.isEmpty()) {
                     repo.updateRobotStateInDatabase("none", "idle", "idle", "");
                 } else {
                     speakTTSOnce(getString(R.string.tts_arrived_pickup), "arrived_pickup");
                     repo.updateRobotStateInDatabase(LOC_PICKUP, "arrived_pickup", "arrived_pickup_zone", currentActiveOrderId);
                 }
-            } else if (LOC_HOME.equalsIgnoreCase(location)) {
+            } else if (LOC_HOME.equalsIgnoreCase(resolvedLocation)) {
                 repo.updateRobotStateInDatabase("none", "idle", "idle", "");
             }
         } else if ("abort".equalsIgnoreCase(status) || 
                    "reject".equalsIgnoreCase(status)) {
             lastNavigatedLocation = ""; // Reset navigation cache on abort to allow retries
-            repo.updateRobotStateInDatabase(location, "blocked", "blocked", currentActiveOrderId);
+            repo.updateRobotStateInDatabase("moving", "blocked", "blocked", currentActiveOrderId);
             speakTTS("Excuse me, my path is blocked. Please clear the way.");
         }
     }

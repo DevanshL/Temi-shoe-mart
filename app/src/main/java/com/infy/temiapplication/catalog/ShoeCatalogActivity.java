@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ShoeCatalogActivity extends AppCompatActivity {
-    private static final int TIMEOUT_DELAY_MS = 20000; // 20 seconds
+    private static final int TIMEOUT_DELAY_MS = 60000; // 60 seconds
 
     private RecyclerView recyclerView;
     private ShoeCatalogAdapter adapter;
@@ -88,24 +88,27 @@ public class ShoeCatalogActivity extends AppCompatActivity {
         loadCatalogData();
     }
 
+    private final FirebaseRepo.CatalogCallback catalogCallback = new FirebaseRepo.CatalogCallback() {
+        @Override
+        public void onCatalogLoaded(List<Shoe> catalog) {
+            runOnUiThread(() -> adapter.updateList(catalog));
+        }
+
+        @Override
+        public void onError(Exception e) {
+            runOnUiThread(() -> Toast.makeText(ShoeCatalogActivity.this, "Failed to load catalog.", Toast.LENGTH_LONG).show());
+        }
+    };
+
     @Override
     protected void onPause() {
         super.onPause();
         stopTimeout();
+        FirebaseRepo.getInstance().removeCatalogCallback(catalogCallback);
     }
 
     private void loadCatalogData() {
-        FirebaseRepo.getInstance().getCatalog(new FirebaseRepo.CatalogCallback() {
-            @Override
-            public void onCatalogLoaded(List<Shoe> catalog) {
-                runOnUiThread(() -> adapter.updateList(catalog));
-            }
-
-            @Override
-            public void onError(Exception e) {
-                runOnUiThread(() -> Toast.makeText(ShoeCatalogActivity.this, "Failed to load catalog.", Toast.LENGTH_LONG).show());
-            }
-        });
+        FirebaseRepo.getInstance().getCatalog(catalogCallback);
     }
 
     private void updateCartBadge() {

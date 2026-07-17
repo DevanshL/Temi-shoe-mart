@@ -505,6 +505,65 @@
     </main>
 </div>
 
+<!-- Custom Confirmation Modal -->
+<div id="confirm-modal" style="
+    display: none; 
+    position: fixed; 
+    top: 0; left: 0; 
+    width: 100vw; height: 100vh; 
+    background: rgba(0, 0, 0, 0.4); 
+    backdrop-filter: blur(8px); 
+    z-index: 10000; 
+    justify-content: center; 
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+">
+    <div id="confirm-modal-box" style="
+        background: rgba(255, 255, 255, 0.96); 
+        border-radius: 16px; 
+        padding: 30px; 
+        width: 440px; 
+        max-width: 90%; 
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 20px 45px rgba(0,0,0,0.18);
+        text-align: center;
+        transform: scale(0.9);
+        transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    ">
+        <div style="font-size: 40px; margin-bottom: 12px;">⚠️</div>
+        <h3 style="margin: 0 0 10px 0; color: #1E1E1E; font-size: 20px; font-weight: 800; font-family: sans-serif;">Confirm Deletion</h3>
+        <p id="confirm-modal-text" style="margin: 0 0 24px 0; color: #5E5E5E; font-size: 15px; line-height: 1.6; font-family: sans-serif;"></p>
+        <div style="display: flex; gap: 12px; justify-content: center;">
+            <button id="confirm-modal-cancel" style="
+                background: #E5E5E5; 
+                color: #2E2E2E; 
+                border: none; 
+                padding: 10px 24px; 
+                font-weight: 700; 
+                border-radius: 8px; 
+                cursor: pointer;
+                font-size: 14px;
+                font-family: sans-serif;
+                transition: background 0.2s;
+            " onmouseover="this.style.background='#D5D5D5'" onmouseout="this.style.background='#E5E5E5'">Cancel</button>
+            <button id="confirm-modal-ok" style="
+                background: #E15A30; 
+                color: white; 
+                border: none; 
+                padding: 10px 24px; 
+                font-weight: 700; 
+                border-radius: 8px; 
+                cursor: pointer;
+                font-size: 14px;
+                font-family: sans-serif;
+                box-shadow: 0 4px 10px rgba(225, 90, 48, 0.3);
+                transition: background 0.2s;
+            " onmouseover="this.style.background='#C54A20'" onmouseout="this.style.background='#E15A30'">Delete</button>
+        </div>
+    </div>
+</div>
+
 <script>
     // Tab switching logic
     function switchTab(tabId) {
@@ -560,6 +619,9 @@
                 name: "Air Runner 2", brand: "Nova", price: 89.99,
                 colors: ["black", "white", "coral", "blue"],
                 sizes: [7, 8, 9, 10, 11],
+                category: "Athletic & Basketball",
+                shapeSet: "sneaker_low",
+                colorHex: { "black": "#2C2C2A", "white": "#E8E8E8", "coral": "#FF6B6B", "blue": "#378ADD" },
                 stock: {
                     "black_7": 4, "black_8": 0, "black_9": 3, "black_10": 5, "black_11": 2,
                     "white_7": 0, "white_8": 3, "white_9": 4, "white_10": 0, "white_11": 1,
@@ -571,6 +633,9 @@
                 name: "Rugged Hiker X", brand: "Timber", price: 149.99,
                 colors: ["wheat", "black", "rust_brown"],
                 sizes: [8, 9, 10, 11, 12],
+                category: "Casual & Sandals",
+                shapeSet: "boot",
+                colorHex: { "wheat": "#D2B48C", "black": "#202020", "rust_brown": "#8B4513" },
                 stock: {
                     "wheat_8": 3, "wheat_9": 0, "wheat_10": 5, "wheat_11": 2, "wheat_12": 1,
                     "black_8": 2, "black_9": 4, "black_10": 1, "black_11": 0, "black_12": 3,
@@ -581,6 +646,9 @@
                 name: "Breeze Slide Z", brand: "Cove", price: 49.99,
                 colors: ["black", "mocha", "taupe"],
                 sizes: [6, 7, 8, 9, 10],
+                category: "Casual & Sandals",
+                shapeSet: "sandal",
+                colorHex: { "black": "#222222", "mocha": "#5C4033", "taupe": "#B38B6D" },
                 stock: {
                     "black_6": 5, "black_7": 2, "black_8": 4, "black_9": 0, "black_10": 3,
                     "mocha_6": 0, "mocha_7": 4, "mocha_8": 2, "mocha_9": 3, "mocha_10": 1,
@@ -591,6 +659,9 @@
                 name: "Classic Oxford", brand: "Aurelius", price: 119.99,
                 colors: ["black", "mahogany"],
                 sizes: [7, 8, 9, 10, 11],
+                category: "Formal Classics",
+                shapeSet: "formal",
+                colorHex: { "black": "#1A1A1A", "mahogany": "#4A0E17" },
                 stock: {
                     "black_7": 3, "black_8": 4, "black_9": 5, "black_10": 0, "black_11": 2,
                     "mahogany_7": 2, "mahogany_8": 0, "mahogany_9": 3, "mahogany_10": 4, "mahogany_11": 1
@@ -600,6 +671,9 @@
                 name: "Air Jordan 1 Retro", brand: "Jordan", price: 170.00,
                 colors: ["red", "black", "blue"],
                 sizes: [8, 9, 10, 11],
+                category: "Athletic & Basketball",
+                shapeSet: "boot",
+                colorHex: { "red": "#D32F2F", "black": "#1A1A1A", "blue": "#1976D2" },
                 stock: {
                     "red_8": 3, "red_9": 4, "red_10": 0, "red_11": 2,
                     "black_8": 1, "black_9": 0, "black_10": 3, "black_11": 1,
@@ -610,6 +684,9 @@
                 name: "RS-X Runner", brand: "Puma", price: 110.00,
                 colors: ["white", "black", "red"],
                 sizes: [7, 8, 9, 10, 11],
+                category: "Athletic & Basketball",
+                shapeSet: "sneaker_low",
+                colorHex: { "white": "#F5F5F5", "black": "#2C2C2A", "red": "#D32F2F" },
                 stock: {
                     "white_7": 3, "white_8": 4, "white_9": 0, "white_10": 2, "white_11": 1,
                     "black_7": 2, "black_8": 0, "black_9": 3, "black_10": 4, "black_11": 0,
@@ -620,6 +697,9 @@
                 name: "Stan Smith Classic", brand: "Adidas", price: 95.00,
                 colors: ["white", "green"],
                 sizes: [6, 7, 8, 9, 10],
+                category: "Casual & Sandals",
+                shapeSet: "sneaker_low",
+                colorHex: { "white": "#EAEAEA", "green": "#2E7D32" },
                 stock: {
                     "white_6": 4, "white_7": 2, "white_8": 5, "white_9": 3, "white_10": 1,
                     "green_6": 1, "green_7": 0, "green_8": 3, "green_9": 4, "green_10": 0
@@ -692,12 +772,41 @@
         // Catalog listeners
         db.ref('catalog').on('value', (snap) => {
             const data = snap.val();
+            let needsUpdate = false;
             if (data && Object.keys(data).length >= 7) {
+                for (const key of Object.keys(data)) {
+                    if (!data[key].colorHex || !data[key].category || !data[key].shapeSet) {
+                        needsUpdate = true;
+                        break;
+                    }
+                }
+            } else {
+                needsUpdate = true;
+            }
+
+            if (!needsUpdate) {
                 mockData.catalog = data;
                 renderInventoryList();
             } else {
-                // Seed or update database with the full 7-item catalog
-                db.ref('catalog').update(mockData.catalog);
+                console.log("[Seeding/Healing] Merging missing catalog properties (colorHex/category/shapeSet) into Firebase...");
+                const updateObj = {};
+                for (const key of Object.keys(mockData.catalog)) {
+                    const defaultItem = mockData.catalog[key];
+                    const dbItem = (data && data[key]) ? data[key] : {};
+                    
+                    updateObj[key] = {
+                        name: dbItem.name || defaultItem.name,
+                        brand: dbItem.brand || defaultItem.brand,
+                        price: dbItem.price !== undefined ? dbItem.price : defaultItem.price,
+                        colors: dbItem.colors || defaultItem.colors,
+                        sizes: dbItem.sizes || defaultItem.sizes,
+                        stock: dbItem.stock || defaultItem.stock,
+                        colorHex: dbItem.colorHex || defaultItem.colorHex,
+                        category: dbItem.category || defaultItem.category,
+                        shapeSet: dbItem.shapeSet || defaultItem.shapeSet
+                    };
+                }
+                db.ref('catalog').update(updateObj);
             }
         });
 
@@ -898,7 +1007,8 @@
             "red": "#D32F2F",
             "blue": "#1976D2",
             "green": "#388E3C",
-            "coral": "#D85A30",
+            "coral": "#FF6B6B",
+            "cyan": "#00BCD4",
             "orange": "#FF9800",
             "yellow": "#FFEB3B",
             "grey": "#9E9E9E",
@@ -955,9 +1065,52 @@
         document.getElementById('add-sizes').value = "";
     }
 
+    // Custom confirm modal display helper
+    function showCustomConfirm(message) {
+        return new Promise((resolve) => {
+            const modal = document.getElementById('confirm-modal');
+            const box = document.getElementById('confirm-modal-box');
+            const textEl = document.getElementById('confirm-modal-text');
+            const cancelBtn = document.getElementById('confirm-modal-cancel');
+            const okBtn = document.getElementById('confirm-modal-ok');
+            
+            textEl.innerText = message;
+            
+            // Animation start
+            modal.style.display = "flex";
+            modal.style.opacity = "0";
+            box.style.transform = "scale(0.9)";
+            
+            // Force reflow
+            modal.offsetHeight;
+            
+            modal.style.opacity = "1";
+            box.style.transform = "scale(1)";
+            
+            const cleanup = (result) => {
+                modal.style.opacity = "0";
+                box.style.transform = "scale(0.9)";
+                setTimeout(() => {
+                    modal.style.display = "none";
+                }, 250);
+                
+                // Clear listeners
+                cancelBtn.onclick = null;
+                okBtn.onclick = null;
+                
+                resolve(result);
+            };
+            
+            cancelBtn.onclick = () => cleanup(false);
+            okBtn.onclick = () => cleanup(true);
+        });
+    }
+
     // Delete existing shoe model from catalog
-    function deleteShoeModel(shoeId) {
-        if (!confirm(`Are you sure you want to delete the shoe model "${mockData.catalog[shoeId].brand} - ${mockData.catalog[shoeId].name}"?`)) {
+    async function deleteShoeModel(shoeId) {
+        const message = `Are you sure you want to delete the shoe model "${mockData.catalog[shoeId].brand} - ${mockData.catalog[shoeId].name}"?`;
+        const confirmed = await showCustomConfirm(message);
+        if (!confirmed) {
             return;
         }
 

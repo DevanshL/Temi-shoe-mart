@@ -38,6 +38,7 @@ public class ShoeDetailActivity extends AppCompatActivity {
     private String selectedColor = "";
     private int selectedSize = -1;
     private int quantity = 1;
+    private FirebaseRepo.CatalogCallback catalogCallback;
 
     // UI elements
     private ImageView imageShoeFill;
@@ -101,8 +102,7 @@ public class ShoeDetailActivity extends AppCompatActivity {
             return;
         }
 
-        // Fetch catalog details
-        FirebaseRepo.getInstance().getCatalog(new FirebaseRepo.CatalogCallback() {
+        catalogCallback = new FirebaseRepo.CatalogCallback() {
             @Override
             public void onCatalogLoaded(java.util.List<Shoe> catalog) {
                 for (Shoe s : catalog) {
@@ -129,7 +129,10 @@ public class ShoeDetailActivity extends AppCompatActivity {
                     finish();
                 });
             }
-        });
+        };
+
+        // Fetch catalog details
+        FirebaseRepo.getInstance().getCatalog(catalogCallback);
 
         // Top Toolbar navigation hooks
         btnBack.setOnClickListener(v -> finish());
@@ -603,6 +606,7 @@ public class ShoeDetailActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         stopTimeout();
+        FirebaseRepo.getInstance().removeCatalogCallback(catalogCallback);
     }
 
     private void resetTimeout() {
