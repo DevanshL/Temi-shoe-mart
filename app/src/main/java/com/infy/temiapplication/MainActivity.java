@@ -319,7 +319,11 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
                         ImageView imageFill = itemView.findViewById(R.id.preview_shoe_fill);
                         ImageView imageDetails = itemView.findViewById(R.id.preview_shoe_details);
 
-                        nameText.setText(item.getShoeName());
+                        if (item.getBrand() != null && !item.getBrand().isEmpty()) {
+                            nameText.setText(String.format("%s - %s", item.getBrand(), item.getShoeName()));
+                        } else {
+                            nameText.setText(item.getShoeName());
+                        }
                         String capitalizedColor = item.getColor().substring(0, 1).toUpperCase(Locale.ROOT) + item.getColor().substring(1);
                         variantText.setText(String.format(Locale.US, "%s | Size %d", capitalizedColor, item.getSize()));
                         qtyText.setText(String.format(Locale.US, "Qty: %d", item.getQty()));

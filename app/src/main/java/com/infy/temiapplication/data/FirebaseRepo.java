@@ -266,7 +266,11 @@ public class FirebaseRepo {
         for (CartItem item : items) {
             Map<String, Object> itemMap = new HashMap<>();
             itemMap.put("shoeId", item.getShoeId());
+            itemMap.put("shoeName", item.getShoeName());
             itemMap.put("name", item.getShoeName());
+            itemMap.put("brand", item.getBrand());
+            itemMap.put("shapeSet", item.getShapeSet());
+            itemMap.put("colorHex", item.getColorHex());
             itemMap.put("color", item.getColor());
             itemMap.put("size", item.getSize());
             itemMap.put("qty", item.getQty());
