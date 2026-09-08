@@ -824,10 +824,10 @@
 
         const ordersArr = Object.entries(mockData.orders);
         
-        // Filter active/ongoing/placed orders
+        // Filter active/ongoing/placed/pending orders
         const activeOrders = ordersArr.filter(([id, order]) => {
             const st = (order.status || "").toLowerCase();
-            return st === "placed" || st === "ongoing" || st === "arrived";
+            return st && !["complete", "completed", "cancelled", "canceled"].includes(st);
         });
 
         if (activeOrders.length === 0) {

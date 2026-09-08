@@ -443,19 +443,19 @@ public class FirebaseRepo {
     private void triggerMockRobotTrip(final String orderId) {
         // Step 1: Heading to Store room
         mockHandler.postDelayed(() -> {
-            updateRobotStateInDatabase("store_room", "traveling_storeroom", "moving", orderId);
+            updateRobotStateInDatabase("stockroom", "traveling_storeroom", "moving", orderId);
             
             // Step 2: Arrived at store room (Wait for load)
             mockHandler.postDelayed(() -> {
-                updateRobotStateInDatabase("store_room", "arrived_storeroom", "arrived_store_room", orderId);
+                updateRobotStateInDatabase("stockroom", "arrived_storeroom", "arrived_store_room", orderId);
                 
                 // Normally admin panel triggers departure, we'll auto-simulate it after 5 seconds of loading
                 mockHandler.postDelayed(() -> {
-                    updateRobotStateInDatabase("pickup_zone", "traveling_pickup", "moving", orderId);
+                    updateRobotStateInDatabase("showroom", "traveling_pickup", "moving", orderId);
                     
                     // Step 3: Arrived at pickup zone
                     mockHandler.postDelayed(() -> {
-                        updateRobotStateInDatabase("pickup_zone", "arrived_pickup", "arrived_pickup_zone", orderId);
+                        updateRobotStateInDatabase("showroom", "arrived_pickup", "arrived_pickup_zone", orderId);
                     }, 5000);
                     
                 }, 6000);
