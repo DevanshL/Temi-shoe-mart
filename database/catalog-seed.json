@@ -1,143 +1,897 @@
 {
-  "location": "none",
-  "status": "idle",
-  "robot_state": "idle",
   "active_order_id": "",
   "admin": {
-    "notification_pending": false,
-    "latest_order_id": ""
+    "latest_order_id": "ORD_1784617315875",
+    "notification_pending": true
   },
   "catalog": {
-    "air_runner_2": {
-      "name": "Air Runner 2",
-      "brand": "Nova",
+    "air_jordan_1": {
+      "brand": "Jordan",
       "category": "Athletic & Basketball",
-      "shapeSet": "sneaker_low",
-      "price": 89.99,
-      "colors": ["black", "white", "coral", "blue"],
       "colorHex": {
-        "black": "#2C2C2A",
-        "white": "#E8E8E8",
-        "coral": "#D85A30",
-        "blue": "#378ADD"
+        "black": "#1A1A1A",
+        "blue": "#1976D2",
+        "red": "#D32F2F"
       },
-      "sizes": [7, 8, 9, 10, 11],
+      "colors": [
+        "red",
+        "black",
+        "blue"
+      ],
+      "name": "Air Jordan 1 Retro",
+      "price": 130,
+      "shapeSet": "boot",
+      "sizes": [
+        8,
+        9,
+        10,
+        11
+      ],
       "stock": {
-        "black_7": 4, "black_8": 0, "black_9": 3, "black_10": 5, "black_11": 2,
-        "white_7": 0, "white_8": 3, "white_9": 4, "white_10": 0, "white_11": 1,
-        "coral_7": 2, "coral_8": 4, "coral_9": 0, "coral_10": 2, "coral_11": 3,
-        "blue_7": 1, "blue_8": 2, "blue_9": 6, "blue_10": 4, "blue_11": 0
+        "black_10": 3,
+        "black_11": 1,
+        "black_8": 3,
+        "black_9": 1,
+        "blue_10": 4,
+        "blue_11": 4,
+        "blue_8": 3,
+        "blue_9": 2,
+        "red_10": 6,
+        "red_11": 2,
+        "red_8": 1,
+        "red_9": 5
       }
     },
-    "rugged_hiker_x": {
-      "name": "Rugged Hiker X",
-      "brand": "Timber",
-      "category": "Casual & Sandals",
-      "shapeSet": "boot",
-      "price": 149.99,
-      "colors": ["wheat", "black", "rust_brown"],
+    "air_runner_2": {
+      "brand": "Nova",
+      "category": "Athletic & Basketball",
       "colorHex": {
-        "wheat": "#D2B48C",
-        "black": "#202020",
-        "rust_brown": "#8B4513"
+        "black": "#2C2C2A",
+        "blue": "#378ADD",
+        "coral": "#D85A30",
+        "white": "#E8E8E8"
       },
-      "sizes": [8, 9, 10, 11, 12],
+      "colors": [
+        "black",
+        "white",
+        "coral",
+        "blue"
+      ],
+      "name": "Air Runner 2",
+      "price": 89.99,
+      "shapeSet": "sneaker_low",
+      "sizes": [
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
       "stock": {
-        "wheat_8": 3, "wheat_9": 0, "wheat_10": 5, "wheat_11": 2, "wheat_12": 1,
-        "black_8": 2, "black_9": 4, "black_10": 1, "black_11": 0, "black_12": 3,
-        "rust_brown_8": 0, "rust_brown_9": 3, "rust_brown_10": 4, "rust_brown_11": 2, "rust_brown_12": 0
+        "black_10": 5,
+        "black_11": 2,
+        "black_7": 3,
+        "black_8": 2,
+        "black_9": 3,
+        "blue_10": 4,
+        "blue_11": 5,
+        "blue_7": 1,
+        "blue_8": 2,
+        "blue_9": 6,
+        "coral_10": 2,
+        "coral_11": 3,
+        "coral_7": 2,
+        "coral_8": 4,
+        "coral_9": 1,
+        "white_10": 3,
+        "white_11": 1,
+        "white_7": 4,
+        "white_8": 3,
+        "white_9": 4
       }
     },
     "breeze_slide_z": {
-      "name": "Breeze Slide Z",
       "brand": "Cove",
       "category": "Casual & Sandals",
-      "shapeSet": "sandal",
-      "price": 49.99,
-      "colors": ["black", "mocha", "taupe"],
       "colorHex": {
         "black": "#222222",
         "mocha": "#5C4033",
         "taupe": "#B38B6D"
       },
-      "sizes": [6, 7, 8, 9, 10],
+      "colors": [
+        "black",
+        "mocha",
+        "taupe"
+      ],
+      "name": "Breeze Slide Z",
+      "price": 49.99,
+      "shapeSet": "sandal",
+      "sizes": [
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
       "stock": {
-        "black_6": 5, "black_7": 2, "black_8": 4, "black_9": 0, "black_10": 3,
-        "mocha_6": 0, "mocha_7": 4, "mocha_8": 2, "mocha_9": 3, "mocha_10": 1,
-        "taupe_6": 2, "taupe_7": 0, "taupe_8": 0, "taupe_9": 4, "taupe_10": 2
+        "black_10": 2,
+        "black_6": 4,
+        "black_7": 2,
+        "black_8": 4,
+        "black_9": 3,
+        "mocha_10": 0,
+        "mocha_6": 3,
+        "mocha_7": 2,
+        "mocha_8": 2,
+        "mocha_9": 2,
+        "taupe_10": 2,
+        "taupe_6": 2,
+        "taupe_7": 2,
+        "taupe_8": 3,
+        "taupe_9": 4
       }
     },
     "classic_oxford": {
-      "name": "Classic Oxford",
       "brand": "Aurelius",
       "category": "Formal Classics",
-      "shapeSet": "formal",
-      "price": 119.99,
-      "colors": ["black", "mahogany"],
       "colorHex": {
         "black": "#1A1A1A",
         "mahogany": "#4A0E17"
       },
-      "sizes": [7, 8, 9, 10, 11],
+      "colors": [
+        "black",
+        "mahogany"
+      ],
+      "name": "Classic Oxford",
+      "price": 120,
+      "shapeSet": "formal",
+      "sizes": [
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
       "stock": {
-        "black_7": 3, "black_8": 4, "black_9": 5, "black_10": 0, "black_11": 2,
-        "mahogany_7": 2, "mahogany_8": 0, "mahogany_9": 3, "mahogany_10": 4, "mahogany_11": 1
-      }
-    },
-    "air_jordan_1": {
-      "name": "Air Jordan 1 Retro",
-      "brand": "Jordan",
-      "category": "Athletic & Basketball",
-      "shapeSet": "boot",
-      "price": 170.00,
-      "colors": ["red", "black", "blue"],
-      "colorHex": {
-        "red": "#D32F2F",
-        "black": "#1A1A1A",
-        "blue": "#1976D2"
-      },
-      "sizes": [8, 9, 10, 11],
-      "stock": {
-        "red_8": 3, "red_9": 4, "red_10": 0, "red_11": 2,
-        "black_8": 1, "black_9": 0, "black_10": 3, "black_11": 1,
-        "blue_8": 0, "blue_9": 2, "blue_10": 4, "blue_11": 0
+        "black_10": 3,
+        "black_11": 2,
+        "black_7": 3,
+        "black_8": 3,
+        "black_9": 5,
+        "mahogany_10": 3,
+        "mahogany_11": 1,
+        "mahogany_7": 2,
+        "mahogany_8": 2,
+        "mahogany_9": 3
       }
     },
     "rs_x_runner": {
-      "name": "RS-X Runner",
       "brand": "Puma",
       "category": "Athletic & Basketball",
-      "shapeSet": "sneaker_low",
-      "price": 110.00,
-      "colors": ["white", "black", "red"],
       "colorHex": {
-        "white": "#F5F5F5",
         "black": "#2C2C2A",
-        "red": "#D85A30"
+        "red": "#D85A30",
+        "white": "#F5F5F5"
       },
-      "sizes": [7, 8, 9, 10, 11],
+      "colors": [
+        "white",
+        "black",
+        "red"
+      ],
+      "name": "RS-X Runner",
+      "price": 110,
+      "shapeSet": "sneaker_low",
+      "sizes": [
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
       "stock": {
-        "white_7": 3, "white_8": 4, "white_9": 0, "white_10": 2, "white_11": 1,
-        "black_7": 2, "black_8": 0, "black_9": 3, "black_10": 4, "black_11": 0,
-        "red_7": 0, "red_8": 2, "red_9": 1, "red_10": 0, "red_11": 3
+        "black_10": 4,
+        "black_11": 2,
+        "black_7": 2,
+        "black_8": 2,
+        "black_9": 3,
+        "red_10": 3,
+        "red_11": 3,
+        "red_7": 3,
+        "red_8": 2,
+        "red_9": 1,
+        "white_10": 1,
+        "white_11": 1,
+        "white_7": 3,
+        "white_8": 3,
+        "white_9": 4
+      }
+    },
+    "rugged_hiker_x": {
+      "brand": "Timber",
+      "category": "Casual & Sandals",
+      "colorHex": {
+        "black": "#202020",
+        "rust_brown": "#8B4513",
+        "wheat": "#D2B48C"
+      },
+      "colors": [
+        "wheat",
+        "black",
+        "rust_brown"
+      ],
+      "name": "Rugged Hiker X",
+      "price": 149.99,
+      "shapeSet": "boot",
+      "sizes": [
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "stock": {
+        "black_10": 1,
+        "black_11": 2,
+        "black_12": 3,
+        "black_8": 2,
+        "black_9": 4,
+        "rust_brown_10": 4,
+        "rust_brown_11": 2,
+        "rust_brown_12": 1,
+        "rust_brown_8": 2,
+        "rust_brown_9": 3,
+        "wheat_10": 5,
+        "wheat_11": 1,
+        "wheat_12": 2,
+        "wheat_8": 2,
+        "wheat_9": 3
       }
     },
     "stan_smith_classic": {
-      "name": "Stan Smith Classic",
       "brand": "Adidas",
       "category": "Casual & Sandals",
-      "shapeSet": "sneaker_low",
-      "price": 95.00,
-      "colors": ["white", "green"],
       "colorHex": {
-        "white": "#EAEAEA",
-        "green": "#2E7D32"
+        "green": "#2E7D32",
+        "white": "#EAEAEA"
       },
-      "sizes": [6, 7, 8, 9, 10],
+      "colors": [
+        "white",
+        "green"
+      ],
+      "name": "Stan Smith Classic",
+      "price": 95.55,
+      "shapeSet": "sneaker_low",
+      "sizes": [
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
       "stock": {
-        "white_6": 4, "white_7": 2, "white_8": 5, "white_9": 3, "white_10": 1,
-        "green_6": 1, "green_7": 0, "green_8": 3, "green_9": 4, "green_10": 0
+        "green_10": 0,
+        "green_6": 1,
+        "green_7": 0,
+        "green_8": 3,
+        "green_9": 3,
+        "white_10": 1,
+        "white_6": 1,
+        "white_7": 1,
+        "white_8": 5,
+        "white_9": 3
       }
     }
-  }
+  },
+  "current_delivering_round": "",
+  "location": "none",
+  "orders": {
+    "ORD_1784202286179": {
+      "createdAt": 1784202286180,
+      "items": [
+        {
+          "color": "black",
+          "name": "Breeze Slide Z",
+          "price": 49.99,
+          "qty": 2,
+          "shoeId": "breeze_slide_z",
+          "size": 6
+        },
+        {
+          "color": "white",
+          "name": "Stan Smith Classic",
+          "price": 95,
+          "qty": 1,
+          "shoeId": "stan_smith_classic",
+          "size": 6
+        }
+      ],
+      "status": "pending"
+    },
+    "ORD_1784261464823": {
+      "createdAt": 1784261465054,
+      "items": [
+        {
+          "color": "red",
+          "name": "Air Jordan 1 Retro",
+          "price": 120,
+          "qty": 1,
+          "shoeId": "air_jordan_1",
+          "size": 8
+        }
+      ],
+      "status": "pending"
+    },
+    "ORD_1784261588628": {
+      "createdAt": 1784261588855,
+      "items": [
+        {
+          "color": "black",
+          "name": "Breeze Slide Z",
+          "price": 49.99,
+          "qty": 1,
+          "shoeId": "breeze_slide_z",
+          "size": 10
+        }
+      ],
+      "status": "pending"
+    },
+    "ORD_1784262109778": {
+      "createdAt": 1784262133915,
+      "items": [
+        {
+          "color": "red",
+          "name": "Air Jordan 1 Retro",
+          "price": 170,
+          "qty": 1,
+          "shoeId": "air_jordan_1",
+          "size": 8
+        },
+        {
+          "color": "white",
+          "name": "Stan Smith Classic",
+          "price": 95,
+          "qty": 1,
+          "shoeId": "stan_smith_classic",
+          "size": 6
+        }
+      ],
+      "status": "pending"
+    },
+    "ORD_1784262360343": {
+      "createdAt": 1784262360649,
+      "items": [
+        {
+          "color": "wheat",
+          "name": "Rugged Hiker X",
+          "price": 149.99,
+          "qty": 1,
+          "shoeId": "rugged_hiker_x",
+          "size": 8
+        }
+      ],
+      "status": "pending"
+    },
+    "ORD_1784262927480": {
+      "createdAt": 1784262927777,
+      "items": [
+        {
+          "color": "green",
+          "name": "Stan Smith Classic",
+          "price": 95,
+          "qty": 1,
+          "shoeId": "stan_smith_classic",
+          "size": 9
+        },
+        {
+          "color": "white",
+          "name": "Stan Smith Classic",
+          "price": 95,
+          "qty": 1,
+          "shoeId": "stan_smith_classic",
+          "size": 6
+        }
+      ],
+      "status": "pending"
+    },
+    "ORD_1784263502259": {
+      "createdAt": 1784263502549,
+      "items": [
+        {
+          "color": "black",
+          "name": "Air Jordan 1 Retro",
+          "price": 120,
+          "qty": 1,
+          "shoeId": "air_jordan_1",
+          "size": 8
+        }
+      ],
+      "status": "pending"
+    },
+    "ORD_1784263897529": {
+      "createdAt": 1784263897822,
+      "items": [
+        {
+          "color": "wheat",
+          "name": "Rugged Hiker X",
+          "price": 149.99,
+          "qty": 1,
+          "shoeId": "rugged_hiker_x",
+          "size": 8
+        },
+        {
+          "color": "white",
+          "name": "RS-X Runner",
+          "price": 110,
+          "qty": 1,
+          "shoeId": "rs_x_runner",
+          "size": 7
+        },
+        {
+          "color": "white",
+          "name": "Stan Smith Classic",
+          "price": 95,
+          "qty": 1,
+          "shoeId": "stan_smith_classic",
+          "size": 6
+        }
+      ],
+      "status": "pending"
+    },
+    "ORD_1784265397922": {
+      "createdAt": 1784265398199,
+      "items": [
+        {
+          "color": "red",
+          "name": "Air Jordan 1 Retro",
+          "price": 130,
+          "qty": 1,
+          "shoeId": "air_jordan_1",
+          "size": 8
+        }
+      ],
+      "status": "pending"
+    },
+    "ORD_1784266287141": {
+      "createdAt": 1784266287548,
+      "items": [
+        {
+          "color": "wheat",
+          "name": "Rugged Hiker X",
+          "price": 149.99,
+          "qty": 1,
+          "shoeId": "rugged_hiker_x",
+          "size": 8
+        }
+      ],
+      "status": "pending"
+    },
+    "ORD_1784267767012": {
+      "createdAt": 1784267767324,
+      "items": [
+        {
+          "color": "red",
+          "name": "Air Jordan 1 Retro",
+          "price": 130,
+          "qty": 1,
+          "shoeId": "air_jordan_1",
+          "size": 8
+        }
+      ],
+      "status": "pending"
+    },
+    "ORD_1784268514266": {
+      "createdAt": 1784268514575,
+      "items": [
+        {
+          "color": "black",
+          "name": "Air Runner 2",
+          "price": 89.99,
+          "qty": 1,
+          "shoeId": "air_runner_2",
+          "size": 7
+        }
+      ],
+      "status": "pending"
+    },
+    "ORD_1784268652442": {
+      "createdAt": 1784268652826,
+      "items": [
+        {
+          "color": "red",
+          "name": "Air Jordan 1 Retro",
+          "price": 130,
+          "qty": 1,
+          "shoeId": "air_jordan_1",
+          "size": 8
+        }
+      ],
+      "status": "pending"
+    },
+    "ORD_1784280718484": {
+      "createdAt": 1784280720377,
+      "items": [
+        {
+          "color": "black",
+          "name": "Breeze Slide Z",
+          "price": 49.99,
+          "qty": 1,
+          "shoeId": "breeze_slide_z",
+          "size": 6
+        },
+        {
+          "color": "white",
+          "name": "RS-X Runner",
+          "price": 110,
+          "qty": 1,
+          "shoeId": "rs_x_runner",
+          "size": 7
+        }
+      ],
+      "status": "pending"
+    },
+    "ORD_1784283465393": {
+      "createdAt": 1784283465687,
+      "items": [
+        {
+          "color": "mocha",
+          "name": "Breeze Slide Z",
+          "price": 49.99,
+          "qty": 1,
+          "shoeId": "breeze_slide_z",
+          "size": 9
+        }
+      ],
+      "status": "pending"
+    },
+    "ORD_1784283709459": {
+      "createdAt": 1784283709707,
+      "items": [
+        {
+          "color": "black",
+          "name": "Air Jordan 1 Retro",
+          "price": 130,
+          "qty": 1,
+          "shoeId": "air_jordan_1",
+          "size": 9
+        },
+        {
+          "color": "black",
+          "name": "RS-X Runner",
+          "price": 110,
+          "qty": 1,
+          "shoeId": "rs_x_runner",
+          "size": 11
+        },
+        {
+          "color": "wheat",
+          "name": "Rugged Hiker X",
+          "price": 149.99,
+          "qty": 1,
+          "shoeId": "rugged_hiker_x",
+          "size": 11
+        }
+      ],
+      "status": "pending"
+    },
+    "ORD_1784284077470": {
+      "createdAt": 1784284077730,
+      "items": [
+        {
+          "color": "red",
+          "name": "Air Jordan 1 Retro",
+          "price": 130,
+          "qty": 1,
+          "shoeId": "air_jordan_1",
+          "size": 8
+        },
+        {
+          "color": "white",
+          "name": "RS-X Runner",
+          "price": 110,
+          "qty": 1,
+          "shoeId": "rs_x_runner",
+          "size": 7
+        },
+        {
+          "color": "mahogany",
+          "name": "Classic Oxford",
+          "price": 120,
+          "qty": 1,
+          "shoeId": "classic_oxford",
+          "size": 10
+        }
+      ],
+      "status": "pending"
+    },
+    "ORD_1784284352903": {
+      "createdAt": 1784284353139,
+      "items": [
+        {
+          "color": "black",
+          "name": "Air Jordan 1 Retro",
+          "price": 130,
+          "qty": 1,
+          "shoeId": "air_jordan_1",
+          "size": 9
+        },
+        {
+          "color": "black",
+          "name": "RS-X Runner",
+          "price": 110,
+          "qty": 1,
+          "shoeId": "rs_x_runner",
+          "size": 11
+        },
+        {
+          "color": "mahogany",
+          "name": "Classic Oxford",
+          "price": 120,
+          "qty": 1,
+          "shoeId": "classic_oxford",
+          "size": 8
+        }
+      ],
+      "status": "pending"
+    },
+    "ORD_1784612745433": {
+      "createdAt": 1784612745685,
+      "items": [
+        {
+          "color": "black",
+          "name": "Air Jordan 1 Retro",
+          "price": 130,
+          "qty": 1,
+          "shoeId": "air_jordan_1",
+          "size": 11
+        },
+        {
+          "color": "green",
+          "name": "Stan Smith Classic",
+          "price": 95.55,
+          "qty": 1,
+          "shoeId": "stan_smith_classic",
+          "size": 7
+        },
+        {
+          "color": "mocha",
+          "name": "Breeze Slide Z",
+          "price": 49.99,
+          "qty": 1,
+          "shoeId": "breeze_slide_z",
+          "size": 7
+        }
+      ],
+      "status": "pending"
+    },
+    "ORD_1784613196112": {
+      "createdAt": 1784613196345,
+      "items": [
+        {
+          "color": "mocha",
+          "name": "Breeze Slide Z",
+          "price": 49.99,
+          "qty": 1,
+          "shoeId": "breeze_slide_z",
+          "size": 7
+        },
+        {
+          "color": "wheat",
+          "name": "Rugged Hiker X",
+          "price": 149.99,
+          "qty": 1,
+          "shoeId": "rugged_hiker_x",
+          "size": 8
+        },
+        {
+          "color": "white",
+          "name": "RS-X Runner",
+          "price": 110,
+          "qty": 1,
+          "shoeId": "rs_x_runner",
+          "size": 8
+        }
+      ],
+      "status": "pending"
+    },
+    "ORD_1784613992938": {
+      "createdAt": 1784613993292,
+      "items": [
+        {
+          "color": "black",
+          "name": "Classic Oxford",
+          "price": 120,
+          "qty": 1,
+          "shoeId": "classic_oxford",
+          "size": 8
+        },
+        {
+          "color": "white",
+          "name": "Stan Smith Classic",
+          "price": 95.55,
+          "qty": 1,
+          "shoeId": "stan_smith_classic",
+          "size": 7
+        }
+      ],
+      "status": "pending"
+    },
+    "ORD_1784614477441": {
+      "createdAt": 1784614477920,
+      "items": [
+        {
+          "color": "red",
+          "name": "Air Jordan 1 Retro",
+          "price": 130,
+          "qty": 1,
+          "shoeId": "air_jordan_1",
+          "size": 8
+        },
+        {
+          "color": "mocha",
+          "name": "Breeze Slide Z",
+          "price": 49.99,
+          "qty": 1,
+          "shoeId": "breeze_slide_z",
+          "size": 10
+        }
+      ],
+      "status": "pending"
+    },
+    "ORD_1784615164594": {
+      "createdAt": 1784615164883,
+      "items": [
+        {
+          "color": "red",
+          "name": "Air Jordan 1 Retro",
+          "price": 130,
+          "qty": 1,
+          "shoeId": "air_jordan_1",
+          "size": 9
+        },
+        {
+          "color": "wheat",
+          "name": "Rugged Hiker X",
+          "price": 149.99,
+          "qty": 1,
+          "shoeId": "rugged_hiker_x",
+          "size": 12
+        }
+      ],
+      "status": "pending"
+    },
+    "ORD_1784615592921": {
+      "createdAt": 1784615593166,
+      "items": [
+        {
+          "color": "black",
+          "name": "Air Jordan 1 Retro",
+          "price": 130,
+          "qty": 1,
+          "shoeId": "air_jordan_1",
+          "size": 8
+        },
+        {
+          "color": "white",
+          "name": "RS-X Runner",
+          "price": 110,
+          "qty": 1,
+          "shoeId": "rs_x_runner",
+          "size": 10
+        }
+      ],
+      "status": "pending"
+    },
+    "ORD_1784616119839": {
+      "createdAt": 1784616120078,
+      "items": [
+        {
+          "color": "black",
+          "name": "Air Jordan 1 Retro",
+          "price": 130,
+          "qty": 1,
+          "shoeId": "air_jordan_1",
+          "size": 9
+        },
+        {
+          "color": "wheat",
+          "name": "Rugged Hiker X",
+          "price": 149.99,
+          "qty": 1,
+          "shoeId": "rugged_hiker_x",
+          "size": 11
+        }
+      ],
+      "status": "pending"
+    },
+    "ORD_1784616369539": {
+      "createdAt": 1784616369801,
+      "items": [
+        {
+          "color": "black",
+          "name": "Air Jordan 1 Retro",
+          "price": 130,
+          "qty": 1,
+          "shoeId": "air_jordan_1",
+          "size": 9
+        },
+        {
+          "color": "wheat",
+          "name": "Rugged Hiker X",
+          "price": 149.99,
+          "qty": 1,
+          "shoeId": "rugged_hiker_x",
+          "size": 9
+        }
+      ],
+      "status": "pending"
+    },
+    "ORD_1784617136361": {
+      "createdAt": 1784617136611,
+      "items": [
+        {
+          "color": "black",
+          "name": "Air Jordan 1 Retro",
+          "price": 130,
+          "qty": 1,
+          "shoeId": "air_jordan_1",
+          "size": 9
+        },
+        {
+          "color": "wheat",
+          "name": "Rugged Hiker X",
+          "price": 149.99,
+          "qty": 1,
+          "shoeId": "rugged_hiker_x",
+          "size": 11
+        }
+      ],
+      "status": "pending"
+    },
+    "ORD_1784617237301": {
+      "createdAt": 1784617237522,
+      "items": [
+        {
+          "color": "black",
+          "name": "Air Jordan 1 Retro",
+          "price": 130,
+          "qty": 1,
+          "shoeId": "air_jordan_1",
+          "size": 9
+        },
+        {
+          "color": "wheat",
+          "name": "Rugged Hiker X",
+          "price": 149.99,
+          "qty": 1,
+          "shoeId": "rugged_hiker_x",
+          "size": 11
+        }
+      ],
+      "status": "pending"
+    },
+    "ORD_1784617315875": {
+      "createdAt": 1784617316076,
+      "items": [
+        {
+          "color": "black",
+          "name": "Air Jordan 1 Retro",
+          "price": 130,
+          "qty": 1,
+          "shoeId": "air_jordan_1",
+          "size": 9
+        },
+        {
+          "color": "wheat",
+          "name": "Rugged Hiker X",
+          "price": 149.99,
+          "qty": 1,
+          "shoeId": "rugged_hiker_x",
+          "size": 11
+        }
+      ],
+      "status": "pending"
+    }
+  },
+  "robot_state": "idle",
+  "status": "idle"
 }
