@@ -786,22 +786,52 @@
         "nagpur": "Nagpur"
     };
 
+    // High-Entropy Cryptographic Store Security Tokens (Unguessable across locations)
+    const STORE_AUTH_REGISTRY = {
+        "sec_pun_8f92a4e1b7c3d05e": "pune",
+        "sec_blr_3e71d9f8c4a2b601": "bengaluru",
+        "sec_hyd_9a62b1e4f8c7d350": "hyderabad",
+        "sec_chn_4b83c2d1e9f0a765": "chennai",
+        "sec_chd_7c19e5a3f2b8d406": "chandigarh",
+        "sec_mys_2d84a7e1c9f3b650": "mysuru",
+        "sec_trv_5f18b3d9e4a7c206": "trivandrum",
+        "sec_bhu_1a72d4e8c3f9b506": "bhubaneswar",
+        "sec_mng_6e93b2a5f1c8d740": "mangalore",
+        "sec_ind_8c27e4f1a9b3d560": "indore",
+        "sec_nag_3f81b9d4e2a6c750": "nagpur"
+    };
+
+    // Store Access PINs for manual manager login
+    const STORE_PIN_REGISTRY = {
+        "pun-7821": "pune",
+        "blr-4910": "bengaluru",
+        "hyd-9154": "hyderabad",
+        "chn-3620": "chennai",
+        "chd-8147": "chandigarh",
+        "mys-5290": "mysuru",
+        "trv-6418": "trivandrum",
+        "bhu-7302": "bhubaneswar",
+        "mng-1945": "mangalore",
+        "ind-8526": "indore",
+        "nag-4073": "nagpur"
+    };
+
+    function resolveStoreLocationFromToken(rawInput) {
+        if (!rawInput) return null;
+        const clean = rawInput.trim().toLowerCase();
+        if (STORE_AUTH_REGISTRY[clean]) return STORE_AUTH_REGISTRY[clean];
+        if (STORE_PIN_REGISTRY[clean]) return STORE_PIN_REGISTRY[clean];
+        return null;
+    }
+
     function handleLoginSubmit(e) {
         if (e) e.preventDefault();
         const inputEl = document.getElementById('login-store-key');
-        const rawKey = inputEl ? inputEl.value.trim().toLowerCase() : "";
-        
-        // Normalize alias / name checks
-        let matchedLocation = null;
-        for (let locKey in locationDisplayNames) {
-            if (rawKey === locKey || rawKey === locationDisplayNames[locKey].toLowerCase() || rawKey === `${locKey}_store` || rawKey === `${locKey}-store`) {
-                matchedLocation = locKey;
-                break;
-            }
-        }
+        const rawKey = inputEl ? inputEl.value : "";
+        const matchedLocation = resolveStoreLocationFromToken(rawKey);
 
         if (!matchedLocation) {
-            showToast("⚠️ Invalid Store Access Key. Please check your assigned store code.");
+            showToast("⛔ Unauthorized: Invalid Store Security Key/PIN.");
             return;
         }
 
@@ -818,7 +848,7 @@
         } else {
             updateUI();
         }
-        showToast(`Authorized: Welcome to ${locationDisplayNames[matchedLocation]} Store Console!`);
+        showToast(`Authenticated: Logged in to ${locationDisplayNames[matchedLocation]} Store Console!`);
     }
 
     function handleLogout() {
@@ -1452,17 +1482,19 @@
 
     // Main Init
     window.onload = () => {
-        // Check URL parameter for direct store key (e.g. admin.html?key=pune or admin.html?location=pune)
+        // Validate URL parameter for cryptographic store token or PIN
         try {
             const urlParams = new URLSearchParams(window.location.search);
-            const paramKey = (urlParams.get('key') || urlParams.get('location') || urlParams.get('store') || "").toLowerCase().trim();
-            if (paramKey) {
-                for (let locKey in locationDisplayNames) {
-                    if (paramKey === locKey || paramKey === locationDisplayNames[locKey].toLowerCase() || paramKey === `${locKey}_store` || paramKey === `${locKey}-store`) {
-                        currentStoreLocation = locKey;
-                        sessionStorage.setItem('temi_store_location', locKey);
-                        break;
-                    }
+            const token = urlParams.get('token') || urlParams.get('key') || urlParams.get('auth');
+            if (token) {
+                const resolvedLoc = resolveStoreLocationFromToken(token);
+                if (resolvedLoc) {
+                    currentStoreLocation = resolvedLoc;
+                    sessionStorage.setItem('temi_store_location', resolvedLoc);
+                    // Sanitize visible URL bar so the security token is not exposed on-screen to visitors
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                } else {
+                    showToast("⛔ Invalid URL Security Token. Access denied.");
                 }
             }
         } catch(e) {}
