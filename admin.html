@@ -388,16 +388,21 @@
 
     <header>
         <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
-            <h1>👟 Temi Shoe Mart - Living Labs</h1>
+            <h1 id="main-title">👟 Temi Shoe Store (Pune)</h1>
             <div style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.85); border-radius: 20px; padding: 4px 12px; border: 1px solid var(--glass-border); gap: 8px;">
-                <span style="font-weight: 700; color: var(--brand-primary); font-size: 13px;">📍 Living Lab:</span>
+                <span style="font-weight: 700; color: var(--brand-primary); font-size: 13px;">📍 Location:</span>
                 <select id="select-store-location" onchange="onStoreLocationChanged(this.value)" style="border: none; background: transparent; font-weight: 700; color: var(--text-primary); font-size: 13px; cursor: pointer; outline: none; font-family: 'Outfit', sans-serif;">
-                    <option value="pune" selected>Pune (Hinjawadi)</option>
-                    <option value="bengaluru">Bengaluru (Electronic City)</option>
-                    <option value="hyderabad">Hyderabad (Gachibowli)</option>
-                    <option value="chennai">Chennai (Mahindra World City)</option>
-                    <option value="chandigarh">Chandigarh (IT Park)</option>
-                    <option value="mysuru">Mysuru (GEC)</option>
+                    <option value="bengaluru">Bengaluru</option>
+                    <option value="pune" selected>Pune</option>
+                    <option value="hyderabad">Hyderabad</option>
+                    <option value="chennai">Chennai</option>
+                    <option value="chandigarh">Chandigarh</option>
+                    <option value="mysuru">Mysuru</option>
+                    <option value="trivandrum">Thiruvananthapuram</option>
+                    <option value="bhubaneswar">Bhubaneswar</option>
+                    <option value="mangalore">Mangalore</option>
+                    <option value="indore">Indore</option>
+                    <option value="nagpur">Nagpur</option>
                 </select>
             </div>
         </div>
@@ -761,10 +766,32 @@
         updateUI();
     }
 
-    // Switch Active Store / Living Lab location
+    const locationDisplayNames = {
+        "bengaluru": "Bengaluru",
+        "pune": "Pune",
+        "hyderabad": "Hyderabad",
+        "chennai": "Chennai",
+        "chandigarh": "Chandigarh",
+        "mysuru": "Mysuru",
+        "trivandrum": "Thiruvananthapuram",
+        "bhubaneswar": "Bhubaneswar",
+        "mangalore": "Mangalore",
+        "indore": "Indore",
+        "nagpur": "Nagpur"
+    };
+
+    // Switch Active Store / Location
     function onStoreLocationChanged(newLoc) {
         currentStoreLocation = newLoc || "pune";
-        showToast(`Switched view to Living Lab: ${currentStoreLocation.toUpperCase()}`);
+        const displayName = locationDisplayNames[currentStoreLocation] || (currentStoreLocation.charAt(0).toUpperCase() + currentStoreLocation.slice(1));
+        
+        // Dynamically update heading
+        const titleEl = document.getElementById('main-title');
+        if (titleEl) {
+            titleEl.innerText = `👟 Temi Shoe Store (${displayName})`;
+        }
+        document.title = `Temi Shoe Store (${displayName}) - Admin Dashboard`;
+        showToast(`Switched view to: ${displayName}`);
         
         if (isFirebaseConnected && db) {
             bindFirebaseListeners();

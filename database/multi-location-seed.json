@@ -104,11 +104,8 @@
   },
   "locations": {
     "bengaluru": {
-      "name": "Bengaluru (Electronic City Living Lab)",
-      "location": "none",
-      "status": "idle",
-      "robot_state": "idle",
-      "active_order_id": "",
+      "name": "Bengaluru",
+      "location": "none", "status": "idle", "robot_state": "idle", "active_order_id": "",
       "stock": {
         "air_runner_2": { "black_7": 4, "black_8": 3, "black_9": 3, "black_10": 5, "black_11": 2, "white_7": 2, "white_8": 3, "white_9": 4, "white_10": 1, "white_11": 1, "coral_7": 2, "coral_8": 4, "coral_9": 3, "coral_10": 2, "coral_11": 3, "blue_7": 1, "blue_8": 2, "blue_9": 6, "blue_10": 4, "blue_11": 2 },
         "rugged_hiker_x": { "wheat_8": 3, "wheat_9": 2, "wheat_10": 5, "wheat_11": 2, "wheat_12": 1, "black_8": 2, "black_9": 4, "black_10": 1, "black_11": 2, "black_12": 3, "rust_brown_8": 1, "rust_brown_9": 3, "rust_brown_10": 4, "rust_brown_11": 2, "rust_brown_12": 1 },
@@ -121,11 +118,8 @@
       "orders": {}
     },
     "pune": {
-      "name": "Pune (Hinjawadi Living Lab)",
-      "location": "none",
-      "status": "idle",
-      "robot_state": "idle",
-      "active_order_id": "",
+      "name": "Pune",
+      "location": "none", "status": "idle", "robot_state": "idle", "active_order_id": "",
       "stock": {
         "air_runner_2": { "black_7": 4, "black_8": 3, "black_9": 3, "black_10": 5, "black_11": 2, "white_7": 2, "white_8": 3, "white_9": 4, "white_10": 1, "white_11": 1, "coral_7": 2, "coral_8": 4, "coral_9": 3, "coral_10": 2, "coral_11": 3, "blue_7": 1, "blue_8": 2, "blue_9": 6, "blue_10": 4, "blue_11": 2 },
         "rugged_hiker_x": { "wheat_8": 3, "wheat_9": 2, "wheat_10": 5, "wheat_11": 2, "wheat_12": 1, "black_8": 2, "black_9": 4, "black_10": 1, "black_11": 2, "black_12": 3, "rust_brown_8": 1, "rust_brown_9": 3, "rust_brown_10": 4, "rust_brown_11": 2, "rust_brown_12": 1 },
@@ -138,11 +132,8 @@
       "orders": {}
     },
     "hyderabad": {
-      "name": "Hyderabad (Gachibowli Living Lab)",
-      "location": "none",
-      "status": "idle",
-      "robot_state": "idle",
-      "active_order_id": "",
+      "name": "Hyderabad",
+      "location": "none", "status": "idle", "robot_state": "idle", "active_order_id": "",
       "stock": {
         "air_runner_2": { "black_7": 4, "black_8": 3, "black_9": 3, "black_10": 5, "black_11": 2, "white_7": 2, "white_8": 3, "white_9": 4, "white_10": 1, "white_11": 1, "coral_7": 2, "coral_8": 4, "coral_9": 3, "coral_10": 2, "coral_11": 3, "blue_7": 1, "blue_8": 2, "blue_9": 6, "blue_10": 4, "blue_11": 2 },
         "rugged_hiker_x": { "wheat_8": 3, "wheat_9": 2, "wheat_10": 5, "wheat_11": 2, "wheat_12": 1, "black_8": 2, "black_9": 4, "black_10": 1, "black_11": 2, "black_12": 3, "rust_brown_8": 1, "rust_brown_9": 3, "rust_brown_10": 4, "rust_brown_11": 2, "rust_brown_12": 1 },
@@ -155,11 +146,8 @@
       "orders": {}
     },
     "chennai": {
-      "name": "Chennai (Mahindra World City Living Lab)",
-      "location": "none",
-      "status": "idle",
-      "robot_state": "idle",
-      "active_order_id": "",
+      "name": "Chennai",
+      "location": "none", "status": "idle", "robot_state": "idle", "active_order_id": "",
       "stock": {
         "air_runner_2": { "black_7": 4, "black_8": 3, "black_9": 3, "black_10": 5, "black_11": 2, "white_7": 2, "white_8": 3, "white_9": 4, "white_10": 1, "white_11": 1, "coral_7": 2, "coral_8": 4, "coral_9": 3, "coral_10": 2, "coral_11": 3, "blue_7": 1, "blue_8": 2, "blue_9": 6, "blue_10": 4, "blue_11": 2 },
         "rugged_hiker_x": { "wheat_8": 3, "wheat_9": 2, "wheat_10": 5, "wheat_11": 2, "wheat_12": 1, "black_8": 2, "black_9": 4, "black_10": 1, "black_11": 2, "black_12": 3, "rust_brown_8": 1, "rust_brown_9": 3, "rust_brown_10": 4, "rust_brown_11": 2, "rust_brown_12": 1 },
@@ -172,11 +160,8 @@
       "orders": {}
     },
     "chandigarh": {
-      "name": "Chandigarh (IT Park Living Lab)",
-      "location": "none",
-      "status": "idle",
-      "robot_state": "idle",
-      "active_order_id": "",
+      "name": "Chandigarh",
+      "location": "none", "status": "idle", "robot_state": "idle", "active_order_id": "",
       "stock": {
         "air_runner_2": { "black_7": 4, "black_8": 3, "black_9": 3, "black_10": 5, "black_11": 2, "white_7": 2, "white_8": 3, "white_9": 4, "white_10": 1, "white_11": 1, "coral_7": 2, "coral_8": 4, "coral_9": 3, "coral_10": 2, "coral_11": 3, "blue_7": 1, "blue_8": 2, "blue_9": 6, "blue_10": 4, "blue_11": 2 },
         "rugged_hiker_x": { "wheat_8": 3, "wheat_9": 2, "wheat_10": 5, "wheat_11": 2, "wheat_12": 1, "black_8": 2, "black_9": 4, "black_10": 1, "black_11": 2, "black_12": 3, "rust_brown_8": 1, "rust_brown_9": 3, "rust_brown_10": 4, "rust_brown_11": 2, "rust_brown_12": 1 },
@@ -189,11 +174,78 @@
       "orders": {}
     },
     "mysuru": {
-      "name": "Mysuru (GEC Living Lab)",
-      "location": "none",
-      "status": "idle",
-      "robot_state": "idle",
-      "active_order_id": "",
+      "name": "Mysuru",
+      "location": "none", "status": "idle", "robot_state": "idle", "active_order_id": "",
+      "stock": {
+        "air_runner_2": { "black_7": 4, "black_8": 3, "black_9": 3, "black_10": 5, "black_11": 2, "white_7": 2, "white_8": 3, "white_9": 4, "white_10": 1, "white_11": 1, "coral_7": 2, "coral_8": 4, "coral_9": 3, "coral_10": 2, "coral_11": 3, "blue_7": 1, "blue_8": 2, "blue_9": 6, "blue_10": 4, "blue_11": 2 },
+        "rugged_hiker_x": { "wheat_8": 3, "wheat_9": 2, "wheat_10": 5, "wheat_11": 2, "wheat_12": 1, "black_8": 2, "black_9": 4, "black_10": 1, "black_11": 2, "black_12": 3, "rust_brown_8": 1, "rust_brown_9": 3, "rust_brown_10": 4, "rust_brown_11": 2, "rust_brown_12": 1 },
+        "breeze_slide_z": { "black_6": 5, "black_7": 2, "black_8": 4, "black_9": 1, "black_10": 3, "mocha_6": 2, "mocha_7": 4, "mocha_8": 2, "mocha_9": 3, "mocha_10": 1, "taupe_6": 2, "taupe_7": 1, "taupe_8": 2, "taupe_9": 4, "taupe_10": 2 },
+        "classic_oxford": { "black_7": 3, "black_8": 4, "black_9": 5, "black_10": 2, "black_11": 2, "mahogany_7": 2, "mahogany_8": 1, "mahogany_9": 3, "mahogany_10": 4, "mahogany_11": 1 },
+        "air_jordan_1": { "red_8": 3, "red_9": 4, "red_10": 2, "red_11": 2, "black_8": 1, "black_9": 2, "black_10": 3, "black_11": 1, "blue_8": 2, "blue_9": 2, "blue_10": 4, "blue_11": 1 },
+        "rs_x_runner": { "white_7": 3, "white_8": 4, "white_9": 2, "white_10": 2, "white_11": 1, "black_7": 2, "black_8": 2, "black_9": 3, "black_10": 4, "black_11": 1, "red_7": 2, "red_8": 2, "red_9": 1, "red_10": 2, "red_11": 3 },
+        "stan_smith_classic": { "white_6": 4, "white_7": 2, "white_8": 5, "white_9": 3, "white_10": 1, "green_6": 1, "green_7": 2, "green_8": 3, "green_9": 4, "green_10": 1 }
+      },
+      "orders": {}
+    },
+    "trivandrum": {
+      "name": "Thiruvananthapuram",
+      "location": "none", "status": "idle", "robot_state": "idle", "active_order_id": "",
+      "stock": {
+        "air_runner_2": { "black_7": 4, "black_8": 3, "black_9": 3, "black_10": 5, "black_11": 2, "white_7": 2, "white_8": 3, "white_9": 4, "white_10": 1, "white_11": 1, "coral_7": 2, "coral_8": 4, "coral_9": 3, "coral_10": 2, "coral_11": 3, "blue_7": 1, "blue_8": 2, "blue_9": 6, "blue_10": 4, "blue_11": 2 },
+        "rugged_hiker_x": { "wheat_8": 3, "wheat_9": 2, "wheat_10": 5, "wheat_11": 2, "wheat_12": 1, "black_8": 2, "black_9": 4, "black_10": 1, "black_11": 2, "black_12": 3, "rust_brown_8": 1, "rust_brown_9": 3, "rust_brown_10": 4, "rust_brown_11": 2, "rust_brown_12": 1 },
+        "breeze_slide_z": { "black_6": 5, "black_7": 2, "black_8": 4, "black_9": 1, "black_10": 3, "mocha_6": 2, "mocha_7": 4, "mocha_8": 2, "mocha_9": 3, "mocha_10": 1, "taupe_6": 2, "taupe_7": 1, "taupe_8": 2, "taupe_9": 4, "taupe_10": 2 },
+        "classic_oxford": { "black_7": 3, "black_8": 4, "black_9": 5, "black_10": 2, "black_11": 2, "mahogany_7": 2, "mahogany_8": 1, "mahogany_9": 3, "mahogany_10": 4, "mahogany_11": 1 },
+        "air_jordan_1": { "red_8": 3, "red_9": 4, "red_10": 2, "red_11": 2, "black_8": 1, "black_9": 2, "black_10": 3, "black_11": 1, "blue_8": 2, "blue_9": 2, "blue_10": 4, "blue_11": 1 },
+        "rs_x_runner": { "white_7": 3, "white_8": 4, "white_9": 2, "white_10": 2, "white_11": 1, "black_7": 2, "black_8": 2, "black_9": 3, "black_10": 4, "black_11": 1, "red_7": 2, "red_8": 2, "red_9": 1, "red_10": 2, "red_11": 3 },
+        "stan_smith_classic": { "white_6": 4, "white_7": 2, "white_8": 5, "white_9": 3, "white_10": 1, "green_6": 1, "green_7": 2, "green_8": 3, "green_9": 4, "green_10": 1 }
+      },
+      "orders": {}
+    },
+    "bhubaneswar": {
+      "name": "Bhubaneswar",
+      "location": "none", "status": "idle", "robot_state": "idle", "active_order_id": "",
+      "stock": {
+        "air_runner_2": { "black_7": 4, "black_8": 3, "black_9": 3, "black_10": 5, "black_11": 2, "white_7": 2, "white_8": 3, "white_9": 4, "white_10": 1, "white_11": 1, "coral_7": 2, "coral_8": 4, "coral_9": 3, "coral_10": 2, "coral_11": 3, "blue_7": 1, "blue_8": 2, "blue_9": 6, "blue_10": 4, "blue_11": 2 },
+        "rugged_hiker_x": { "wheat_8": 3, "wheat_9": 2, "wheat_10": 5, "wheat_11": 2, "wheat_12": 1, "black_8": 2, "black_9": 4, "black_10": 1, "black_11": 2, "black_12": 3, "rust_brown_8": 1, "rust_brown_9": 3, "rust_brown_10": 4, "rust_brown_11": 2, "rust_brown_12": 1 },
+        "breeze_slide_z": { "black_6": 5, "black_7": 2, "black_8": 4, "black_9": 1, "black_10": 3, "mocha_6": 2, "mocha_7": 4, "mocha_8": 2, "mocha_9": 3, "mocha_10": 1, "taupe_6": 2, "taupe_7": 1, "taupe_8": 2, "taupe_9": 4, "taupe_10": 2 },
+        "classic_oxford": { "black_7": 3, "black_8": 4, "black_9": 5, "black_10": 2, "black_11": 2, "mahogany_7": 2, "mahogany_8": 1, "mahogany_9": 3, "mahogany_10": 4, "mahogany_11": 1 },
+        "air_jordan_1": { "red_8": 3, "red_9": 4, "red_10": 2, "red_11": 2, "black_8": 1, "black_9": 2, "black_10": 3, "black_11": 1, "blue_8": 2, "blue_9": 2, "blue_10": 4, "blue_11": 1 },
+        "rs_x_runner": { "white_7": 3, "white_8": 4, "white_9": 2, "white_10": 2, "white_11": 1, "black_7": 2, "black_8": 2, "black_9": 3, "black_10": 4, "black_11": 1, "red_7": 2, "red_8": 2, "red_9": 1, "red_10": 2, "red_11": 3 },
+        "stan_smith_classic": { "white_6": 4, "white_7": 2, "white_8": 5, "white_9": 3, "white_10": 1, "green_6": 1, "green_7": 2, "green_8": 3, "green_9": 4, "green_10": 1 }
+      },
+      "orders": {}
+    },
+    "mangalore": {
+      "name": "Mangalore",
+      "location": "none", "status": "idle", "robot_state": "idle", "active_order_id": "",
+      "stock": {
+        "air_runner_2": { "black_7": 4, "black_8": 3, "black_9": 3, "black_10": 5, "black_11": 2, "white_7": 2, "white_8": 3, "white_9": 4, "white_10": 1, "white_11": 1, "coral_7": 2, "coral_8": 4, "coral_9": 3, "coral_10": 2, "coral_11": 3, "blue_7": 1, "blue_8": 2, "blue_9": 6, "blue_10": 4, "blue_11": 2 },
+        "rugged_hiker_x": { "wheat_8": 3, "wheat_9": 2, "wheat_10": 5, "wheat_11": 2, "wheat_12": 1, "black_8": 2, "black_9": 4, "black_10": 1, "black_11": 2, "black_12": 3, "rust_brown_8": 1, "rust_brown_9": 3, "rust_brown_10": 4, "rust_brown_11": 2, "rust_brown_12": 1 },
+        "breeze_slide_z": { "black_6": 5, "black_7": 2, "black_8": 4, "black_9": 1, "black_10": 3, "mocha_6": 2, "mocha_7": 4, "mocha_8": 2, "mocha_9": 3, "mocha_10": 1, "taupe_6": 2, "taupe_7": 1, "taupe_8": 2, "taupe_9": 4, "taupe_10": 2 },
+        "classic_oxford": { "black_7": 3, "black_8": 4, "black_9": 5, "black_10": 2, "black_11": 2, "mahogany_7": 2, "mahogany_8": 1, "mahogany_9": 3, "mahogany_10": 4, "mahogany_11": 1 },
+        "air_jordan_1": { "red_8": 3, "red_9": 4, "red_10": 2, "red_11": 2, "black_8": 1, "black_9": 2, "black_10": 3, "black_11": 1, "blue_8": 2, "blue_9": 2, "blue_10": 4, "blue_11": 1 },
+        "rs_x_runner": { "white_7": 3, "white_8": 4, "white_9": 2, "white_10": 2, "white_11": 1, "black_7": 2, "black_8": 2, "black_9": 3, "black_10": 4, "black_11": 1, "red_7": 2, "red_8": 2, "red_9": 1, "red_10": 2, "red_11": 3 },
+        "stan_smith_classic": { "white_6": 4, "white_7": 2, "white_8": 5, "white_9": 3, "white_10": 1, "green_6": 1, "green_7": 2, "green_8": 3, "green_9": 4, "green_10": 1 }
+      },
+      "orders": {}
+    },
+    "indore": {
+      "name": "Indore",
+      "location": "none", "status": "idle", "robot_state": "idle", "active_order_id": "",
+      "stock": {
+        "air_runner_2": { "black_7": 4, "black_8": 3, "black_9": 3, "black_10": 5, "black_11": 2, "white_7": 2, "white_8": 3, "white_9": 4, "white_10": 1, "white_11": 1, "coral_7": 2, "coral_8": 4, "coral_9": 3, "coral_10": 2, "coral_11": 3, "blue_7": 1, "blue_8": 2, "blue_9": 6, "blue_10": 4, "blue_11": 2 },
+        "rugged_hiker_x": { "wheat_8": 3, "wheat_9": 2, "wheat_10": 5, "wheat_11": 2, "wheat_12": 1, "black_8": 2, "black_9": 4, "black_10": 1, "black_11": 2, "black_12": 3, "rust_brown_8": 1, "rust_brown_9": 3, "rust_brown_10": 4, "rust_brown_11": 2, "rust_brown_12": 1 },
+        "breeze_slide_z": { "black_6": 5, "black_7": 2, "black_8": 4, "black_9": 1, "black_10": 3, "mocha_6": 2, "mocha_7": 4, "mocha_8": 2, "mocha_9": 3, "mocha_10": 1, "taupe_6": 2, "taupe_7": 1, "taupe_8": 2, "taupe_9": 4, "taupe_10": 2 },
+        "classic_oxford": { "black_7": 3, "black_8": 4, "black_9": 5, "black_10": 2, "black_11": 2, "mahogany_7": 2, "mahogany_8": 1, "mahogany_9": 3, "mahogany_10": 4, "mahogany_11": 1 },
+        "air_jordan_1": { "red_8": 3, "red_9": 4, "red_10": 2, "red_11": 2, "black_8": 1, "black_9": 2, "black_10": 3, "black_11": 1, "blue_8": 2, "blue_9": 2, "blue_10": 4, "blue_11": 1 },
+        "rs_x_runner": { "white_7": 3, "white_8": 4, "white_9": 2, "white_10": 2, "white_11": 1, "black_7": 2, "black_8": 2, "black_9": 3, "black_10": 4, "black_11": 1, "red_7": 2, "red_8": 2, "red_9": 1, "red_10": 2, "red_11": 3 },
+        "stan_smith_classic": { "white_6": 4, "white_7": 2, "white_8": 5, "white_9": 3, "white_10": 1, "green_6": 1, "green_7": 2, "green_8": 3, "green_9": 4, "green_10": 1 }
+      },
+      "orders": {}
+    },
+    "nagpur": {
+      "name": "Nagpur",
+      "location": "none", "status": "idle", "robot_state": "idle", "active_order_id": "",
       "stock": {
         "air_runner_2": { "black_7": 4, "black_8": 3, "black_9": 3, "black_10": 5, "black_11": 2, "white_7": 2, "white_8": 3, "white_9": 4, "white_10": 1, "white_11": 1, "coral_7": 2, "coral_8": 4, "coral_9": 3, "coral_10": 2, "coral_11": 3, "blue_7": 1, "blue_8": 2, "blue_9": 6, "blue_10": 4, "blue_11": 2 },
         "rugged_hiker_x": { "wheat_8": 3, "wheat_9": 2, "wheat_10": 5, "wheat_11": 2, "wheat_12": 1, "black_8": 2, "black_9": 4, "black_10": 1, "black_11": 2, "black_12": 3, "rust_brown_8": 1, "rust_brown_9": 3, "rust_brown_10": 4, "rust_brown_11": 2, "rust_brown_12": 1 },
