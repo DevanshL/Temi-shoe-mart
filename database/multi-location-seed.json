@@ -1,4 +1,17 @@
 {
+  "store_pins": {
+    "pune": "7821",
+    "bengaluru": "4910",
+    "hyderabad": "9154",
+    "chennai": "3620",
+    "chandigarh": "8147",
+    "mysuru": "5290",
+    "trivandrum": "6418",
+    "bhubaneswar": "7302",
+    "mangalore": "1945",
+    "indore": "8526",
+    "nagpur": "4073"
+  },
   "location": "none",
   "status": "idle",
   "robot_state": "idle",

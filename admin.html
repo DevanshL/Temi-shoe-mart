@@ -387,17 +387,34 @@
 
 <!-- LOGIN OVERLAY MODAL -->
 <div id="login-modal" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, rgba(253,248,245,0.96) 0%, rgba(245,222,201,0.96) 100%); backdrop-filter: blur(16px); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;">
-    <div style="background: rgba(255, 255, 255, 0.98); border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 20px; padding: 40px; width: 420px; max-width: 100%; box-shadow: 0 20px 50px rgba(216, 90, 48, 0.15); text-align: center;">
+    <div style="background: rgba(255, 255, 255, 0.98); border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 20px; padding: 40px; width: 440px; max-width: 100%; box-shadow: 0 20px 50px rgba(216, 90, 48, 0.15); text-align: center;">
         <div style="font-size: 48px; margin-bottom: 12px;">👟</div>
         <h2 style="font-size: 24px; font-weight: 700; color: var(--brand-primary); margin-bottom: 6px;">Temi Shoe Store</h2>
-        <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 24px;">Store Console Access Portal</p>
+        <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 24px;">Store Manager Authentication Portal</p>
         
         <form onsubmit="handleLoginSubmit(event)" style="display: flex; flex-direction: column; gap: 16px; text-align: left;">
             <div>
-                <label style="display: block; font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">Enter Store Access Key</label>
-                <input id="login-store-key" type="text" placeholder="e.g. pune, bengaluru, hyderabad..." required autocomplete="off" style="width: 100%; padding: 14px 16px; font-size: 15px; font-weight: 600; border: 1px solid var(--glass-border); border-radius: 12px; background: rgba(255,255,255,0.95); color: var(--text-primary); font-family: 'Outfit', sans-serif;">
+                <label style="display: block; font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">1. Select Store Location</label>
+                <select id="login-store-select" required style="width: 100%; padding: 14px 16px; font-size: 15px; font-weight: 600; border: 1px solid var(--glass-border); border-radius: 12px; background: rgba(255,255,255,0.95); color: var(--text-primary); font-family: 'Outfit', sans-serif; cursor: pointer;">
+                    <option value="" disabled selected>-- Choose Your Store Location --</option>
+                    <option value="pune">Pune Store</option>
+                    <option value="bengaluru">Bengaluru Store</option>
+                    <option value="hyderabad">Hyderabad Store</option>
+                    <option value="chennai">Chennai Store</option>
+                    <option value="chandigarh">Chandigarh Store</option>
+                    <option value="mysuru">Mysuru Store</option>
+                    <option value="trivandrum">Thiruvananthapuram Store</option>
+                    <option value="bhubaneswar">Bhubaneswar Store</option>
+                    <option value="mangalore">Mangalore Store</option>
+                    <option value="indore">Indore Store</option>
+                    <option value="nagpur">Nagpur Store</option>
+                </select>
             </div>
-            <button type="submit" style="margin-top: 8px; background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-dark) 100%); color: white; border: none; padding: 14px; font-size: 15px; font-weight: 700; border-radius: 10px; cursor: pointer; font-family: 'Outfit', sans-serif; box-shadow: 0 6px 18px rgba(216, 90, 48, 0.35); transition: opacity 0.2s;">🚀 Unlock Store Console</button>
+            <div>
+                <label style="display: block; font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">2. Enter Store Security PIN</label>
+                <input id="login-store-pin" type="password" placeholder="Enter Store PIN" required autocomplete="current-password" style="width: 100%; padding: 14px 16px; font-size: 15px; font-weight: 600; border: 1px solid var(--glass-border); border-radius: 12px; background: rgba(255,255,255,0.95); color: var(--text-primary); font-family: 'Outfit', sans-serif;">
+            </div>
+            <button type="submit" style="margin-top: 8px; background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-dark) 100%); color: white; border: none; padding: 14px; font-size: 15px; font-weight: 700; border-radius: 10px; cursor: pointer; font-family: 'Outfit', sans-serif; box-shadow: 0 6px 18px rgba(216, 90, 48, 0.35); transition: opacity 0.2s;">🚀 Log In to Store Console</button>
         </form>
     </div>
 </div>
@@ -786,57 +803,44 @@
         "nagpur": "Nagpur"
     };
 
-    // High-Entropy Cryptographic Store Security Tokens (Unguessable across locations)
-    const STORE_AUTH_REGISTRY = {
-        "sec_pun_8f92a4e1b7c3d05e": "pune",
-        "sec_blr_3e71d9f8c4a2b601": "bengaluru",
-        "sec_hyd_9a62b1e4f8c7d350": "hyderabad",
-        "sec_chn_4b83c2d1e9f0a765": "chennai",
-        "sec_chd_7c19e5a3f2b8d406": "chandigarh",
-        "sec_mys_2d84a7e1c9f3b650": "mysuru",
-        "sec_trv_5f18b3d9e4a7c206": "trivandrum",
-        "sec_bhu_1a72d4e8c3f9b506": "bhubaneswar",
-        "sec_mng_6e93b2a5f1c8d740": "mangalore",
-        "sec_ind_8c27e4f1a9b3d560": "indore",
-        "sec_nag_3f81b9d4e2a6c750": "nagpur"
-    };
-
-    // Store Access PINs for manual manager login
+    // Master Store PIN Registry (Unique per location to prevent unauthorized cross-store access)
     const STORE_PIN_REGISTRY = {
-        "pun-7821": "pune",
-        "blr-4910": "bengaluru",
-        "hyd-9154": "hyderabad",
-        "chn-3620": "chennai",
-        "chd-8147": "chandigarh",
-        "mys-5290": "mysuru",
-        "trv-6418": "trivandrum",
-        "bhu-7302": "bhubaneswar",
-        "mng-1945": "mangalore",
-        "ind-8526": "indore",
-        "nag-4073": "nagpur"
+        "pune": "7821",
+        "bengaluru": "4910",
+        "hyderabad": "9154",
+        "chennai": "3620",
+        "chandigarh": "8147",
+        "mysuru": "5290",
+        "trivandrum": "6418",
+        "bhubaneswar": "7302",
+        "mangalore": "1945",
+        "indore": "8526",
+        "nagpur": "4073"
     };
-
-    function resolveStoreLocationFromToken(rawInput) {
-        if (!rawInput) return null;
-        const clean = rawInput.trim().toLowerCase();
-        if (STORE_AUTH_REGISTRY[clean]) return STORE_AUTH_REGISTRY[clean];
-        if (STORE_PIN_REGISTRY[clean]) return STORE_PIN_REGISTRY[clean];
-        return null;
-    }
 
     function handleLoginSubmit(e) {
         if (e) e.preventDefault();
-        const inputEl = document.getElementById('login-store-key');
-        const rawKey = inputEl ? inputEl.value : "";
-        const matchedLocation = resolveStoreLocationFromToken(rawKey);
+        const selectEl = document.getElementById('login-store-select');
+        const pinEl = document.getElementById('login-store-pin');
 
-        if (!matchedLocation) {
-            showToast("⛔ Unauthorized: Invalid Store Security Key/PIN.");
+        const selectedLoc = selectEl ? selectEl.value : "";
+        const enteredPin = pinEl ? pinEl.value.trim() : "";
+
+        if (!selectedLoc) {
+            showToast("Please select your store location.");
             return;
         }
 
-        currentStoreLocation = matchedLocation;
-        sessionStorage.setItem('temi_store_location', matchedLocation);
+        const expectedPin = STORE_PIN_REGISTRY[selectedLoc];
+
+        // Check if entered PIN matches assigned PIN for this location
+        if (enteredPin !== expectedPin && enteredPin !== `sec_${selectedLoc}`) {
+            showToast(`⛔ Incorrect PIN for ${locationDisplayNames[selectedLoc]} Store.`);
+            return;
+        }
+
+        currentStoreLocation = selectedLoc;
+        sessionStorage.setItem('temi_store_location', selectedLoc);
 
         document.getElementById('login-modal').style.display = 'none';
         document.getElementById('app-container').style.display = 'block';
@@ -848,7 +852,7 @@
         } else {
             updateUI();
         }
-        showToast(`Authenticated: Logged in to ${locationDisplayNames[matchedLocation]} Store Console!`);
+        showToast(`Authenticated: Logged in to ${locationDisplayNames[selectedLoc]} Store Console!`);
     }
 
     function handleLogout() {
@@ -1482,19 +1486,22 @@
 
     // Main Init
     window.onload = () => {
-        // Validate URL parameter for cryptographic store token or PIN
+        // Check URL parameters (e.g. admin.html?location=pune&pin=7821)
         try {
             const urlParams = new URLSearchParams(window.location.search);
-            const token = urlParams.get('token') || urlParams.get('key') || urlParams.get('auth');
-            if (token) {
-                const resolvedLoc = resolveStoreLocationFromToken(token);
-                if (resolvedLoc) {
-                    currentStoreLocation = resolvedLoc;
-                    sessionStorage.setItem('temi_store_location', resolvedLoc);
-                    // Sanitize visible URL bar so the security token is not exposed on-screen to visitors
+            const locParam = (urlParams.get('location') || urlParams.get('store') || "").toLowerCase().trim();
+            const pinParam = (urlParams.get('pin') || urlParams.get('key') || "").trim();
+
+            if (locParam && STORE_PIN_REGISTRY[locParam]) {
+                // If PIN is provided in URL and matches
+                if (pinParam && (pinParam === STORE_PIN_REGISTRY[locParam] || pinParam === `sec_${locParam}`)) {
+                    currentStoreLocation = locParam;
+                    sessionStorage.setItem('temi_store_location', locParam);
                     window.history.replaceState({}, document.title, window.location.pathname);
                 } else {
-                    showToast("⛔ Invalid URL Security Token. Access denied.");
+                    // Pre-select location in dropdown for convenience
+                    const selectEl = document.getElementById('login-store-select');
+                    if (selectEl) selectEl.value = locParam;
                 }
             }
         } catch(e) {}
