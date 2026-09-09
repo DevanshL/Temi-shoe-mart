@@ -387,7 +387,20 @@
 <div class="container">
 
     <header>
-        <h1>👟 Temi Shoe Store - Staff Console</h1>
+        <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+            <h1>👟 Temi Shoe Mart - Living Labs</h1>
+            <div style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.85); border-radius: 20px; padding: 4px 12px; border: 1px solid var(--glass-border); gap: 8px;">
+                <span style="font-weight: 700; color: var(--brand-primary); font-size: 13px;">📍 Living Lab:</span>
+                <select id="select-store-location" onchange="onStoreLocationChanged(this.value)" style="border: none; background: transparent; font-weight: 700; color: var(--text-primary); font-size: 13px; cursor: pointer; outline: none; font-family: 'Outfit', sans-serif;">
+                    <option value="pune" selected>Pune (Hinjawadi)</option>
+                    <option value="bengaluru">Bengaluru (Electronic City)</option>
+                    <option value="hyderabad">Hyderabad (Gachibowli)</option>
+                    <option value="chennai">Chennai (Mahindra World City)</option>
+                    <option value="chandigarh">Chandigarh (IT Park)</option>
+                    <option value="mysuru">Mysuru (GEC)</option>
+                </select>
+            </div>
+        </div>
         <div id="connection-status" class="status-badge">Mode: Simulator (Offline)</div>
     </header>
 
@@ -591,6 +604,8 @@
     let firebaseApp = null;
     let db = null;
     let isFirebaseConnected = false;
+    let currentStoreLocation = "pune";
+    let activeListeners = [];
 
     // Hardcoded Firebase Config (just like Temi Butler Admin page)
     const firebaseConfig = {
@@ -746,74 +761,137 @@
         updateUI();
     }
 
-    // Firebase Listener bindings
+    // Switch Active Store / Living Lab location
+    function onStoreLocationChanged(newLoc) {
+        currentStoreLocation = newLoc || "pune";
+        showToast(`Switched view to Living Lab: ${currentStoreLocation.toUpperCase()}`);
+        
+        if (isFirebaseConnected && db) {
+            bindFirebaseListeners();
+        } else {
+            updateUI();
+        }
+    }
+
+    // Firebase Listener bindings (Scoped to currentStoreLocation)
     function bindFirebaseListeners() {
-        // Robot telemetry
-        db.ref('location').on('value', (snap) => {
-            mockData.location = snap.val() || "none";
-            document.getElementById('tel-location').innerText = mockData.location;
+        // Clean up previous listeners
+        if (activeListeners && activeListeners.length > 0) {
+            activeListeners.forEach(refObj => {
+                try {
+                    refObj.ref.off(refObj.event, refObj.callback);
+                } catch(e) {}
+            });
+            activeListeners = [];
+        }
+
+        const locRef = db.ref(`locations/${currentStoreLocation}`);
+
+        // Helper to register and track listener
+        function addTrackedListener(ref, event, callback) {
+            ref.on(event, callback);
+            activeListeners.push({ ref, event, callback });
+        }
+
+        // Robot telemetry for selected location
+        addTrackedListener(locRef.child('location'), 'value', (snap) => {
+            let val = snap.val();
+            if (val === null) {
+                // Fallback to root location
+                db.ref('location').once('value', (rootSnap) => {
+                    mockData.location = rootSnap.val() || "none";
+                    document.getElementById('tel-location').innerText = mockData.location;
+                });
+            } else {
+                mockData.location = val || "none";
+                document.getElementById('tel-location').innerText = mockData.location;
+            }
         });
 
-        db.ref('status').on('value', (snap) => {
-            mockData.status = snap.val() || "idle";
-            document.getElementById('tel-status').innerText = mockData.status;
+        addTrackedListener(locRef.child('status'), 'value', (snap) => {
+            let val = snap.val();
+            if (val === null) {
+                db.ref('status').once('value', (rootSnap) => {
+                    mockData.status = rootSnap.val() || "idle";
+                    document.getElementById('tel-status').innerText = mockData.status;
+                });
+            } else {
+                mockData.status = val || "idle";
+                document.getElementById('tel-status').innerText = mockData.status;
+            }
         });
 
-        db.ref('robot_state').on('value', (snap) => {
-            mockData.robot_state = snap.val() || "idle";
-            document.getElementById('tel-state').innerText = mockData.robot_state;
+        addTrackedListener(locRef.child('robot_state'), 'value', (snap) => {
+            let val = snap.val();
+            if (val === null) {
+                db.ref('robot_state').once('value', (rootSnap) => {
+                    mockData.robot_state = rootSnap.val() || "idle";
+                    document.getElementById('tel-state').innerText = mockData.robot_state;
+                });
+            } else {
+                mockData.robot_state = val || "idle";
+                document.getElementById('tel-state').innerText = mockData.robot_state;
+            }
         });
 
-        db.ref('active_order_id').on('value', (snap) => {
-            mockData.active_order_id = snap.val() || "";
-            document.getElementById('tel-active-order').innerText = mockData.active_order_id || "-";
+        addTrackedListener(locRef.child('active_order_id'), 'value', (snap) => {
+            let val = snap.val();
+            if (val === null) {
+                db.ref('active_order_id').once('value', (rootSnap) => {
+                    mockData.active_order_id = rootSnap.val() || "";
+                    document.getElementById('tel-active-order').innerText = mockData.active_order_id || "-";
+                });
+            } else {
+                mockData.active_order_id = val || "";
+                document.getElementById('tel-active-order').innerText = mockData.active_order_id || "-";
+            }
         });
 
-        // Catalog listeners
-        db.ref('catalog').on('value', (snap) => {
-            const data = snap.val();
-            let needsUpdate = false;
-            if (data && Object.keys(data).length >= 7) {
-                for (const key of Object.keys(data)) {
-                    if (!data[key].colorHex || !data[key].category || !data[key].shapeSet) {
-                        needsUpdate = true;
-                        break;
+        // Store-specific incoming orders
+        addTrackedListener(locRef.child('orders'), 'value', (snap) => {
+            if (snap.exists()) {
+                mockData.orders = snap.val() || {};
+                renderOrdersList();
+            } else {
+                // Fallback to root orders
+                db.ref('orders').once('value', (rootSnap) => {
+                    mockData.orders = rootSnap.val() || {};
+                    renderOrdersList();
+                });
+            }
+        });
+
+        // Store-specific stock listener
+        addTrackedListener(locRef.child('stock'), 'value', (stockSnap) => {
+            if (stockSnap.exists()) {
+                const storeStockData = stockSnap.val();
+                for (let shoeId in storeStockData) {
+                    if (mockData.catalog[shoeId]) {
+                        mockData.catalog[shoeId].stock = storeStockData[shoeId];
                     }
                 }
-            } else {
-                needsUpdate = true;
-            }
-
-            if (!needsUpdate) {
-                mockData.catalog = data;
                 renderInventoryList();
-            } else {
-                console.log("[Seeding/Healing] Merging missing catalog properties (colorHex/category/shapeSet) into Firebase...");
-                const updateObj = {};
-                for (const key of Object.keys(mockData.catalog)) {
-                    const defaultItem = mockData.catalog[key];
-                    const dbItem = (data && data[key]) ? data[key] : {};
-                    
-                    updateObj[key] = {
-                        name: dbItem.name || defaultItem.name,
-                        brand: dbItem.brand || defaultItem.brand,
-                        price: dbItem.price !== undefined ? dbItem.price : defaultItem.price,
-                        colors: dbItem.colors || defaultItem.colors,
-                        sizes: dbItem.sizes || defaultItem.sizes,
-                        stock: dbItem.stock || defaultItem.stock,
-                        colorHex: dbItem.colorHex || defaultItem.colorHex,
-                        category: dbItem.category || defaultItem.category,
-                        shapeSet: dbItem.shapeSet || defaultItem.shapeSet
-                    };
-                }
-                db.ref('catalog').update(updateObj);
             }
         });
 
-        // Incoming orders
-        db.ref('orders').on('value', (snap) => {
-            mockData.orders = snap.val() || {};
-            renderOrdersList();
+        // Global Catalog listener
+        addTrackedListener(db.ref('catalog'), 'value', (snap) => {
+            const data = snap.val();
+            if (data) {
+                mockData.catalog = data;
+                // Re-apply store stock if available
+                locRef.child('stock').once('value', (sSnap) => {
+                    if (sSnap.exists()) {
+                        const sData = sSnap.val();
+                        for (let sId in sData) {
+                            if (mockData.catalog[sId]) {
+                                mockData.catalog[sId].stock = sData[sId];
+                            }
+                        }
+                    }
+                    renderInventoryList();
+                });
+            }
         });
     }
 
@@ -1161,18 +1239,24 @@
         }
     }
 
-    // Update Stock Value directly in database/simulator state
+    // Update Stock Value directly in database/simulator state (Scoped to currentStoreLocation)
     function updateStockValue(shoeId, color, size, val) {
         const numericVal = Math.max(0, parseInt(val) || 0);
         const key = color + "_" + size;
 
+        if (!mockData.catalog[shoeId].stock) {
+            mockData.catalog[shoeId].stock = {};
+        }
         mockData.catalog[shoeId].stock[key] = numericVal;
         localStorage.setItem('shoe_catalog', JSON.stringify(mockData.catalog));
 
         if (isFirebaseConnected) {
-            db.ref('catalog/' + shoeId + '/stock/' + key).set(numericVal).catch(e => {
-                console.warn("Firebase stock update failed, fallback to local storage.", e);
+            // Write to locations/{storeLocation}/stock/{shoeId}/{key}
+            db.ref(`locations/${currentStoreLocation}/stock/${shoeId}/${key}`).set(numericVal).catch(e => {
+                console.warn("Location stock update failed.", e);
             });
+            // Also write to root catalog stock for backward compatibility
+            db.ref(`catalog/${shoeId}/stock/${key}`).set(numericVal).catch(e => {});
         }
     }
 
@@ -1194,9 +1278,12 @@
     function manualDispatchManual() {
         const dest = document.getElementById('select-destination-manual').value;
         if (isFirebaseConnected) {
+            db.ref(`locations/${currentStoreLocation}/location`).set(dest);
+            db.ref(`locations/${currentStoreLocation}/status`).set("manual_override_to_" + dest);
+            // Also update root for backward compatibility
             db.ref('location').set(dest);
             db.ref('status').set("manual_override_to_" + dest);
-            showToast(`Manual override sent: navigating to '${dest}'`);
+            showToast(`Manual override sent for [${currentStoreLocation.toUpperCase()}]: navigating to '${dest}'`);
         } else {
             mockData.location = dest;
             mockData.status = "manual_override_to_" + dest;
@@ -1221,6 +1308,11 @@
 
                 if (shoeId && color && size) {
                     if (isFirebaseConnected) {
+                        // Refund to store stock
+                        db.ref(`locations/${currentStoreLocation}/stock/${shoeId}/${key}`).transaction(curr => {
+                            return (curr !== null && curr !== undefined ? curr : 0) + qty;
+                        });
+                        // Refund to root catalog stock
                         db.ref(`catalog/${shoeId}/stock/${key}`).transaction(curr => {
                             return (curr !== null && curr !== undefined ? curr : 0) + qty;
                         });
@@ -1234,6 +1326,7 @@
         }
 
         if (isFirebaseConnected) {
+            db.ref(`locations/${currentStoreLocation}/orders/${orderId}/status`).set("cancelled");
             db.ref(`orders/${orderId}/status`).set("cancelled");
         }
         if (mockData.orders && mockData.orders[orderId]) {
@@ -1253,12 +1346,19 @@
         }
 
         if (isFirebaseConnected) {
+            // Reset locations/{storeId}/
+            db.ref(`locations/${currentStoreLocation}/location`).set("none");
+            db.ref(`locations/${currentStoreLocation}/status`).set("idle");
+            db.ref(`locations/${currentStoreLocation}/robot_state`).set("idle");
+            db.ref(`locations/${currentStoreLocation}/active_order_id`).set("");
+
+            // Also reset root for backwards compatibility
             db.ref('location').set("none");
             db.ref('status').set("idle");
             db.ref('robot_state').set("idle");
             db.ref('active_order_id').set("");
             db.ref('current_delivering_round').set("");
-            showToast(refunded ? "Robot reset to idle & active order stock refunded!" : "Robot state reset successfully!");
+            showToast(refunded ? `[${currentStoreLocation.toUpperCase()}] Robot reset to idle & stock refunded!` : `[${currentStoreLocation.toUpperCase()}] Robot state reset successfully!`);
         } else {
             mockData.location = "none";
             mockData.status = "idle";
@@ -1273,6 +1373,11 @@
     // Order Actions
     function startDelivery(orderId) {
         if (isFirebaseConnected) {
+            db.ref(`locations/${currentStoreLocation}/active_order_id`).set(orderId);
+            db.ref(`locations/${currentStoreLocation}/orders/${orderId}/status`).set("ongoing");
+            db.ref(`locations/${currentStoreLocation}/location`).set("stockroom");
+            db.ref(`locations/${currentStoreLocation}/status`).set("navigating_to_storeroom");
+            
             db.ref('active_order_id').set(orderId);
             db.ref('orders/' + orderId + '/status').set("ongoing");
             db.ref('location').set("stockroom");
@@ -1289,6 +1394,11 @@
     // Complete delivery
     function completeOrder(orderId) {
         if (isFirebaseConnected) {
+            db.ref(`locations/${currentStoreLocation}/orders/${orderId}/status`).set("complete");
+            db.ref(`locations/${currentStoreLocation}/active_order_id`).set("");
+            db.ref(`locations/${currentStoreLocation}/location`).set("showroom");
+            db.ref(`locations/${currentStoreLocation}/status`).set("returning_to_pickup_zone");
+
             db.ref('orders/' + orderId + '/status').set("complete");
             db.ref('active_order_id').set("");
             db.ref('location').set("showroom");
