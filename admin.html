@@ -873,72 +873,31 @@
             activeListeners.push({ ref, event, callback });
         }
 
-        // Robot telemetry for selected location
+        // Robot telemetry strictly for selected store location
         addTrackedListener(locRef.child('location'), 'value', (snap) => {
-            let val = snap.val();
-            if (val === null) {
-                // Fallback to root location
-                db.ref('location').once('value', (rootSnap) => {
-                    mockData.location = rootSnap.val() || "none";
-                    document.getElementById('tel-location').innerText = mockData.location;
-                });
-            } else {
-                mockData.location = val || "none";
-                document.getElementById('tel-location').innerText = mockData.location;
-            }
+            mockData.location = snap.val() || "none";
+            document.getElementById('tel-location').innerText = mockData.location;
         });
 
         addTrackedListener(locRef.child('status'), 'value', (snap) => {
-            let val = snap.val();
-            if (val === null) {
-                db.ref('status').once('value', (rootSnap) => {
-                    mockData.status = rootSnap.val() || "idle";
-                    document.getElementById('tel-status').innerText = mockData.status;
-                });
-            } else {
-                mockData.status = val || "idle";
-                document.getElementById('tel-status').innerText = mockData.status;
-            }
+            mockData.status = snap.val() || "idle";
+            document.getElementById('tel-status').innerText = mockData.status;
         });
 
         addTrackedListener(locRef.child('robot_state'), 'value', (snap) => {
-            let val = snap.val();
-            if (val === null) {
-                db.ref('robot_state').once('value', (rootSnap) => {
-                    mockData.robot_state = rootSnap.val() || "idle";
-                    document.getElementById('tel-state').innerText = mockData.robot_state;
-                });
-            } else {
-                mockData.robot_state = val || "idle";
-                document.getElementById('tel-state').innerText = mockData.robot_state;
-            }
+            mockData.robot_state = snap.val() || "idle";
+            document.getElementById('tel-state').innerText = mockData.robot_state;
         });
 
         addTrackedListener(locRef.child('active_order_id'), 'value', (snap) => {
-            let val = snap.val();
-            if (val === null) {
-                db.ref('active_order_id').once('value', (rootSnap) => {
-                    mockData.active_order_id = rootSnap.val() || "";
-                    document.getElementById('tel-active-order').innerText = mockData.active_order_id || "-";
-                });
-            } else {
-                mockData.active_order_id = val || "";
-                document.getElementById('tel-active-order').innerText = mockData.active_order_id || "-";
-            }
+            mockData.active_order_id = snap.val() || "";
+            document.getElementById('tel-active-order').innerText = mockData.active_order_id || "-";
         });
 
-        // Store-specific incoming orders
+        // Store-specific incoming orders strictly for selected location
         addTrackedListener(locRef.child('orders'), 'value', (snap) => {
-            if (snap.exists()) {
-                mockData.orders = snap.val() || {};
-                renderOrdersList();
-            } else {
-                // Fallback to root orders
-                db.ref('orders').once('value', (rootSnap) => {
-                    mockData.orders = rootSnap.val() || {};
-                    renderOrdersList();
-                });
-            }
+            mockData.orders = snap.val() || {};
+            renderOrdersList();
         });
 
         // Store-specific stock listener
@@ -1331,12 +1290,10 @@
         localStorage.setItem('shoe_catalog', JSON.stringify(mockData.catalog));
 
         if (isFirebaseConnected) {
-            // Write to locations/{storeLocation}/stock/{shoeId}/{key}
+            // Write strictly to locations/{storeLocation}/stock/{shoeId}/{key}
             db.ref(`locations/${currentStoreLocation}/stock/${shoeId}/${key}`).set(numericVal).catch(e => {
                 console.warn("Location stock update failed.", e);
             });
-            // Also write to root catalog stock for backward compatibility
-            db.ref(`catalog/${shoeId}/stock/${key}`).set(numericVal).catch(e => {});
         }
     }
 
@@ -1360,9 +1317,6 @@
         if (isFirebaseConnected) {
             db.ref(`locations/${currentStoreLocation}/location`).set(dest);
             db.ref(`locations/${currentStoreLocation}/status`).set("manual_override_to_" + dest);
-            // Also update root for backward compatibility
-            db.ref('location').set(dest);
-            db.ref('status').set("manual_override_to_" + dest);
             showToast(`Manual override sent for [${currentStoreLocation.toUpperCase()}]: navigating to '${dest}'`);
         } else {
             mockData.location = dest;
@@ -1388,12 +1342,8 @@
 
                 if (shoeId && color && size) {
                     if (isFirebaseConnected) {
-                        // Refund to store stock
+                        // Refund strictly to this store's stock
                         db.ref(`locations/${currentStoreLocation}/stock/${shoeId}/${key}`).transaction(curr => {
-                            return (curr !== null && curr !== undefined ? curr : 0) + qty;
-                        });
-                        // Refund to root catalog stock
-                        db.ref(`catalog/${shoeId}/stock/${key}`).transaction(curr => {
                             return (curr !== null && curr !== undefined ? curr : 0) + qty;
                         });
                     }
@@ -1407,7 +1357,6 @@
 
         if (isFirebaseConnected) {
             db.ref(`locations/${currentStoreLocation}/orders/${orderId}/status`).set("cancelled");
-            db.ref(`orders/${orderId}/status`).set("cancelled");
         }
         if (mockData.orders && mockData.orders[orderId]) {
             mockData.orders[orderId].status = "cancelled";
@@ -1426,18 +1375,11 @@
         }
 
         if (isFirebaseConnected) {
-            // Reset locations/{storeId}/
+            // Reset strictly under locations/{storeId}/
             db.ref(`locations/${currentStoreLocation}/location`).set("none");
             db.ref(`locations/${currentStoreLocation}/status`).set("idle");
             db.ref(`locations/${currentStoreLocation}/robot_state`).set("idle");
             db.ref(`locations/${currentStoreLocation}/active_order_id`).set("");
-
-            // Also reset root for backwards compatibility
-            db.ref('location').set("none");
-            db.ref('status').set("idle");
-            db.ref('robot_state').set("idle");
-            db.ref('active_order_id').set("");
-            db.ref('current_delivering_round').set("");
             showToast(refunded ? `[${currentStoreLocation.toUpperCase()}] Robot reset to idle & stock refunded!` : `[${currentStoreLocation.toUpperCase()}] Robot state reset successfully!`);
         } else {
             mockData.location = "none";
@@ -1457,11 +1399,6 @@
             db.ref(`locations/${currentStoreLocation}/orders/${orderId}/status`).set("ongoing");
             db.ref(`locations/${currentStoreLocation}/location`).set("stockroom");
             db.ref(`locations/${currentStoreLocation}/status`).set("navigating_to_storeroom");
-            
-            db.ref('active_order_id').set(orderId);
-            db.ref('orders/' + orderId + '/status').set("ongoing");
-            db.ref('location').set("stockroom");
-            db.ref('status').set("navigating_to_storeroom");
         } else {
             mockData.active_order_id = orderId;
             mockData.orders[orderId].status = "ongoing";
@@ -1478,11 +1415,6 @@
             db.ref(`locations/${currentStoreLocation}/active_order_id`).set("");
             db.ref(`locations/${currentStoreLocation}/location`).set("showroom");
             db.ref(`locations/${currentStoreLocation}/status`).set("returning_to_pickup_zone");
-
-            db.ref('orders/' + orderId + '/status').set("complete");
-            db.ref('active_order_id').set("");
-            db.ref('location').set("showroom");
-            db.ref('status').set("returning_to_pickup_zone");
         } else {
             mockData.orders[orderId].status = "complete";
             mockData.active_order_id = "";

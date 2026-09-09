@@ -475,24 +475,13 @@ public class FirebaseRepo {
         orderMap.put("createdAt", System.currentTimeMillis());
         orderMap.put("locationId", storeLocationId);
 
-        // Perform writes under locations/{storeId}/ and sync active order states
+        // Perform writes strictly under locations/{storeLocationId}/
         Map<String, Object> updates = new HashMap<>();
-        
-        // 1. Write under locations/{storeLocationId}/
         updates.put("locations/" + storeLocationId + "/orders/" + orderId, orderMap);
         updates.put("locations/" + storeLocationId + "/active_order_id", orderId);
         updates.put("locations/" + storeLocationId + "/location", "moving");
         updates.put("locations/" + storeLocationId + "/status", "traveling_storeroom");
         updates.put("locations/" + storeLocationId + "/robot_state", "moving");
-
-        // 2. Also write root-level keys for backwards compatibility with single-store monitors
-        updates.put("orders/" + orderId, orderMap);
-        updates.put("active_order_id", orderId);
-        updates.put("location", "moving");
-        updates.put("status", "traveling_storeroom");
-        updates.put("robot_state", "moving");
-        updates.put("admin/notification_pending", true);
-        updates.put("admin/latest_order_id", orderId);
 
         dbRef.updateChildren(updates, (databaseError, databaseReference) -> {
             if (databaseError == null) {
@@ -557,42 +546,18 @@ public class FirebaseRepo {
             return;
         }
 
-        // Try reading from locations/{storeLocationId}/orders/{orderId}/items first
+        // Read strictly from locations/{storeLocationId}/orders/{orderId}/items
         dbRef.child("locations").child(storeLocationId).child("orders").child(orderId).child("items")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists() && snapshot.getChildrenCount() > 0) {
-                    List<CartItem> list = new ArrayList<>();
+                List<CartItem> list = new ArrayList<>();
+                if (snapshot.exists()) {
                     for (DataSnapshot itemSnap : snapshot.getChildren()) {
                         CartItem item = itemSnap.getValue(CartItem.class);
                         if (item != null) {
                             list.add(item);
                         }
-                    }
-                    callback.onOrderDetailsLoaded(list);
-                } else {
-                    // Fallback to root /orders/{orderId}/items
-                    fetchRootOrderItems(orderId, callback);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                fetchRootOrderItems(orderId, callback);
-            }
-        });
-    }
-
-    private void fetchRootOrderItems(String orderId, final OrderDetailsCallback callback) {
-        dbRef.child("orders").child(orderId).child("items").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                List<CartItem> list = new ArrayList<>();
-                for (DataSnapshot itemSnap : snapshot.getChildren()) {
-                    CartItem item = itemSnap.getValue(CartItem.class);
-                    if (item != null) {
-                        list.add(item);
                     }
                 }
                 callback.onOrderDetailsLoaded(list);
@@ -618,28 +583,18 @@ public class FirebaseRepo {
         if (rootListenerAttached) return;
         rootListenerAttached = true;
 
-        // Listen to locations/{storeLocationId} node
+        // Listen strictly to locations/{storeLocationId} node
         if (robotStateListener != null && dbRef != null) {
-            dbRef.removeEventListener(robotStateListener);
+            dbRef.child("locations").child(storeLocationId).removeEventListener(robotStateListener);
         }
 
         robotStateListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                DataSnapshot storeSnap = snapshot.child("locations").child(storeLocationId);
-                
-                String loc = storeSnap.child("location").getValue(String.class);
-                String stat = storeSnap.child("status").getValue(String.class);
-                String rState = storeSnap.child("robot_state").getValue(String.class);
-                String activeOrd = storeSnap.child("active_order_id").getValue(String.class);
-
-                // Fallback to root snapshot if location branch is not yet populated
-                if (loc == null && stat == null && rState == null) {
-                    loc = snapshot.child("location").getValue(String.class);
-                    stat = snapshot.child("status").getValue(String.class);
-                    rState = snapshot.child("robot_state").getValue(String.class);
-                    activeOrd = snapshot.child("active_order_id").getValue(String.class);
-                }
+                String loc = snapshot.child("location").getValue(String.class);
+                String stat = snapshot.child("status").getValue(String.class);
+                String rState = snapshot.child("robot_state").getValue(String.class);
+                String activeOrd = snapshot.child("active_order_id").getValue(String.class);
 
                 robotLocation = loc != null ? loc : "none";
                 robotStatus = stat != null ? stat : "idle";
@@ -651,11 +606,11 @@ public class FirebaseRepo {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Log.e(TAG, "Error listening to robot state changes", error.toException());
+                Log.e(TAG, "Error listening to store robot state changes", error.toException());
             }
         };
 
-        dbRef.addValueEventListener(robotStateListener);
+        dbRef.child("locations").child(storeLocationId).addValueEventListener(robotStateListener);
     }
 
     public void removeRobotStateCallback(RobotStateCallback callback) {
@@ -672,18 +627,10 @@ public class FirebaseRepo {
 
         if (useFirebase && dbRef != null) {
             Map<String, Object> updates = new HashMap<>();
-            
-            // 1. Update under locations/{storeLocationId}/
             updates.put("locations/" + storeLocationId + "/location", location);
             updates.put("locations/" + storeLocationId + "/status", status);
             updates.put("locations/" + storeLocationId + "/robot_state", state);
             updates.put("locations/" + storeLocationId + "/active_order_id", activeOrdId);
-
-            // 2. Also update root for backwards compatibility
-            updates.put("location", location);
-            updates.put("status", status);
-            updates.put("robot_state", state);
-            updates.put("active_order_id", activeOrdId);
 
             dbRef.updateChildren(updates);
         }
