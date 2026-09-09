@@ -387,30 +387,17 @@
 
 <!-- LOGIN OVERLAY MODAL -->
 <div id="login-modal" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, rgba(253,248,245,0.96) 0%, rgba(245,222,201,0.96) 100%); backdrop-filter: blur(16px); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;">
-    <div style="background: rgba(255, 255, 255, 0.98); border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 20px; padding: 40px; width: 440px; max-width: 100%; box-shadow: 0 20px 50px rgba(216, 90, 48, 0.15); text-align: center;">
+    <div style="background: rgba(255, 255, 255, 0.98); border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 20px; padding: 40px; width: 420px; max-width: 100%; box-shadow: 0 20px 50px rgba(216, 90, 48, 0.15); text-align: center;">
         <div style="font-size: 48px; margin-bottom: 12px;">👟</div>
         <h2 style="font-size: 24px; font-weight: 700; color: var(--brand-primary); margin-bottom: 6px;">Temi Shoe Store</h2>
-        <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 24px;">Store Console &amp; Robot Monitor</p>
+        <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 24px;">Store Console Access Portal</p>
         
         <form onsubmit="handleLoginSubmit(event)" style="display: flex; flex-direction: column; gap: 16px; text-align: left;">
             <div>
-                <label style="display: block; font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">Select Your Store Location</label>
-                <select id="login-store-select" required style="width: 100%; padding: 14px 16px; font-size: 15px; font-weight: 600; border: 1px solid var(--glass-border); border-radius: 12px; background: rgba(255,255,255,0.95); color: var(--text-primary); font-family: 'Outfit', sans-serif; cursor: pointer;">
-                    <option value="" disabled selected>-- Choose Store Location --</option>
-                    <option value="pune">Pune Store</option>
-                    <option value="bengaluru">Bengaluru Store</option>
-                    <option value="hyderabad">Hyderabad Store</option>
-                    <option value="chennai">Chennai Store</option>
-                    <option value="chandigarh">Chandigarh Store</option>
-                    <option value="mysuru">Mysuru Store</option>
-                    <option value="trivandrum">Thiruvananthapuram Store</option>
-                    <option value="bhubaneswar">Bhubaneswar Store</option>
-                    <option value="mangalore">Mangalore Store</option>
-                    <option value="indore">Indore Store</option>
-                    <option value="nagpur">Nagpur Store</option>
-                </select>
+                <label style="display: block; font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">Enter Store Access Key</label>
+                <input id="login-store-key" type="text" placeholder="e.g. pune, bengaluru, hyderabad..." required autocomplete="off" style="width: 100%; padding: 14px 16px; font-size: 15px; font-weight: 600; border: 1px solid var(--glass-border); border-radius: 12px; background: rgba(255,255,255,0.95); color: var(--text-primary); font-family: 'Outfit', sans-serif;">
             </div>
-            <button type="submit" style="margin-top: 8px; background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-dark) 100%); color: white; border: none; padding: 14px; font-size: 15px; font-weight: 700; border-radius: 10px; cursor: pointer; font-family: 'Outfit', sans-serif; box-shadow: 0 6px 18px rgba(216, 90, 48, 0.35); transition: opacity 0.2s;">🚀 Enter Store Console</button>
+            <button type="submit" style="margin-top: 8px; background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-dark) 100%); color: white; border: none; padding: 14px; font-size: 15px; font-weight: 700; border-radius: 10px; cursor: pointer; font-family: 'Outfit', sans-serif; box-shadow: 0 6px 18px rgba(216, 90, 48, 0.35); transition: opacity 0.2s;">🚀 Unlock Store Console</button>
         </form>
     </div>
 </div>
@@ -801,15 +788,25 @@
 
     function handleLoginSubmit(e) {
         if (e) e.preventDefault();
-        const selectEl = document.getElementById('login-store-select');
-        const selected = selectEl ? selectEl.value : null;
-        if (!selected) {
-            showToast("Please select your store location.");
+        const inputEl = document.getElementById('login-store-key');
+        const rawKey = inputEl ? inputEl.value.trim().toLowerCase() : "";
+        
+        // Normalize alias / name checks
+        let matchedLocation = null;
+        for (let locKey in locationDisplayNames) {
+            if (rawKey === locKey || rawKey === locationDisplayNames[locKey].toLowerCase() || rawKey === `${locKey}_store` || rawKey === `${locKey}-store`) {
+                matchedLocation = locKey;
+                break;
+            }
+        }
+
+        if (!matchedLocation) {
+            showToast("⚠️ Invalid Store Access Key. Please check your assigned store code.");
             return;
         }
 
-        currentStoreLocation = selected;
-        sessionStorage.setItem('temi_store_location', selected);
+        currentStoreLocation = matchedLocation;
+        sessionStorage.setItem('temi_store_location', matchedLocation);
 
         document.getElementById('login-modal').style.display = 'none';
         document.getElementById('app-container').style.display = 'block';
@@ -821,7 +818,7 @@
         } else {
             updateUI();
         }
-        showToast(`Logged in to ${locationDisplayNames[selected]} Store Console!`);
+        showToast(`Authorized: Welcome to ${locationDisplayNames[matchedLocation]} Store Console!`);
     }
 
     function handleLogout() {
@@ -1523,13 +1520,18 @@
 
     // Main Init
     window.onload = () => {
-        // Check URL parameter for store location (e.g. admin.html?location=pune)
+        // Check URL parameter for direct store key (e.g. admin.html?key=pune or admin.html?location=pune)
         try {
             const urlParams = new URLSearchParams(window.location.search);
-            const paramLoc = urlParams.get('location') || urlParams.get('store');
-            if (paramLoc && locationDisplayNames[paramLoc.toLowerCase().trim()]) {
-                currentStoreLocation = paramLoc.toLowerCase().trim();
-                sessionStorage.setItem('temi_store_location', currentStoreLocation);
+            const paramKey = (urlParams.get('key') || urlParams.get('location') || urlParams.get('store') || "").toLowerCase().trim();
+            if (paramKey) {
+                for (let locKey in locationDisplayNames) {
+                    if (paramKey === locKey || paramKey === locationDisplayNames[locKey].toLowerCase() || paramKey === `${locKey}_store` || paramKey === `${locKey}-store`) {
+                        currentStoreLocation = locKey;
+                        sessionStorage.setItem('temi_store_location', locKey);
+                        break;
+                    }
+                }
             }
         } catch(e) {}
 
