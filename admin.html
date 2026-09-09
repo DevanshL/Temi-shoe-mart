@@ -852,11 +852,20 @@
 
             let actionButtonsHTML = "";
             if (isArrived) {
-                actionButtonsHTML = `<button class="btn btn-secondary" onclick="completeOrder('${id}')">Complete Delivery</button>`;
+                actionButtonsHTML = `
+                    <button class="btn btn-secondary" onclick="completeOrder('${id}')">Complete Delivery</button>
+                    <button class="btn btn-secondary" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; margin-top: 6px;" onclick="cancelAndRefundOrder('${id}'); resetRobotState();">Cancel & Refund</button>
+                `;
             } else if (!isOngoing) {
-                actionButtonsHTML = `<button class="btn" onclick="startDelivery('${id}')">Start Round</button>`;
+                actionButtonsHTML = `
+                    <button class="btn" onclick="startDelivery('${id}')">Start Round</button>
+                    <button class="btn btn-secondary" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; margin-top: 6px;" onclick="cancelAndRefundOrder('${id}'); resetRobotState();">Cancel & Refund</button>
+                `;
             } else {
-                actionButtonsHTML = `<span style="color: var(--brand-primary); font-weight: 600; font-size: 14px;">En Route...</span>`;
+                actionButtonsHTML = `
+                    <span style="color: var(--brand-primary); font-weight: 600; font-size: 14px;">En Route...</span>
+                    <button class="btn btn-secondary" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; margin-top: 6px;" onclick="cancelAndRefundOrder('${id}'); resetRobotState();">Cancel & Refund</button>
+                `;
             }
 
             card.innerHTML = `
@@ -865,7 +874,7 @@
                     <p style="margin-bottom: 8px;"><strong>Status:</strong> ${order.status.toUpperCase()}</p>
                     ${itemsHTML}
                 </div>
-                <div class="order-actions">
+                <div class="order-actions" style="display: flex; flex-direction: column; align-items: flex-end;">
                     ${actionButtonsHTML}
                 </div>
             `;
@@ -1196,15 +1205,60 @@
         }
     }
 
-    // Reset robot back to idle
+    // Cancel an order and restore stock back to catalog
+    function cancelAndRefundOrder(orderId) {
+        if (!orderId) return;
+
+        const order = mockData.orders ? mockData.orders[orderId] : null;
+        if (order && order.items) {
+            const items = Array.isArray(order.items) ? order.items : Object.values(order.items);
+            items.forEach(item => {
+                const shoeId = item.shoeId || item.shoe_id;
+                const color = (item.color || "").toLowerCase();
+                const size = item.size;
+                const qty = parseInt(item.qty || item.quantity || 1);
+                const key = color + "_" + size;
+
+                if (shoeId && color && size) {
+                    if (isFirebaseConnected) {
+                        db.ref(`catalog/${shoeId}/stock/${key}`).transaction(curr => {
+                            return (curr !== null && curr !== undefined ? curr : 0) + qty;
+                        });
+                    }
+                    if (mockData.catalog[shoeId] && mockData.catalog[shoeId].stock) {
+                        const current = mockData.catalog[shoeId].stock[key] || 0;
+                        mockData.catalog[shoeId].stock[key] = current + qty;
+                    }
+                }
+            });
+        }
+
+        if (isFirebaseConnected) {
+            db.ref(`orders/${orderId}/status`).set("cancelled");
+        }
+        if (mockData.orders && mockData.orders[orderId]) {
+            mockData.orders[orderId].status = "cancelled";
+        }
+        localStorage.setItem('shoe_catalog', JSON.stringify(mockData.catalog));
+    }
+
+    // Reset robot back to idle and refund any active order
     function resetRobotState() {
+        const activeId = mockData.active_order_id;
+        let refunded = false;
+
+        if (activeId) {
+            cancelAndRefundOrder(activeId);
+            refunded = true;
+        }
+
         if (isFirebaseConnected) {
             db.ref('location').set("none");
             db.ref('status').set("idle");
             db.ref('robot_state').set("idle");
             db.ref('active_order_id').set("");
             db.ref('current_delivering_round').set("");
-            showToast("Robot state reset successfully!");
+            showToast(refunded ? "Robot reset to idle & active order stock refunded!" : "Robot state reset successfully!");
         } else {
             mockData.location = "none";
             mockData.status = "idle";
@@ -1212,7 +1266,7 @@
             mockData.active_order_id = "";
             mockData.current_delivering_round = "";
             updateUI();
-            showToast("[Simulator Mode] Mock robot state reset to idle!");
+            showToast(refunded ? "[Simulator Mode] Robot reset & active order stock refunded!" : "[Simulator Mode] Mock robot state reset to idle!");
         }
     }
 
