@@ -95,6 +95,28 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
 
         // Initialize Local/Firebase Repo
         repo = FirebaseRepo.getInstance();
+        android.content.SharedPreferences prefs = getSharedPreferences("temi_kiosk_prefs", MODE_PRIVATE);
+        String savedLoc = prefs.getString("store_location_id", "pune");
+        repo.setStoreLocationId(savedLoc);
+
+        // Secret Admin trigger: 5 rapid taps on brand title to switch location
+        final TextView textBrandTitle = findViewById(R.id.text_brand_title);
+        if (textBrandTitle != null) {
+            final int[] tapCount = {0};
+            final long[] lastTapTime = {0};
+            textBrandTitle.setOnClickListener(v -> {
+                long now = System.currentTimeMillis();
+                if (now - lastTapTime[0] > 2000) {
+                    tapCount[0] = 0;
+                }
+                lastTapTime[0] = now;
+                tapCount[0]++;
+                if (tapCount[0] >= 5) {
+                    tapCount[0] = 0;
+                    showStoreLocationSelectorDialog(prefs);
+                }
+            });
+        }
         
         // Setup Order Screen trigger
         btnStartOrdering.setOnClickListener(v -> {
@@ -111,6 +133,38 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
             btnStatusOk.setEnabled(false); // Double tap prevention
             handleConfirmOkClick();
         });
+    }
+
+    private void showStoreLocationSelectorDialog(android.content.SharedPreferences prefs) {
+        final String[] locationKeys = {
+            "pune", "bengaluru", "hyderabad", "chennai", "chandigarh",
+            "mysuru", "trivandrum", "bhubaneswar", "mangalore", "indore", "nagpur"
+        };
+        final String[] locationNames = {
+            "Pune Store", "Bengaluru Store", "Hyderabad Store", "Chennai Store", "Chandigarh Store",
+            "Mysuru Store", "Thiruvananthapuram Store", "Bhubaneswar Store", "Mangalore Store", "Indore Store", "Nagpur Store"
+        };
+
+        String current = repo.getStoreLocationId();
+        int selectedIndex = 0;
+        for (int i = 0; i < locationKeys.length; i++) {
+            if (locationKeys[i].equalsIgnoreCase(current)) {
+                selectedIndex = i;
+                break;
+            }
+        }
+
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("⚙️ Configure Robot Store Location")
+            .setSingleChoiceItems(locationNames, selectedIndex, (dialog, which) -> {
+                String chosenKey = locationKeys[which];
+                prefs.edit().putString("store_location_id", chosenKey).apply();
+                repo.setStoreLocationId(chosenKey);
+                Toast.makeText(MainActivity.this, "Robot assigned to: " + locationNames[which], Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+            })
+            .setNegativeButton("Cancel", null)
+            .show();
     }
 
     @Override
