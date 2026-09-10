@@ -96,6 +96,15 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
         // Initialize Local/Firebase Repo
         repo = FirebaseRepo.getInstance();
         
+        // One-time setup check: Retrieve saved store location or prompt on very first install
+        android.content.SharedPreferences prefs = getSharedPreferences("temi_kiosk_prefs", MODE_PRIVATE);
+        String savedLoc = prefs.getString("store_location_id", null);
+        if (savedLoc != null && !savedLoc.trim().isEmpty()) {
+            repo.setStoreLocationId(savedLoc);
+        } else {
+            showFirstTimeStoreSetupDialog(prefs);
+        }
+
         // Setup Order Screen trigger
         btnStartOrdering.setOnClickListener(v -> {
             // Prevent spamming
@@ -111,6 +120,34 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
             btnStatusOk.setEnabled(false); // Double tap prevention
             handleConfirmOkClick();
         });
+    }
+
+    /**
+     * Displayed ONLY ONCE when the APK is first launched on a fresh Temi robot.
+     * Once selected, it saves permanently to SharedPreferences and never prompts again.
+     */
+    private void showFirstTimeStoreSetupDialog(final android.content.SharedPreferences prefs) {
+        final String[] locationKeys = {
+            "pune", "bengaluru", "hyderabad", "chennai", "chandigarh",
+            "mysuru", "trivandrum", "bhubaneswar", "mangalore", "indore", "nagpur"
+        };
+        final String[] locationNames = {
+            "Pune Store", "Bengaluru Store", "Hyderabad Store", "Chennai Store", "Chandigarh Store",
+            "Mysuru Store", "Thiruvananthapuram Store", "Bhubaneswar Store", "Mangalore Store", "Indore Store", "Nagpur Store"
+        };
+
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("📍 Setup Robot Location (One-Time)")
+            .setMessage("Please select the showcase location for this Temi robot:")
+            .setCancelable(false)
+            .setItems(locationNames, (dialog, which) -> {
+                String chosenKey = locationKeys[which];
+                prefs.edit().putString("store_location_id", chosenKey).apply();
+                repo.setStoreLocationId(chosenKey);
+                Toast.makeText(MainActivity.this, "Robot assigned to " + locationNames[which] + "!", Toast.LENGTH_LONG).show();
+                dialog.dismiss();
+            })
+            .show();
     }
 
     @Override
