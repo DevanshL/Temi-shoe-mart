@@ -1,127 +1,109 @@
 # Temi Shoe Mart 👟🤖
+### Multi-Location Autonomous Retail & Delivery Platform
 
-An autonomous footwear retail and delivery system built for the **Temi Robot**. It connects an on-robot Android customer kiosk with a live store management dashboard powered by **Firebase Realtime Database**, featuring **100% isolated multi-location support across 11 showcase centers in India**.
+**Temi Shoe Mart** is an autonomous in-store footwear retail and robotic fulfillment platform engineered for the **Temi Robot**. It couples an on-robot Android customer kiosk with a centralized, real-time store management console powered by **Firebase Realtime Database**, featuring **complete multi-location store isolation across 11 showcase centers in India**.
 
 ---
 
 ## 📑 Table of Contents
 
-1. [System Architecture & Multi-Location Overview](#1-system-architecture--multi-location-overview)
-2. [Prerequisites & Supported Versions](#2-prerequisites--supported-versions)
-3. [Temi Robot Setup & Waypoint Names](#3-temi-robot-setup--waypoint-names)
-4. [Firebase Realtime Database Setup](#4-firebase-realtime-database-setup)
-5. [Building & Installing the APK on Temi Robots](#5-building--installing-the-apk-on-temi-robots)
-6. [First-Time Robot Setup (One-Time Location Assignment)](#6-first-time-robot-setup-one-time-location-assignment)
-7. [Customer Kiosk Flow (On the Robot)](#7-customer-kiosk-flow-on-the-robot)
-8. [Store Admin Monitoring Dashboard (`admin.html`)](#8-store-admin-monitoring-dashboard-adminhtml)
-9. [Store Manager PIN Directory](#9-store-manager-pin-directory)
-10. [Troubleshooting & FAQs](#10-troubleshooting--faqs)
+1. [Architecture & Cloud Infrastructure Overview](#1-architecture--cloud-infrastructure-overview)
+2. [Hardware & Software Specifications](#2-hardware--software-specifications)
+3. [Physical Robot Waypoint Setup (On-Site Mapping)](#3-physical-robot-waypoint-setup-on-site-mapping)
+4. [Temi Robot Application Deployment (ADB over Wi-Fi)](#4-temi-robot-application-deployment-adb-over-wi-fi)
+5. [First-Boot Store Assignment](#5-first-boot-store-assignment)
+6. [Autonomous In-Store Customer & Delivery Flow](#6-autonomous-in-store-customer--delivery-flow)
+7. [Store Manager Web Console Guide (`admin.html`)](#7-store-manager-web-console-guide-adminhtml)
+8. [Store Manager PIN Directory (11 Locations)](#8-store-manager-pin-directory-11-locations)
+9. [Data Isolation & Concurrency Architecture](#9-data-isolation--concurrency-architecture)
+10. [Field Operations & Troubleshooting Runbook](#10-field-operations--troubleshooting-runbook)
 
 ---
 
-## 1. System Architecture & Multi-Location Overview
+## 1. Architecture & Cloud Infrastructure Overview
 
-The ecosystem consists of two main applications connected in real-time through Firebase:
+The system runs on a **centralized single-backend multi-tenant architecture**. All 11 regional showcase stores connect to the same central Firebase cloud instance, while maintaining strict, automated data isolation:
 
 ```
-                                  ┌─────────────────────────────────────────┐
-                                  │       Firebase Realtime Database        │
-                                  ├─────────────────────────────────────────┤
-                                  │  /catalog        (Global Shoe Models)   │
-                                  │  /store_pins     (Security Passcodes)   │
-                                  │  /locations/     (11 Isolated Stores)   │
-                                  └─────────────────────────────────────────┘
-                                           ▲                       ▲
-                        (Isolated Live Sync)│                       │(Isolated Live Sync)
-                                           ▼                       ▼
-┌──────────────────────────────────────────────────┐      ┌──────────────────────────────────────────┐
-│              Temi Android Kiosk App              │      │           Admin Web Dashboard            │
-│──────────────────────────────────────────────────│      │──────────────────────────────────────────│
-│ • Fullscreen Customer Kiosk                      │      │ • Store Manager Login Portal             │
-│ • Real-time Shoe Catalog & Dynamic Vector Colors │      │ • Live Robot Telemetry & Location        │
-│ • In-Memory Cart & Atomic Stock Decrement        │      │ • Live Incoming Orders Queue             │
-│ • Autonomous Navigation & TTS Voice Guidance     │      │ • Real-Time Inventory & Price Matrix     │
-│ • Physical Obstacle Detection & Auto-Recovery    │      │ • Manual Override & Auto-Refund Resets   │
-└──────────────────────────────────────────────────┘      └──────────────────────────────────────────┘
+                                  ┌──────────────────────────────────────────────┐
+                                  │      Centralized Firebase Realtime DB        │
+                                  │           (Single Cloud Instance)            │
+                                  ├──────────────────────────────────────────────┤
+                                  │  • /catalog     (Shared Global Products)     │
+                                  │  • /store_pins  (Central Authentication)     │
+                                  │  • /locations/  (11 Isolated Store Branches) │
+                                  └──────────────────────────────────────────────┘
+                                           ▲                            ▲
+                        (Isolated Live Sync)│                            │(Isolated Live Sync)
+                                           ▼                            ▼
+┌────────────────────────────────────────────────────────┐   ┌──────────────────────────────────────────┐
+│                 Temi Robot Kiosk App                   │   │          Store Manager Console           │
+│────────────────────────────────────────────────────────│   │──────────────────────────────────────────│
+│ • Fullscreen Customer Retail Kiosk                     │   │ • Secure Store Manager Portal            │
+│ • Dynamic Vector Color Layering & Live Catalog         │   │ • Real-Time Robot Telemetry & Waypoints  │
+│ • Atomic In-Store Stock Validation & Instant Ordering  │   │ • Live Order Queue & Dispatching         │
+│ • Autonomous Waypoint Navigation & TTS Voice Guidance  │   │ • Real-Time Color × Size Inventory Matrix│
+│ • Real-Time Obstacle Avoidance & Path Recovery         │   │ • One-Click Recovery & Emergency Stop    │
+└────────────────────────────────────────────────────────┘   └──────────────────────────────────────────┘
 ```
 
-### 11 Supported Indian Showcase Locations:
-* **Bengaluru** (`bengaluru`)
-* **Pune** (`pune`)
-* **Hyderabad** (`hyderabad`)
-* **Chennai** (`chennai`)
-* **Chandigarh** (`chandigarh`)
-* **Mysuru** (`mysuru`)
-* **Thiruvananthapuram** (`trivandrum`)
-* **Bhubaneswar** (`bhubaneswar`)
-* **Mangalore** (`mangalore`)
-* **Indore** (`indore`)
-* **Nagpur** (`nagpur`)
+> [!NOTE]
+> **Cloud Setup Status: Completed Centrally**  
+> The Firebase Realtime Database and seed data (`database/multi-location-seed.json`) are **already deployed and managed centrally**.  
+> **Regional store installers and field staff do NOT need to configure Firebase, create accounts, or import database files.** Local teams only need to follow Sections 3, 4, and 5 below.
+
+### Supported Showcase Centers:
+| City ID | Location Name | City ID | Location Name |
+| :--- | :--- | :--- | :--- |
+| `bengaluru` | Bengaluru Store | `trivandrum` | Thiruvananthapuram Store |
+| `pune` | Pune Store | `bhubaneswar` | Bhubaneswar Store |
+| `hyderabad` | Hyderabad Store | `mangalore` | Mangalore Store |
+| `chennai` | Chennai Store | `indore` | Indore Store |
+| `chandigarh` | Chandigarh Store | `nagpur` | Nagpur Store |
+| `mysuru` | Mysuru Store | | |
 
 ---
 
-## 2. Prerequisites & Supported Versions
+## 2. Hardware & Software Specifications
 
-| Component | Required Version | Description |
+| Parameter | Specification | Notes |
 | :--- | :--- | :--- |
-| **Java Development Kit** | **JDK 11** or **JDK 17** | Required to compile Android Java code |
-| **Android Gradle Plugin** | Gradle 8.2+ | Managed automatically via `./gradlew` |
-| **Android OS Target** | Android 7.0+ (API 24 to 34) | Standard operating system on Temi Robot |
-| **Robotemi SDK** | `com.robotemi:sdk:1.138.0` | Temi hardware communication (Navigation, TTS, Obstacles) |
-| **Firebase SDK** | Firebase Android BoM `32.8.0` | Real-time database sync |
-| **Web Browser** | Chrome, Edge, Safari, Firefox | For the Admin Dashboard |
+| **Target Hardware** | Temi Autonomous Robot | Standard display, lidar, 3D depth sensors, and delivery tray |
+| **Operating System** | Android 7.0+ (API level 24 to 34) | Compatible with all commercial Temi platform releases |
+| **Language & Toolchain** | Java 11 / JDK 17, Gradle 8.2+ | Automated build via `./gradlew` wrapper |
+| **Robot SDK** | Robotemi SDK (`com.robotemi:sdk:1.138.0`) | Autonomous navigation, TTS announcements, battery telemetry |
+| **Cloud Synchronization** | Firebase Android BoM `32.8.0` | Real-time WebSocket connection with offline queuing |
+| **Web Console** | Modern HTML5 / Vanilla ES6 / CSS3 | Zero-dependency, responsive glassmorphism UI |
 
 ---
 
-## 3. Temi Robot Setup & Waypoint Names
+## 3. Physical Robot Waypoint Setup (On-Site Mapping)
 
-Before running the application on the physical robot, Temi must map the store area and have **3 specific waypoint locations** saved in the Temi Settings menu.
+Before running the application, each regional Temi robot must have its physical retail floor mapped using Temi's native mapping system.
 
-### Required Location Names on Temi Map:
+### Required Waypoint Names:
 
 > [!IMPORTANT]
-> Name these locations **exactly as shown in lowercase** on your Temi map so the robot can navigate automatically:
+> The robot's automated state machine relies on **exact case-sensitive string matching**. Ensure all 3 waypoints are saved in **exact lowercase**:
 
-1. **`stockroom`** — The back-office / shoe storeroom where store staff load ordered shoes into Temi's tray.
-2. **`showroom`** — The front retail showroom / pickup area where the customer interacts with Temi and collects their shoes.
-3. **`home base`** — The charging dock / staging station where Temi returns when idle.
+1. **`stockroom`** — The back-office / inventory staging area where staff place shoes into Temi's tray.
+2. **`showroom`** — The front customer greeting area where customers browse the catalog and collect deliveries.
+3. **`home base`** — The docking station where Temi charges when idle.
 
-#### How to Save Waypoints on Temi:
-1. Open the Temi top menu ➔ **Locations / Map**.
-2. Drive Temi to the stockroom ➔ Tap **Add Location** ➔ Name it **`stockroom`**.
-3. Drive Temi to the customer area ➔ Tap **Add Location** ➔ Name it **`showroom`**.
-4. Set Temi's charging station as **`home base`**.
-
----
-
-## 4. Firebase Realtime Database Setup
-
-### Step 1: Import the Seed Database
-1. Open the [Firebase Console](https://console.firebase.google.com/) and navigate to your project (**`temi-shoe-mart`**).
-2. Go to **Build** ➔ **Realtime Database** ➔ **Data** tab.
-3. Click the **three vertical dots (⋮)** in the top-right corner of the data pane.
-4. Click **Import JSON**.
-5. Select the file from this repository:
-   `database/multi-location-seed.json`
-6. Click **Import**.
-
-### Step 2: Set Database Rules
-In the **Realtime Database** ➔ **Rules** tab, ensure read/write access is active:
-```json
-{
-  "rules": {
-    ".read": true,
-    ".write": true
-  }
-}
-```
+#### On-Site Waypoint Setup Procedure:
+1. On Temi's display, pull down the top menu ➔ Tap **Locations / Map**.
+2. Drive Temi manually to the stockroom ➔ Tap **Add Location** ➔ Name it **`stockroom`**.
+3. Drive Temi manually to the customer greeting area ➔ Tap **Add Location** ➔ Name it **`showroom`**.
+4. Confirm Temi's charging station is registered as **`home base`**.
 
 ---
 
-## 5. Building & Installing the APK on Temi Robots
+## 4. Temi Robot Application Deployment (ADB over Wi-Fi)
 
-### Step 1: Build the APK
-Open your terminal in the root project folder and run:
+Deployment to the robot is performed wirelessly over the local network using the Android Debug Bridge (ADB).
+
+### Step 1: Compile the APK
+From the project root directory, run:
 ```bash
 ./gradlew assembleDebug
 ```
@@ -130,128 +112,124 @@ The compiled APK will be generated at:
 
 ---
 
-### Step 2: Install onto the Temi Robot
+### Step 2: Wireless Installation to Temi
 
-#### Option A: Over Wi-Fi (ADB) — *Recommended*
-1. On Temi, open **Settings** ➔ **About** ➔ Find Temi's **IP Address** (e.g. `192.168.1.50`).
-2. Ensure your computer and Temi are connected to the same Wi-Fi network.
-3. In your computer's terminal, connect and install:
+1. Connect your computer to the **same Wi-Fi network** as the Temi robot.
+2. On Temi, open **Settings** ➔ **About** ➔ Note the robot's **IP Address** (e.g., `192.168.1.105`).
+3. In your terminal, run the following commands to connect and install:
    ```bash
-   adb connect 192.168.1.50:5555
+   # Connect to Temi wirelessly
+   adb connect 192.168.1.105:5555
+
+   # Install the application (with automatic replace/re-install)
    adb install -r app/build/outputs/apk/debug/app-debug.apk
    ```
 
-#### Option B: Via USB Flash Drive
-1. Copy `app/build/outputs/apk/debug/app-debug.apk` to a USB drive.
-2. Plug the USB drive into Temi's USB port (under the screen / back tray).
-3. On Temi, open the **Files** app ➔ Tap `app-debug.apk` ➔ Tap **Install**.
-
 ---
 
-## 6. First-Time Robot Setup (One-Time Location Assignment)
+## 5. First-Boot Store Assignment
 
-1. Launch the **Temi Shoe Mart** app on the robot.
-2. Because it is the first launch on a fresh robot, an assignment dialog will appear:
+1. On the Temi robot, open the **Temi Shoe Mart** app from the app launcher.
+2. On the initial launch, the one-time configuration modal will be presented:
    > **`📍 Setup Robot Location (One-Time)`**  
    > *Please select the showcase location for this Temi robot:*
-3. Tap the location where this robot is physically placed (e.g. **Pune Store**, **Bengaluru Store**, or **Hyderabad Store**).
-4. **Done!** The robot permanently saves this selection in its internal memory.
-   * On all future launches and robot reboots, **this dialog will never show again**.
-   * The robot will strictly communicate with that city's isolated database partition.
+3. Tap your physical store location (e.g., **Hyderabad Store**, **Bengaluru Store**, or **Pune Store**).
+4. **Setup is complete.**
+   * The app permanently saves the store ID in Android secure `SharedPreferences` (`temi_kiosk_prefs`).
+   * This dialog will **never appear again** on subsequent app launches, customer interactions, or robot reboots.
+   * The robot is now permanently bound to its local store inventory, orders queue, and telemetry.
 
 ---
 
-## 7. Customer Kiosk Flow (On the Robot)
+## 6. Autonomous In-Store Customer & Delivery Flow
 
 ```
-┌───────────────────────────────┐
-│     Welcome Screen (Idle)     │
-│   (Customer taps "Start")     │
-└──────────────┬────────────────┘
-               │ 🗣️ "Hi welcome! Please add items into cart and place order."
-               ▼
-┌───────────────────────────────┐
-│     Product Catalog Grid      │
-│   (Filter by Category/Brand)  │
-└──────────────┬────────────────┘
-               │
-               ▼
-┌───────────────────────────────┐
-│    Shoe Detail & 3D Vector    │
-│  (Select Color, Size, & Qty)  │
-└──────────────┬────────────────┘
-               │
-               ▼
-┌───────────────────────────────┐
-│     Cart & Checkout Screen    │
-│  (Tap "Place Order & Deliver")│
-└──────────────┬────────────────┘
-               │
-               ▼
-┌───────────────────────────────┐
-│ Temi Navigates to Stockroom   │ ──► 🗣️ "Heading to the stock room for loading"
-└──────────────┬────────────────┘
-               │ (Arrival at Stockroom)
-               ▼
-┌───────────────────────────────┐
-│ Staff Loads Shoes into Tray   │ ──► Staff loads shoes & taps "Shoes Loaded"
-└──────────────┬────────────────┘
-               │
-               ▼
-┌───────────────────────────────┐
-│ Temi Delivers to Showroom     │ ──► 🗣️ "Shoes have arrived! Please collect your order."
-└──────────────┬────────────────┘
-               │ (Customer takes shoes & taps "Collect Shoes")
-               ▼
-┌───────────────────────────────┐
-│   Order Complete / Returns    │ ──► Temi resets to Welcome Screen
-└───────────────────────────────┘
+┌───────────────────────────────────────┐
+│        Welcome Screen (Idle)          │
+│   (Customer taps "Start Ordering")    │
+└──────────────────┬────────────────────┘
+                   │ 🗣️ "Hi welcome! Please add items into cart and place order."
+                   ▼
+┌───────────────────────────────────────┐
+│         Product Catalog Grid          │
+│  (Filter by Brand & Category)         │
+└──────────────────┬────────────────────┘
+                   │
+                   ▼
+┌───────────────────────────────────────┐
+│     Shoe Detail & Vector Preview      │
+│  (Select Color, Size, & Quantity)     │
+└──────────────────┬────────────────────┘
+                   │
+                   ▼
+┌───────────────────────────────────────┐
+│       Cart & Order Submission         │
+│  (Atomic Stock Validation in Cloud)   │
+└──────────────────┬────────────────────┘
+                   │
+                   ▼
+┌───────────────────────────────────────┐
+│    Temi Dispatches to Stockroom       │ ──► 🗣️ "Heading to the stock room for loading"
+└──────────────────┬────────────────────┘
+                   │ (Arrives at 'stockroom')
+                   ▼
+┌───────────────────────────────────────┐
+│    Staff Loading Confirmation         │ ──► Staff places shoes on tray & taps "Shoes Loaded"
+└──────────────────┬────────────────────┘
+                   │
+                   ▼
+┌───────────────────────────────────────┐
+│    Temi Delivers to Showroom Area     │ ──► 🗣️ "Shoes have arrived! Please collect your order."
+└──────────────────┬────────────────────┘
+                   │ (Customer collects shoes & taps "Collect Shoes")
+                   ▼
+┌───────────────────────────────────────┐
+│   Order Completed & Auto-Reset        │ ──► Robot returns to Welcome Screen ready for next customer
+└───────────────────────────────────────┘
 ```
 
 ---
 
-## 8. Store Admin Monitoring Dashboard (`admin.html`)
+## 7. Store Manager Web Console Guide (`admin.html`)
 
-Store managers use the web dashboard to monitor their store's Temi robot in real-time, manage customer orders, and update shoe inventory.
+Store managers monitor robot movement, dispatch orders, and manage inventory via the live web console.
 
-### How to Open the Dashboard:
-* **Live Web URL**: **`https://devanshl.github.io/Temi-shoe-mart/`**
-* **Local File**: Open `admin.html` directly in any web browser.
+### Web Console URL:
+* **Live Production Link**: **`https://devanshl.github.io/Temi-shoe-mart/`**
 
 ---
 
-### Dashboard Features & Operations:
+### Key Operational Modules:
 
-#### 1. Store Authentication
+#### 1. Secure Store Login
 * Select your store location from the dropdown.
-* Enter your assigned **4-Digit Store Security PIN** (see directory below).
-* Click **Log In to Store Console**.
-* The console locks into your store: **`👟 Temi Shoe Store ({City})`**.
+* Enter your location's **4-digit numeric PIN**.
+* Once authenticated, the dashboard locks into your specific store view (**`👟 Temi Shoe Store ({City})`**). Cross-store dropdowns are omitted to prevent accidental cross-store actions.
 
-#### 2. Orders Queue Tab
-* **Live Orders**: Customer orders placed on the in-store robot appear instantly with exact shoe models, colors, sizes, and quantities.
-* **Start Round**: Dispatches the robot to the stockroom for loading.
-* **Complete Delivery**: Marks the order completed after customer pickup.
-* **Cancel & Refund**: Cancels the order and **automatically restores inventory stock counts back to that store's stock matrix**.
+#### 2. Live Orders Queue
+* **Incoming Stream**: Orders placed by customers on Temi appear in real time with model names, selected colors, sizes, and quantities.
+* **Start Round**: Dispatches Temi from the showroom to the stockroom.
+* **Complete Delivery**: Finalizes the order after customer pickup.
+* **Cancel & Refund**: Cancels the order and **automatically executes an atomic stock refund back into this store's inventory matrix**.
 
-#### 3. Inventory Matrix Tab
-* Click any shoe model to expand its **Color × Size Stock Grid**.
-* **Edit Stock**: Type any number directly into a size box ➔ updates live on the robot's catalog within milliseconds.
-* **Edit Price**: Type a new model price ➔ updates live on the robot screen.
+#### 3. Real-Time Inventory & Price Matrix
+* Click any shoe model to expand its **Color × Size matrix**.
+* **Edit Stock**: Update stock counts directly in any size box ➔ synchronizes to the Temi robot screen in milliseconds.
+* **Edit Price**: Update shoe pricing ➔ reflects in real time across customer screens.
 
-#### 4. Add New Shoe Tab
-* Add brand new footwear models (Brand, SKU, Model Name, Price, Category, Vector Shape, Colors, and Sizes).
+#### 4. Add New Shoe Model
+* Add new footwear models globally (Brand, SKU, Model Name, Base Price, Category, 3D Vector SVG Shape, Colors, and Sizes).
 
-#### 5. Robot Control & Emergency Recovery
-* **Real-Time Telemetry Bar**: Shows current Robot Waypoint (`showroom`, `stockroom`), Activity Status (`traveling_storeroom`, `arrived_pickup`), and Active Order ID.
-* **Manual Override**: Send Temi to any waypoint manually from the top dropdown.
-* **Reset Robot (Idle)**: One-click emergency recovery that clears stuck navigation states and **automatically refunds inventory stock** if an order was cancelled mid-trip.
+#### 5. Robot Telemetry & Emergency Controls
+* **Live Telemetry Bar**: Displays real-time waypoint (`showroom`, `stockroom`, `none`), robot state (`idle`, `moving`), battery level, and active order ID.
+* **Manual Dispatch**: Dispatch Temi directly to any mapped waypoint (`stockroom`, `showroom`, `home base`).
+* **Reset Robot (Idle)**: Emergency reset that unblocks stuck navigation states and automatically restores inventory if an order was active.
 
 ---
 
-## 9. Store Manager PIN Directory
+## 8. Store Manager PIN Directory (11 Locations)
 
-| Store Location | Login Dropdown Name | 4-Digit Security PIN |
+| Location Name | Login Selection | 4-Digit Security PIN |
 | :--- | :--- | :--- |
 | **Pune** | `Pune Store` | **`7821`** |
 | **Bengaluru** | `Bengaluru Store` | **`4910`** |
@@ -265,32 +243,55 @@ Store managers use the web dashboard to monitor their store's Temi robot in real
 | **Indore** | `Indore Store` | **`8526`** |
 | **Nagpur** | `Nagpur Store` | **`4073`** |
 
-> [!NOTE]
-> Entering a wrong PIN triggers a red error banner and shakes the card. The PIN input accepts **only 4 numeric digits**.
+---
+
+## 9. Data Isolation & Concurrency Architecture
+
+```
+Firebase Realtime Database
+├── catalog/                     <-- Global catalog (models, prices, vector assets)
+├── store_pins/                  <-- Central security PIN registry
+│
+└── locations/
+    ├── pune/                    <-- Isolated Pune partition
+    │   ├── orders/              <-- Pune store orders
+    │   ├── stock/               <-- Pune inventory counts
+    │   ├── location             <-- Real-time Pune Temi waypoint
+    │   └── status               <-- Real-time Pune Temi state
+    │
+    ├── bengaluru/               <-- Isolated Bengaluru partition
+    │   ├── orders/
+    │   └── stock/
+    │
+    └── hyderabad/...            <-- Fully independent partitions for all 11 cities
+```
+
+* **Zero Cross-Store Data Bleed**: All Firebase operations (`ValueEventListener`, queries, transactions, writes) are strictly scoped under `locations/{storeLocationId}/...`.
+* **Atomic Concurrency**: Inventory decrements and order cancellations use atomic Firebase transactions (`runTransaction`) to prevent race conditions during concurrent customer checkouts.
+* **Listener Lifecycle Management**: Logging out or switching stores tears down active WebSocket listeners to prevent background memory overhead and lingering connections.
 
 ---
 
-## 10. Troubleshooting & FAQs
+## 10. Field Operations & Troubleshooting Runbook
 
-### Q1: The robot says "Path Blocked". What should I do?
-* **Answer**: An obstacle (person, box, or chair) is in Temi's path. Clear the obstacle and tap the green **"Retry"** button on Temi's screen. Temi will recalculate its route and continue moving.
+### Q1: The robot announces "Path Blocked" and halts.
+* **Root Cause**: An obstacle (person, cart, or object) is detected in Temi's safety LiDAR/3D sensor envelope.
+* **Resolution**: Clear the obstruction in front of Temi and tap the green **"Retry"** button on the screen. Temi will re-plan its trajectory and continue autonomously.
 
-### Q2: How do I change the store location of a robot after it has already been set up?
-* **Answer**: Clear the app's cache and data on the robot:
-  1. Open Android **Settings** on Temi ➔ **Apps** ➔ **Temi Shoe Mart**.
-  2. Tap **Storage** ➔ **Clear Storage / Clear Data**.
-  3. Reopen the app ➔ The one-time location setup dialog will appear again.
+### Q2: How do I reassign a robot to a different store if the wrong city was selected on first boot?
+* **Resolution**: Clear application data on the Temi tablet:
+  1. Open Android **Settings** ➔ **Apps & Notifications** ➔ **Temi Shoe Mart**.
+  2. Tap **Storage & Cache** ➔ **Clear Storage / Clear Data**.
+  3. Reopen **Temi Shoe Mart** ➔ The one-time store selection dialog will reappear.
 
-### Q3: Does changing stock in Pune affect Bengaluru or Hyderabad?
-* **Answer**: No. All 11 locations are **100% isolated**. Modifying stock, placing orders, or moving the robot in Pune only affects Pune's robot and Pune's dashboard.
-
-### Q4: An order was cancelled midway. Did we lose our stock count?
-* **Answer**: No. Pressing **Cancel & Refund** or **Reset Robot (Idle)** performs an automatic transaction that refunds the exact ordered quantities back to your store's inventory matrix.
+### Q3: What happens to inventory if an order is cancelled or the robot is reset?
+* **Resolution**: The system executes an automatic transactional stock refund. The exact quantities of each size and color ordered are restored to the store's inventory matrix in real time.
 
 ---
 
-## 👨‍💻 Maintainers & Support
+## 👨‍💻 Repository & System Links
 
 * **Repository**: [DevanshL/Temi-shoe-mart](https://github.com/DevanshL/Temi-shoe-mart)
-* **Active Feature Branch**: `feature/multi-location`
-* **Live Dashboard**: [https://devanshl.github.io/Temi-shoe-mart/](https://devanshl.github.io/Temi-shoe-mart/)
+* **Branch**: `feature/multi-location`
+* **Live Manager Console**: [https://devanshl.github.io/Temi-shoe-mart/](https://devanshl.github.io/Temi-shoe-mart/)
+
