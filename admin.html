@@ -425,8 +425,8 @@
                 </select>
             </div>
             <div>
-                <label style="display: block; font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">2. Enter Store Security PIN</label>
-                <input id="login-store-pin" type="password" placeholder="Enter 4-Digit Store PIN" required autocomplete="current-password" style="width: 100%; padding: 14px 16px; font-size: 15px; font-weight: 600; border: 1px solid var(--glass-border); border-radius: 12px; background: rgba(255,255,255,0.95); color: var(--text-primary); font-family: 'Outfit', sans-serif;">
+                <label style="display: block; font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">2. Enter Store Security PIN (4 Digits)</label>
+                <input id="login-store-pin" type="password" maxlength="4" pattern="[0-9]*" inputmode="numeric" placeholder="••••" required autocomplete="current-password" oninput="onPinInput(this)" style="width: 100%; padding: 14px 16px; font-size: 20px; font-weight: 700; letter-spacing: 8px; text-align: center; border: 1px solid var(--glass-border); border-radius: 12px; background: rgba(255,255,255,0.95); color: var(--text-primary); font-family: 'Outfit', sans-serif;">
             </div>
             <button id="btn-login-submit" type="submit" style="margin-top: 8px; background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-dark) 100%); color: white; border: none; padding: 14px; font-size: 15px; font-weight: 700; border-radius: 10px; cursor: pointer; font-family: 'Outfit', sans-serif; box-shadow: 0 6px 18px rgba(216, 90, 48, 0.35); transition: opacity 0.2s;">🚀 Log In to Store Console</button>
         </form>
@@ -832,15 +832,33 @@
         "nagpur": "4073"
     };
 
+    let loginErrorTimeout = null;
+
     function onLoginStoreChanged() {
-        const errorAlert = document.getElementById('login-error-alert');
-        if (errorAlert) {
-            errorAlert.style.display = 'none';
-        }
+        hideLoginError();
         const pinEl = document.getElementById('login-store-pin');
         if (pinEl) {
             pinEl.value = '';
             pinEl.focus();
+        }
+    }
+
+    function onPinInput(el) {
+        // Enforce strictly digits and max 4 characters
+        if (el) {
+            el.value = el.value.replace(/\D/g, '').slice(0, 4);
+        }
+        hideLoginError();
+    }
+
+    function hideLoginError() {
+        const errorAlert = document.getElementById('login-error-alert');
+        if (errorAlert) {
+            errorAlert.style.display = 'none';
+        }
+        if (loginErrorTimeout) {
+            clearTimeout(loginErrorTimeout);
+            loginErrorTimeout = null;
         }
     }
 
@@ -852,11 +870,15 @@
         if (errorAlert) {
             errorAlert.innerText = message;
             errorAlert.style.display = 'block';
+            
+            if (loginErrorTimeout) clearTimeout(loginErrorTimeout);
+            loginErrorTimeout = setTimeout(() => {
+                errorAlert.style.display = 'none';
+            }, 4500);
         }
 
         if (cardBox) {
             cardBox.classList.remove('shake-effect');
-            // Trigger reflow
             void cardBox.offsetWidth;
             cardBox.classList.add('shake-effect');
         }
@@ -865,8 +887,6 @@
             pinEl.value = '';
             pinEl.focus();
         }
-
-        showToast(message);
     }
 
     function handleLoginSubmit(e) {
