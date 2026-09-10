@@ -95,28 +95,33 @@ public class FirebaseRepo {
         return storeLocationId;
     }
 
-    public void setStoreLocationId(String storeLocationId) {
-        if (storeLocationId == null || storeLocationId.trim().isEmpty()) {
+    public void setStoreLocationId(String newStoreLocationId) {
+        String oldStoreLocationId = this.storeLocationId;
+        if (newStoreLocationId == null || newStoreLocationId.trim().isEmpty()) {
             this.storeLocationId = "pune";
         } else {
-            this.storeLocationId = storeLocationId.trim().toLowerCase();
+            this.storeLocationId = newStoreLocationId.trim().toLowerCase();
         }
-        Log.d(TAG, "Active store location changed to: " + this.storeLocationId);
+        Log.d(TAG, "Active store location changed from [" + oldStoreLocationId + "] to: " + this.storeLocationId);
         
-        // Re-bind listeners for new store location
+        // Re-bind listeners cleanly for new store location
         if (useFirebase && dbRef != null) {
-            restartListeners();
+            restartListeners(oldStoreLocationId);
         }
     }
 
-    private void restartListeners() {
+    private void restartListeners(String oldLoc) {
         if (catalogListener != null && dbRef != null) {
             dbRef.child("catalog").removeEventListener(catalogListener);
             catalogListener = null;
         }
-        if (storeStockListener != null && dbRef != null) {
-            dbRef.child("locations").child(storeLocationId).child("stock").removeEventListener(storeStockListener);
+        if (storeStockListener != null && dbRef != null && oldLoc != null) {
+            dbRef.child("locations").child(oldLoc).child("stock").removeEventListener(storeStockListener);
             storeStockListener = null;
+        }
+        if (robotStateListener != null && dbRef != null && oldLoc != null) {
+            dbRef.child("locations").child(oldLoc).removeEventListener(robotStateListener);
+            robotStateListener = null;
         }
         rootListenerAttached = false;
         startCatalogRealtimeSync();
