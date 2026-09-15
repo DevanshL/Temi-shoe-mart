@@ -52,15 +52,13 @@ The system runs on a **centralized single-backend multi-tenant architecture**. A
 > The Firebase Realtime Database and seed data (`database/multi-location-seed.json`) are **already deployed and managed centrally**.  
 > **Regional store installers and field staff do NOT need to configure Firebase, create accounts, or import database files.** Local teams only need to follow Sections 3, 4, and 5 below.
 
-### Supported Showcase Centers:
+### Supported Showcase Centers (8 Active Locations):
 | City ID | Location Name | City ID | Location Name |
 | :--- | :--- | :--- | :--- |
-| `bengaluru` | Bengaluru Store | `trivandrum` | Thiruvananthapuram Store |
-| `pune` | Pune Store | `bhubaneswar` | Bhubaneswar Store |
-| `hyderabad` | Hyderabad Store | `mangalore` | Mangalore Store |
-| `chennai` | Chennai Store | `indore` | Indore Store |
-| `chandigarh` | Chandigarh Store | `nagpur` | Nagpur Store |
-| `mysuru` | Mysuru Store | | |
+| `bengaluru` | Bengaluru Store (Working Hub) | `hyd_sez` | Hyd Sez Store |
+| `mysore` | Mysore Store | `tvm` | TVM Store |
+| `chennai_sholinganallur` | Chennai - Shollinganallur Store | `pune` | Pune Store |
+| `chennai_mcity` | Chennai - Mcity Store | `noida` | Noida Store |
 
 ---
 
@@ -227,21 +225,18 @@ Store managers monitor robot movement, dispatch orders, and manage inventory via
 
 ---
 
-## 8. Store Manager PIN Directory (11 Locations)
+## 8. Store Manager PIN Directory (8 Locations)
 
 | Location Name | Login Selection | 4-Digit Security PIN |
 | :--- | :--- | :--- |
+| **Bengaluru** | `Bengaluru Store (Working Hub)` | **`4910`** |
+| **Mysore** | `Mysore Store` | **`5290`** |
+| **Chennai - Shollinganallur** | `Chennai - Shollinganallur Store` | **`3620`** |
+| **Chennai - Mcity** | `Chennai - Mcity Store` | **`3621`** |
+| **Hyd Sez** | `Hyd Sez Store` | **`9154`** |
+| **TVM** | `TVM Store` | **`6418`** |
 | **Pune** | `Pune Store` | **`7821`** |
-| **Bengaluru** | `Bengaluru Store` | **`4910`** |
-| **Hyderabad** | `Hyderabad Store` | **`9154`** |
-| **Chennai** | `Chennai Store` | **`3620`** |
-| **Chandigarh** | `Chandigarh Store` | **`8147`** |
-| **Mysuru** | `Mysuru Store` | **`5290`** |
-| **Thiruvananthapuram** | `Thiruvananthapuram Store` | **`6418`** |
-| **Bhubaneswar** | `Bhubaneswar Store` | **`7302`** |
-| **Mangalore** | `Mangalore Store` | **`1945`** |
-| **Indore** | `Indore Store` | **`8526`** |
-| **Nagpur** | `Nagpur Store` | **`4073`** |
+| **Noida** | `Noida Store` | **`2013`** |
 
 ---
 

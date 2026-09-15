@@ -411,17 +411,14 @@
                 <label style="display: block; font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">1. Select Store Location</label>
                 <select id="login-store-select" required onchange="onLoginStoreChanged()" style="width: 100%; padding: 14px 16px; font-size: 15px; font-weight: 600; border: 1px solid var(--glass-border); border-radius: 12px; background: rgba(255,255,255,0.95); color: var(--text-primary); font-family: 'Outfit', sans-serif; cursor: pointer;">
                     <option value="" disabled selected>-- Choose Your Store Location --</option>
+                    <option value="bengaluru">Bengaluru Store (Working Hub)</option>
+                    <option value="mysore">Mysore Store</option>
+                    <option value="chennai_sholinganallur">Chennai - Shollinganallur Store</option>
+                    <option value="chennai_mcity">Chennai - Mcity Store</option>
+                    <option value="hyd_sez">Hyd Sez Store</option>
+                    <option value="tvm">TVM Store</option>
                     <option value="pune">Pune Store</option>
-                    <option value="bengaluru">Bengaluru Store</option>
-                    <option value="hyderabad">Hyderabad Store</option>
-                    <option value="chennai">Chennai Store</option>
-                    <option value="chandigarh">Chandigarh Store</option>
-                    <option value="mysuru">Mysuru Store</option>
-                    <option value="trivandrum">Thiruvananthapuram Store</option>
-                    <option value="bhubaneswar">Bhubaneswar Store</option>
-                    <option value="mangalore">Mangalore Store</option>
-                    <option value="indore">Indore Store</option>
-                    <option value="nagpur">Nagpur Store</option>
+                    <option value="noida">Noida Store</option>
                 </select>
             </div>
             <div>
@@ -805,31 +802,25 @@
 
     const locationDisplayNames = {
         "bengaluru": "Bengaluru",
+        "mysore": "Mysore",
+        "chennai_sholinganallur": "Chennai - Shollinganallur",
+        "chennai_mcity": "Chennai - Mcity",
+        "hyd_sez": "Hyd Sez",
+        "tvm": "TVM",
         "pune": "Pune",
-        "hyderabad": "Hyderabad",
-        "chennai": "Chennai",
-        "chandigarh": "Chandigarh",
-        "mysuru": "Mysuru",
-        "trivandrum": "Thiruvananthapuram",
-        "bhubaneswar": "Bhubaneswar",
-        "mangalore": "Mangalore",
-        "indore": "Indore",
-        "nagpur": "Nagpur"
+        "noida": "Noida"
     };
 
     // Master Store PIN Registry (Unique per location to prevent unauthorized cross-store access)
     const STORE_PIN_REGISTRY = {
-        "pune": "7821",
         "bengaluru": "4910",
-        "hyderabad": "9154",
-        "chennai": "3620",
-        "chandigarh": "8147",
-        "mysuru": "5290",
-        "trivandrum": "6418",
-        "bhubaneswar": "7302",
-        "mangalore": "1945",
-        "indore": "8526",
-        "nagpur": "4073"
+        "mysore": "5290",
+        "chennai_sholinganallur": "3620",
+        "chennai_mcity": "3621",
+        "hyd_sez": "9154",
+        "tvm": "6418",
+        "pune": "7821",
+        "noida": "2013"
     };
 
     let loginErrorTimeout = null;

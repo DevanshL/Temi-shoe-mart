@@ -128,12 +128,12 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
      */
     private void showFirstTimeStoreSetupDialog(final android.content.SharedPreferences prefs) {
         final String[] locationKeys = {
-            "pune", "bengaluru", "hyderabad", "chennai", "chandigarh",
-            "mysuru", "trivandrum", "bhubaneswar", "mangalore", "indore", "nagpur"
+            "bengaluru", "mysore", "chennai_sholinganallur", "chennai_mcity",
+            "hyd_sez", "tvm", "pune", "noida"
         };
         final String[] locationNames = {
-            "Pune Store", "Bengaluru Store", "Hyderabad Store", "Chennai Store", "Chandigarh Store",
-            "Mysuru Store", "Thiruvananthapuram Store", "Bhubaneswar Store", "Mangalore Store", "Indore Store", "Nagpur Store"
+            "Bengaluru Store", "Mysore Store", "Chennai - Shollinganallur Store", "Chennai - Mcity Store",
+            "Hyd Sez Store", "TVM Store", "Pune Store", "Noida Store"
         };
 
         new androidx.appcompat.app.AlertDialog.Builder(this)
