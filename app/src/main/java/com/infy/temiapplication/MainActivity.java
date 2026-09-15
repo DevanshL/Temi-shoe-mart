@@ -87,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
     private boolean isTemiAvailable = false;
     private String lastNavigatedLocation = "";
     private String targetLocationBeforeBlock = "";
+    private boolean isManualOverrideActive = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -296,8 +297,8 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
         boolean hasNoActiveOrder = (currentActiveOrderId == null || currentActiveOrderId.trim().isEmpty() || "none".equalsIgnoreCase(currentActiveOrderId));
 
         if (!isManualOverride && (isIdleStatus || hasNoActiveOrder)) {
-            // Check if robot was traveling to stockroom when order got cancelled
-            if (LOC_STOREROOM.equalsIgnoreCase(lastNavigatedLocation)) {
+            // Check if robot was traveling to stockroom for an order when order got cancelled
+            if (!isManualOverrideActive && LOC_STOREROOM.equalsIgnoreCase(lastNavigatedLocation)) {
                 // Command Temi to safely turn around and return to Showroom!
                 lastNavigatedLocation = "";
                 containerWelcome.setVisibility(View.GONE);
@@ -329,6 +330,7 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
         // Configure layout based on active delivery step
         switch (currentStatus) {
             case "traveling_storeroom":
+                isManualOverrideActive = false;
                 progressTravel.setVisibility(View.VISIBLE);
                 imgArrived.setVisibility(View.GONE);
                 btnStatusOk.setVisibility(View.GONE);
@@ -339,6 +341,7 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
                 break;
 
             case "arrived_storeroom":
+                isManualOverrideActive = false;
                 progressTravel.setVisibility(View.GONE);
                 imgArrived.setVisibility(View.VISIBLE);
                 btnStatusOk.setVisibility(View.VISIBLE);
@@ -355,6 +358,7 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
                 break;
 
             case "traveling_pickup":
+                isManualOverrideActive = false;
                 progressTravel.setVisibility(View.VISIBLE);
                 imgArrived.setVisibility(View.GONE);
                 btnStatusOk.setVisibility(View.GONE);
@@ -365,6 +369,7 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
                 break;
 
             case "arrived_pickup":
+                isManualOverrideActive = false;
                 if ("completed".equalsIgnoreCase(lastSpokenStatus)) {
                     return;
                 }
@@ -383,6 +388,7 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
                 break;
 
             case "returning_home":
+                isManualOverrideActive = false;
                 progressTravel.setVisibility(View.VISIBLE);
                 imgArrived.setVisibility(View.GONE);
                 btnStatusOk.setVisibility(View.GONE);
@@ -392,6 +398,7 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
                 break;
 
             case "returning_staging":
+                isManualOverrideActive = false;
                 progressTravel.setVisibility(View.VISIBLE);
                 imgArrived.setVisibility(View.GONE);
                 btnStatusOk.setVisibility(View.GONE);
@@ -410,6 +417,7 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
                 speakTTSOnce("Excuse me, my path is blocked. Please clear the way.", "blocked");
                 break;
             case "manual_override_to_stockroom":
+                isManualOverrideActive = true;
                 progressTravel.setVisibility(View.VISIBLE);
                 imgArrived.setVisibility(View.GONE);
                 btnStatusOk.setVisibility(View.GONE);
@@ -419,6 +427,7 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
                 break;
 
             case "manual_override_to_showroom":
+                isManualOverrideActive = true;
                 progressTravel.setVisibility(View.VISIBLE);
                 imgArrived.setVisibility(View.GONE);
                 btnStatusOk.setVisibility(View.GONE);
@@ -429,6 +438,7 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
 
             case "manual_override_to_home_base":
             case "manual_override_to_home base":
+                isManualOverrideActive = true;
                 progressTravel.setVisibility(View.VISIBLE);
                 imgArrived.setVisibility(View.GONE);
                 btnStatusOk.setVisibility(View.GONE);
@@ -686,6 +696,14 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
         // Handle physical arrival triggers to sync with Firebase
         if ("complete".equalsIgnoreCase(status)) {
             lastNavigatedLocation = ""; // Reset navigation cache upon arrival
+
+            if (isManualOverrideActive) {
+                isManualOverrideActive = false;
+                repo.updateRobotStateInDatabase(resolvedLocation, "idle", "idle", "");
+                speakTTSOnce("Arrived at " + resolvedLocation + ".", "manual_arrived_" + resolvedLocation);
+                return;
+            }
+
             if (LOC_STOREROOM.equalsIgnoreCase(resolvedLocation)) {
                 if (currentActiveOrderId == null || currentActiveOrderId.isEmpty()) {
                     // Arrived at stockroom but order was cancelled: immediately return to showroom!
