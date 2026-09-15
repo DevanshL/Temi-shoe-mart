@@ -367,28 +367,80 @@
             transform: translateX(-50%);
             background: rgba(44, 44, 42, 0.95);
             color: white;
-            padding: 12px 24px;
+            padding: 14px 28px;
             border-radius: 30px;
-            font-weight: 600;
+            font-weight: 700;
             font-size: 14px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-            z-index: 9999;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            z-index: 999999;
             animation: toastSlideUp 0.3s ease-out;
+            pointer-events: none;
         }
 
         @keyframes toastSlideUp {
             from { transform: translate(-50%, 20px); opacity: 0; }
             to { transform: translate(-50%, 0); opacity: 1; }
         }
+
+        @keyframes shakeModal {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
+        }
+
+        .shake-effect {
+            animation: shakeModal 0.4s ease-in-out !important;
+        }
     </style>
 </head>
 <body>
 <div id="toast-message" class="toast-message">Welcome!</div>
-<div class="container">
+
+<!-- LOGIN OVERLAY MODAL -->
+<div id="login-modal" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, rgba(253,248,245,0.96) 0%, rgba(245,222,201,0.96) 100%); backdrop-filter: blur(16px); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;">
+    <div id="login-box-card" style="background: rgba(255, 255, 255, 0.98); border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 20px; padding: 40px; width: 440px; max-width: 100%; box-shadow: 0 20px 50px rgba(216, 90, 48, 0.15); text-align: center; transition: transform 0.2s;">
+        <div style="font-size: 48px; margin-bottom: 12px;">👟</div>
+        <h2 style="font-size: 24px; font-weight: 700; color: var(--brand-primary); margin-bottom: 6px;">Temi Shoe Store</h2>
+        <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 20px;">Store Manager Authentication Portal</p>
+        
+        <!-- Prominent Error Alert Banner -->
+        <div id="login-error-alert" style="display: none; background: #fee2e2; border: 1.5px solid #ef4444; color: #991b1b; padding: 12px 16px; border-radius: 12px; font-size: 14px; font-weight: 700; margin-bottom: 18px; text-align: center; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);"></div>
+
+        <form onsubmit="handleLoginSubmit(event)" style="display: flex; flex-direction: column; gap: 16px; text-align: left;">
+            <div>
+                <label style="display: block; font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">1. Select Store Location</label>
+                <select id="login-store-select" required onchange="onLoginStoreChanged()" style="width: 100%; padding: 14px 16px; font-size: 15px; font-weight: 600; border: 1px solid var(--glass-border); border-radius: 12px; background: rgba(255,255,255,0.95); color: var(--text-primary); font-family: 'Outfit', sans-serif; cursor: pointer;">
+                    <option value="" disabled selected>-- Choose Your Store Location --</option>
+                    <option value="bengaluru">Bengaluru Store</option>
+                    <option value="mysore">Mysore Store</option>
+                    <option value="chennai_sholinganallur">Chennai - Shollinganallur Store</option>
+                    <option value="chennai_mcity">Chennai - Mcity Store</option>
+                    <option value="hyd_sez">Hyd Sez Store</option>
+                    <option value="tvm">TVM Store</option>
+                    <option value="pune">Pune Store</option>
+                    <option value="noida">Noida Store</option>
+                </select>
+            </div>
+            <div>
+                <label style="display: block; font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">2. Enter Store Security PIN (4 Digits)</label>
+                <input id="login-store-pin" type="password" maxlength="4" pattern="[0-9]*" inputmode="numeric" placeholder="••••" required autocomplete="current-password" oninput="onPinInput(this)" style="width: 100%; padding: 14px 16px; font-size: 20px; font-weight: 700; letter-spacing: 8px; text-align: center; border: 1px solid var(--glass-border); border-radius: 12px; background: rgba(255,255,255,0.95); color: var(--text-primary); font-family: 'Outfit', sans-serif;">
+            </div>
+            <button id="btn-login-submit" type="submit" style="margin-top: 8px; background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-dark) 100%); color: white; border: none; padding: 14px; font-size: 15px; font-weight: 700; border-radius: 10px; cursor: pointer; font-family: 'Outfit', sans-serif; box-shadow: 0 6px 18px rgba(216, 90, 48, 0.35); transition: opacity 0.2s;">🚀 Log In to Store Console</button>
+        </form>
+    </div>
+</div>
+
+<div id="app-container" class="container" style="display: none;">
 
     <header>
-        <h1>👟 Temi Shoe Store - Staff Console</h1>
-        <div id="connection-status" class="status-badge">Mode: Simulator (Offline)</div>
+        <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+            <h1 id="main-title">👟 Temi Shoe Store</h1>
+            <span id="store-badge" class="status-badge" style="color: var(--brand-primary); background: var(--brand-light); border-color: rgba(216,90,48,0.3); font-weight: 700;">📍 Store</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <div id="connection-status" class="status-badge">Mode: Simulator (Offline)</div>
+            <button onclick="handleLogout()" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 13px; cursor: pointer; font-family: 'Outfit', sans-serif; transition: all 0.2s;">🚪 Logout</button>
+        </div>
     </header>
 
     <!-- Top Action Card containing Navigation and Manual controls -->
@@ -396,7 +448,7 @@
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
             <!-- Tabs selection -->
             <div style="display: flex; gap: 8px;">
-                <button class="nav-btn active" id="btn-tab-orders" onclick="switchTab('orders')">Orders Queue</button>
+                <button class="nav-btn active" id="btn-tab-orders" onclick="switchTab('orders')">Orders</button>
                 <button class="nav-btn" id="btn-tab-inventory" onclick="switchTab('inventory')">Inventory Matrix</button>
             </div>
             
@@ -432,9 +484,16 @@
 
         <!-- TAB: ORDERS -->
         <section id="tab-orders" class="tab-panel active">
-            <h2>Incoming Orders Queue</h2>
+            <h2>Current Order</h2>
             <div id="orders-list">
                 <p style="color: var(--text-secondary);">No active orders at this time.</p>
+            </div>
+
+            <div style="margin-top: 36px;">
+                <h3 style="font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 14px; border-bottom: 1px solid var(--glass-border); padding-bottom: 8px;">Order History</h3>
+                <div id="orders-history-list">
+                    <p style="color: var(--text-secondary); font-size: 14px;">No past orders recorded yet.</p>
+                </div>
             </div>
         </section>
 
@@ -564,6 +623,103 @@
     </div>
 </div>
 
+<!-- Add Color Modal -->
+<div id="add-color-modal" style="
+    display: none; 
+    position: fixed; 
+    top: 0; left: 0; 
+    width: 100vw; height: 100vh; 
+    background: rgba(0, 0, 0, 0.45); 
+    backdrop-filter: blur(8px); 
+    z-index: 10000; 
+    justify-content: center; 
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+">
+    <div id="add-color-modal-box" style="
+        background: rgba(255, 255, 255, 0.98); 
+        border-radius: 16px; 
+        padding: 28px; 
+        width: 440px; 
+        max-width: 90%; 
+        box-shadow: 0 20px 45px rgba(0,0,0,0.18);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        transform: scale(0.9);
+        transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    ">
+        <h3 id="add-color-title" style="margin: 0 0 16px 0; color: #1E1E1E; font-size: 18px; font-weight: 800;">🎨 Add New Color Variant</h3>
+        
+        <div style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 22px;">
+            <div>
+                <label style="display: block; font-size: 13px; font-weight: 700; color: #4B4B4B; margin-bottom: 6px;">Color Name:</label>
+                <input id="modal-color-name" type="text" placeholder="e.g. green, burgundy, navy, gold" style="width: 100%; box-sizing: border-box; padding: 10px 14px; border-radius: 8px; border: 1px solid #D1D5DB; font-size: 14px; font-weight: 600;" oninput="syncColorNameWithHex(this.value)">
+            </div>
+            <div>
+                <label style="display: block; font-size: 13px; font-weight: 700; color: #4B4B4B; margin-bottom: 6px;">Color Swatch & Hex Code:</label>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="color" id="modal-color-picker" value="#378ADD" style="width: 44px; height: 40px; padding: 0; border: none; border-radius: 8px; cursor: pointer; background: transparent;" oninput="document.getElementById('modal-color-hex').value = this.value">
+                    <input id="modal-color-hex" type="text" value="#378ADD" placeholder="#378ADD" style="flex: 1; padding: 10px 14px; border-radius: 8px; border: 1px solid #D1D5DB; font-size: 14px; font-weight: 600;" oninput="document.getElementById('modal-color-picker').value = this.value">
+                </div>
+            </div>
+            <div>
+                <label style="display: block; font-size: 13px; font-weight: 700; color: #4B4B4B; margin-bottom: 6px;">Initial Stock (per size):</label>
+                <input id="modal-color-stock" type="number" min="0" max="999" value="10" style="width: 100%; box-sizing: border-box; padding: 10px 14px; border-radius: 8px; border: 1px solid #D1D5DB; font-size: 14px; font-weight: 600;">
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; justify-content: flex-end;">
+            <button onclick="closeAddColorModal()" style="background: #E5E5E5; color: #2E2E2E; border: none; padding: 10px 20px; font-weight: 700; border-radius: 8px; cursor: pointer; font-size: 14px;">Cancel</button>
+            <button onclick="submitAddColorModal()" style="background: var(--brand-primary); color: white; border: none; padding: 10px 22px; font-weight: 700; border-radius: 8px; cursor: pointer; font-size: 14px; box-shadow: 0 4px 10px rgba(225, 90, 48, 0.3);">Add Color</button>
+        </div>
+    </div>
+</div>
+
+<!-- Add Size Modal -->
+<div id="add-size-modal" style="
+    display: none; 
+    position: fixed; 
+    top: 0; left: 0; 
+    width: 100vw; height: 100vh; 
+    background: rgba(0, 0, 0, 0.45); 
+    backdrop-filter: blur(8px); 
+    z-index: 10000; 
+    justify-content: center; 
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+">
+    <div id="add-size-modal-box" style="
+        background: rgba(255, 255, 255, 0.98); 
+        border-radius: 16px; 
+        padding: 28px; 
+        width: 440px; 
+        max-width: 90%; 
+        box-shadow: 0 20px 45px rgba(0,0,0,0.18);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        transform: scale(0.9);
+        transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    ">
+        <h3 id="add-size-title" style="margin: 0 0 16px 0; color: #1E1E1E; font-size: 18px; font-weight: 800;">📏 Add New Size Variant</h3>
+        
+        <div style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 22px;">
+            <div>
+                <label style="display: block; font-size: 13px; font-weight: 700; color: #4B4B4B; margin-bottom: 6px;">Size (US Numeric):</label>
+                <input id="modal-size-num" type="number" step="0.5" min="1" max="25" placeholder="e.g. 12, 13, 6.5" style="width: 100%; box-sizing: border-box; padding: 10px 14px; border-radius: 8px; border: 1px solid #D1D5DB; font-size: 14px; font-weight: 600;">
+            </div>
+            <div>
+                <label style="display: block; font-size: 13px; font-weight: 700; color: #4B4B4B; margin-bottom: 6px;">Initial Stock (per color):</label>
+                <input id="modal-size-stock" type="number" min="0" max="999" value="10" style="width: 100%; box-sizing: border-box; padding: 10px 14px; border-radius: 8px; border: 1px solid #D1D5DB; font-size: 14px; font-weight: 600;">
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; justify-content: flex-end;">
+            <button onclick="closeAddSizeModal()" style="background: #E5E5E5; color: #2E2E2E; border: none; padding: 10px 20px; font-weight: 700; border-radius: 8px; cursor: pointer; font-size: 14px;">Cancel</button>
+            <button onclick="submitAddSizeModal()" style="background: var(--brand-primary); color: white; border: none; padding: 10px 22px; font-weight: 700; border-radius: 8px; cursor: pointer; font-size: 14px; box-shadow: 0 4px 10px rgba(225, 90, 48, 0.3);">Add Size</button>
+        </div>
+    </div>
+</div>
+
 <script>
     // Tab switching logic
     function switchTab(tabId) {
@@ -591,6 +747,8 @@
     let firebaseApp = null;
     let db = null;
     let isFirebaseConnected = false;
+    let currentStoreLocation = sessionStorage.getItem('temi_store_location') || null;
+    let activeListeners = [];
 
     // Hardcoded Firebase Config (just like Temi Butler Admin page)
     const firebaseConfig = {
@@ -746,140 +904,393 @@
         updateUI();
     }
 
-    // Firebase Listener bindings
+    const locationDisplayNames = {
+        "bengaluru": "Bengaluru",
+        "mysore": "Mysore",
+        "chennai_sholinganallur": "Chennai - Shollinganallur",
+        "chennai_mcity": "Chennai - Mcity",
+        "hyd_sez": "Hyd Sez",
+        "tvm": "TVM",
+        "pune": "Pune",
+        "noida": "Noida"
+    };
+
+    // Master Store PIN Registry (Unique per location to prevent unauthorized cross-store access)
+    const STORE_PIN_REGISTRY = {
+        "bengaluru": "4910",
+        "mysore": "5290",
+        "chennai_sholinganallur": "3620",
+        "chennai_mcity": "3621",
+        "hyd_sez": "9154",
+        "tvm": "6418",
+        "pune": "7821",
+        "noida": "2013"
+    };
+
+    let loginErrorTimeout = null;
+
+    function onLoginStoreChanged() {
+        hideLoginError();
+        const pinEl = document.getElementById('login-store-pin');
+        if (pinEl) {
+            pinEl.value = '';
+            pinEl.focus();
+        }
+    }
+
+    function onPinInput(el) {
+        // Enforce strictly digits and max 4 characters
+        if (el) {
+            el.value = el.value.replace(/\D/g, '').slice(0, 4);
+        }
+        hideLoginError();
+    }
+
+    function hideLoginError() {
+        const errorAlert = document.getElementById('login-error-alert');
+        if (errorAlert) {
+            errorAlert.style.display = 'none';
+        }
+        if (loginErrorTimeout) {
+            clearTimeout(loginErrorTimeout);
+            loginErrorTimeout = null;
+        }
+    }
+
+    function showLoginError(message) {
+        const errorAlert = document.getElementById('login-error-alert');
+        const cardBox = document.getElementById('login-box-card');
+        const pinEl = document.getElementById('login-store-pin');
+
+        if (errorAlert) {
+            errorAlert.innerText = message;
+            errorAlert.style.display = 'block';
+            
+            if (loginErrorTimeout) clearTimeout(loginErrorTimeout);
+            loginErrorTimeout = setTimeout(() => {
+                errorAlert.style.display = 'none';
+            }, 4500);
+        }
+
+        if (cardBox) {
+            cardBox.classList.remove('shake-effect');
+            void cardBox.offsetWidth;
+            cardBox.classList.add('shake-effect');
+        }
+
+        if (pinEl) {
+            pinEl.value = '';
+            pinEl.focus();
+        }
+    }
+
+    function handleLoginSubmit(e) {
+        if (e) e.preventDefault();
+        const selectEl = document.getElementById('login-store-select');
+        const pinEl = document.getElementById('login-store-pin');
+        const errorAlert = document.getElementById('login-error-alert');
+
+        const selectedLoc = selectEl ? selectEl.value : "";
+        const enteredPin = pinEl ? pinEl.value.trim() : "";
+
+        if (!selectedLoc) {
+            showLoginError("⚠️ Please select your store location from the list.");
+            return;
+        }
+
+        const expectedPin = STORE_PIN_REGISTRY[selectedLoc];
+        const storeName = locationDisplayNames[selectedLoc] || selectedLoc;
+
+        // Strict PIN Verification: ONLY exact match
+        if (!expectedPin || enteredPin !== expectedPin) {
+            showLoginError(`⛔ Incorrect Security PIN for ${storeName} Store. Access Denied.`);
+            return;
+        }
+
+        // Clear error alert on success
+        if (errorAlert) {
+            errorAlert.style.display = 'none';
+        }
+
+        currentStoreLocation = selectedLoc;
+        sessionStorage.setItem('temi_store_location', selectedLoc);
+
+        document.getElementById('login-modal').style.display = 'none';
+        document.getElementById('app-container').style.display = 'block';
+
+        updateStoreHeaderUI();
+
+        if (isFirebaseConnected && db) {
+            bindFirebaseListeners();
+        } else {
+            updateUI();
+        }
+        showToast(`✅ Authorized: Welcome to ${storeName} Store Console!`);
+    }
+
+    function handleLogout() {
+        sessionStorage.removeItem('temi_store_location');
+        currentStoreLocation = null;
+
+        if (activeListeners && activeListeners.length > 0) {
+            activeListeners.forEach(refObj => {
+                try { refObj.ref.off(refObj.event, refObj.callback); } catch(e) {}
+            });
+            activeListeners = [];
+        }
+
+        const errorAlert = document.getElementById('login-error-alert');
+        if (errorAlert) errorAlert.style.display = 'none';
+        const pinEl = document.getElementById('login-store-pin');
+        if (pinEl) pinEl.value = '';
+
+        document.getElementById('login-modal').style.display = 'flex';
+        document.getElementById('app-container').style.display = 'none';
+        showToast("Logged out successfully.");
+    }
+
+    function updateStoreHeaderUI() {
+        if (!currentStoreLocation) return;
+        const displayName = locationDisplayNames[currentStoreLocation] || (currentStoreLocation.charAt(0).toUpperCase() + currentStoreLocation.slice(1));
+        const titleEl = document.getElementById('main-title');
+        if (titleEl) {
+            titleEl.innerText = `👟 Temi Shoe Store (${displayName})`;
+        }
+        const badgeEl = document.getElementById('store-badge');
+        if (badgeEl) {
+            badgeEl.innerText = `📍 ${displayName} Store`;
+        }
+        document.title = `Temi Shoe Store (${displayName}) - Admin Console`;
+    }
+
+    // Firebase Listener bindings (Scoped to currentStoreLocation)
     function bindFirebaseListeners() {
-        // Robot telemetry
-        db.ref('location').on('value', (snap) => {
+        if (!currentStoreLocation || !db) return;
+
+        // Clean up previous listeners
+        if (activeListeners && activeListeners.length > 0) {
+            activeListeners.forEach(refObj => {
+                try {
+                    refObj.ref.off(refObj.event, refObj.callback);
+                } catch(e) {}
+            });
+            activeListeners = [];
+        }
+
+        const locRef = db.ref(`locations/${currentStoreLocation}`);
+
+        // Helper to register and track listener
+        function addTrackedListener(ref, event, callback) {
+            ref.on(event, callback);
+            activeListeners.push({ ref, event, callback });
+        }
+
+        // Helper formatters for human-readable display
+        function formatLocation(loc) {
+            if (!loc || loc === "none") return "Showroom (Idle)";
+            if (loc === "showroom") return "Showroom";
+            if (loc === "stockroom") return "Stockroom";
+            if (loc === "home base" || loc === "home_base") return "Charging Dock";
+            return loc;
+        }
+
+        function formatStatus(st) {
+            if (!st || st === "idle") return "Idle";
+            if (st === "traveling_storeroom" || st === "navigating_to_storeroom") return "Heading to Stockroom";
+            if (st === "arrived_storeroom") return "At Stockroom (Loading)";
+            if (st === "traveling_pickup" || st === "delivering") return "Delivering to Showroom";
+            if (st === "arrived_pickup" || st === "arrived_showroom") return "At Showroom (Customer Pickup)";
+            if (st === "blocked") return "Path Blocked";
+            if (st === "returning_home") return "Returning to Dock";
+            return st;
+        }
+
+        // Robot telemetry strictly for selected store location
+        addTrackedListener(locRef.child('location'), 'value', (snap) => {
             mockData.location = snap.val() || "none";
-            document.getElementById('tel-location').innerText = mockData.location;
+            document.getElementById('tel-location').innerText = formatLocation(mockData.location);
         });
 
-        db.ref('status').on('value', (snap) => {
+        addTrackedListener(locRef.child('status'), 'value', (snap) => {
             mockData.status = snap.val() || "idle";
-            document.getElementById('tel-status').innerText = mockData.status;
+            document.getElementById('tel-status').innerText = formatStatus(mockData.status);
         });
 
-        db.ref('robot_state').on('value', (snap) => {
+        addTrackedListener(locRef.child('robot_state'), 'value', (snap) => {
             mockData.robot_state = snap.val() || "idle";
             document.getElementById('tel-state').innerText = mockData.robot_state;
         });
 
-        db.ref('active_order_id').on('value', (snap) => {
+        addTrackedListener(locRef.child('active_order_id'), 'value', (snap) => {
             mockData.active_order_id = snap.val() || "";
             document.getElementById('tel-active-order').innerText = mockData.active_order_id || "-";
         });
 
-        // Catalog listeners
-        db.ref('catalog').on('value', (snap) => {
-            const data = snap.val();
-            let needsUpdate = false;
-            if (data && Object.keys(data).length >= 7) {
-                for (const key of Object.keys(data)) {
-                    if (!data[key].colorHex || !data[key].category || !data[key].shapeSet) {
-                        needsUpdate = true;
-                        break;
-                    }
-                }
-            } else {
-                needsUpdate = true;
-            }
-
-            if (!needsUpdate) {
-                mockData.catalog = data;
-                renderInventoryList();
-            } else {
-                console.log("[Seeding/Healing] Merging missing catalog properties (colorHex/category/shapeSet) into Firebase...");
-                const updateObj = {};
-                for (const key of Object.keys(mockData.catalog)) {
-                    const defaultItem = mockData.catalog[key];
-                    const dbItem = (data && data[key]) ? data[key] : {};
-                    
-                    updateObj[key] = {
-                        name: dbItem.name || defaultItem.name,
-                        brand: dbItem.brand || defaultItem.brand,
-                        price: dbItem.price !== undefined ? dbItem.price : defaultItem.price,
-                        colors: dbItem.colors || defaultItem.colors,
-                        sizes: dbItem.sizes || defaultItem.sizes,
-                        stock: dbItem.stock || defaultItem.stock,
-                        colorHex: dbItem.colorHex || defaultItem.colorHex,
-                        category: dbItem.category || defaultItem.category,
-                        shapeSet: dbItem.shapeSet || defaultItem.shapeSet
-                    };
-                }
-                db.ref('catalog').update(updateObj);
-            }
-        });
-
-        // Incoming orders
-        db.ref('orders').on('value', (snap) => {
+        // Store-specific incoming orders strictly for selected location
+        addTrackedListener(locRef.child('orders'), 'value', (snap) => {
             mockData.orders = snap.val() || {};
             renderOrdersList();
         });
+
+        // Store-specific stock listener
+        addTrackedListener(locRef.child('stock'), 'value', (stockSnap) => {
+            if (stockSnap.exists()) {
+                const storeStockData = stockSnap.val();
+                for (let shoeId in storeStockData) {
+                    if (mockData.catalog[shoeId]) {
+                        mockData.catalog[shoeId].stock = storeStockData[shoeId];
+                    }
+                }
+                renderInventoryList();
+            }
+        });
+
+        // Global Catalog listener
+        addTrackedListener(db.ref('catalog'), 'value', (snap) => {
+            const data = snap.val();
+            if (data) {
+                mockData.catalog = data;
+                // Re-apply store stock if available
+                locRef.child('stock').once('value', (sSnap) => {
+                    if (sSnap.exists()) {
+                        const sData = sSnap.val();
+                        for (let sId in sData) {
+                            if (mockData.catalog[sId]) {
+                                mockData.catalog[sId].stock = sData[sId];
+                            }
+                        }
+                    }
+                    renderInventoryList();
+                });
+            }
+        });
     }
 
-    // Render incoming orders queue
+    // Render autonomous live orders queue and past order history
     function renderOrdersList() {
         const listDiv = document.getElementById('orders-list');
+        const historyDiv = document.getElementById('orders-history-list');
         listDiv.innerHTML = "";
+        if (historyDiv) historyDiv.innerHTML = "";
 
-        const ordersArr = Object.entries(mockData.orders);
+        const ordersArr = Object.entries(mockData.orders || {});
         
-        // Filter active/ongoing/placed/pending orders
+        // Active vs Past Orders
         const activeOrders = ordersArr.filter(([id, order]) => {
             const st = (order.status || "").toLowerCase();
             return st && !["complete", "completed", "cancelled", "canceled"].includes(st);
         });
 
+        const historyOrders = ordersArr.filter(([id, order]) => {
+            const st = (order.status || "").toLowerCase();
+            return st && ["complete", "completed", "cancelled", "canceled"].includes(st);
+        }).reverse(); // Most recent first
+
+        // 1. Render Active Orders
         if (activeOrders.length === 0) {
-            listDiv.innerHTML = `<p style="color: var(--text-secondary);">No active orders at this time.</p>`;
-            return;
-        }
-
-        activeOrders.forEach(([id, order]) => {
-            const card = document.createElement('div');
-            card.className = "order-card";
-
-            let itemsHTML = "";
-            if (order.items) {
-                Object.values(order.items).forEach(item => {
-                    const itemName = item.name || item.shoeName || "Unknown Shoe";
-                    itemsHTML += `<p>• ${itemName} (Color: ${item.color}, Size: ${item.size}) x ${item.qty}</p>`;
-                });
-            }
-
-            const isArrived = (order.status || "").toLowerCase() === "arrived";
-            const isOngoing = (order.status || "").toLowerCase() === "ongoing";
-
-            let actionButtonsHTML = "";
-            if (isArrived) {
-                actionButtonsHTML = `
-                    <button class="btn btn-secondary" onclick="completeOrder('${id}')">Complete Delivery</button>
-                    <button class="btn btn-secondary" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; margin-top: 6px;" onclick="cancelAndRefundOrder('${id}'); resetRobotState();">Cancel & Refund</button>
-                `;
-            } else if (!isOngoing) {
-                actionButtonsHTML = `
-                    <button class="btn" onclick="startDelivery('${id}')">Start Round</button>
-                    <button class="btn btn-secondary" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; margin-top: 6px;" onclick="cancelAndRefundOrder('${id}'); resetRobotState();">Cancel & Refund</button>
-                `;
-            } else {
-                actionButtonsHTML = `
-                    <span style="color: var(--brand-primary); font-weight: 600; font-size: 14px;">En Route...</span>
-                    <button class="btn btn-secondary" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; margin-top: 6px;" onclick="cancelAndRefundOrder('${id}'); resetRobotState();">Cancel & Refund</button>
-                `;
-            }
-
-            card.innerHTML = `
-                <div class="order-details">
-                    <h4>Order ID: ${id}</h4>
-                    <p style="margin-bottom: 8px;"><strong>Status:</strong> ${order.status.toUpperCase()}</p>
-                    ${itemsHTML}
-                </div>
-                <div class="order-actions" style="display: flex; flex-direction: column; align-items: flex-end;">
-                    ${actionButtonsHTML}
+            listDiv.innerHTML = `
+                <div style="padding: 24px; text-align: center; background: rgba(255, 255, 255, 0.25); border-radius: 12px; border: 1px dashed var(--glass-border);">
+                    <div style="font-size: 28px; margin-bottom: 8px;">🤖</div>
+                    <p style="color: var(--text-primary); font-weight: 600; font-size: 15px;">Temi Robot is Ready & Idle</p>
+                    <p style="color: var(--text-secondary); font-size: 13px; margin-top: 4px;">Orders placed by customers on Temi will stream here autonomously in real time.</p>
                 </div>
             `;
-            listDiv.appendChild(card);
-        });
+        } else {
+            activeOrders.forEach(([id, order]) => {
+                const card = document.createElement('div');
+                card.className = "order-card";
+                card.style.borderLeft = "4px solid var(--brand-primary)";
+
+                let itemsHTML = "";
+                let totalQty = 0;
+                if (order.items) {
+                    Object.values(order.items).forEach(item => {
+                        const itemName = item.name || item.shoeName || "Footwear";
+                        itemsHTML += `<div style="font-size: 14px; color: var(--text-primary); margin: 3px 0;">• <strong>${itemName}</strong> (Color: ${item.color}, Size: ${item.size}) <span style="color: var(--brand-primary); font-weight: 700;">x${item.qty}</span></div>`;
+                        totalQty += (parseInt(item.qty) || 1);
+                    });
+                }
+
+                const rawStatus = (order.status || "pending").toLowerCase();
+                let statusBadge = "";
+                if (rawStatus === "arrived" || rawStatus === "at_stockroom") {
+                    statusBadge = `<span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; background: rgba(59, 130, 246, 0.15); color: #2563eb; border: 1px solid rgba(59, 130, 246, 0.3);">📦 At Stockroom (Loading)</span>`;
+                } else if (rawStatus === "ongoing" || rawStatus === "navigating_to_storeroom" || rawStatus === "delivering") {
+                    statusBadge = `<span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; background: rgba(245, 158, 11, 0.15); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.3);">🚚 En Route</span>`;
+                } else {
+                    statusBadge = `<span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; background: rgba(216, 90, 48, 0.15); color: var(--brand-primary); border: 1px solid rgba(216, 90, 48, 0.3);">⚡ Order Placed</span>`;
+                }
+
+                const isRobotMoving = (mockData.robot_state === "moving") || 
+                                      (mockData.status && (mockData.status.startsWith("traveling_") || mockData.status.startsWith("manual_override_") || mockData.status.startsWith("returning_")));
+
+                let actionButtonHTML = "";
+                if (isRobotMoving) {
+                    actionButtonHTML = `
+                        <button disabled style="background: rgba(100, 100, 100, 0.08); border: 1px solid rgba(100, 100, 100, 0.2); color: #888; font-size: 13px; font-weight: 700; padding: 8px 18px; border-radius: 8px; cursor: not-allowed; display: inline-flex; align-items: center; gap: 6px;" title="Temi is currently in motion. Cancellation is enabled once Temi stops at the destination.">
+                            <span>⏳ In Transit (Moving)</span>
+                        </button>
+                    `;
+                } else {
+                    actionButtonHTML = `
+                        <button class="btn btn-secondary" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; font-size: 13px; font-weight: 700; padding: 8px 18px; border-radius: 8px; cursor: pointer;" onclick="cancelAndRefundOrder('${id}'); resetRobotState();">Cancel</button>
+                    `;
+                }
+
+                card.innerHTML = `
+                    <div class="order-details" style="flex: 1;">
+                        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px;">
+                            <h4 style="margin: 0; font-size: 16px;">Order #${id}</h4>
+                            ${statusBadge}
+                        </div>
+                        <div style="margin-top: 8px;">${itemsHTML}</div>
+                        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">Total Items: <strong>${totalQty}</strong></div>
+                    </div>
+                    <div class="order-actions" style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center;">
+                        ${actionButtonHTML}
+                    </div>
+                `;
+                listDiv.appendChild(card);
+            });
+        }
+
+        // 2. Render History Orders
+        if (historyDiv) {
+            if (historyOrders.length === 0) {
+                historyDiv.innerHTML = `<p style="color: var(--text-secondary); font-size: 14px;">No past orders recorded yet.</p>`;
+            } else {
+                historyOrders.forEach(([id, order]) => {
+                    const isComplete = ["complete", "completed"].includes((order.status || "").toLowerCase());
+                    const hCard = document.createElement('div');
+                    hCard.style.cssText = "background: rgba(255, 255, 255, 0.25); border: 1px solid var(--glass-border); border-radius: 10px; padding: 12px 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;";
+
+                    let itemsSummary = [];
+                    if (order.items) {
+                        Object.values(order.items).forEach(item => {
+                            itemsSummary.push(`${item.name || item.shoeName || "Shoe"} (${item.color}, Size ${item.size}) x${item.qty}`);
+                        });
+                    }
+
+                    const badge = isComplete 
+                        ? `<span style="padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; background: rgba(16, 185, 129, 0.15); color: #059669; border: 1px solid rgba(16, 185, 129, 0.3);">✅ Completed</span>`
+                        : `<span style="padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; background: rgba(239, 68, 68, 0.15); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.3);">❌ Cancelled</span>`;
+
+                    hCard.innerHTML = `
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <strong style="font-size: 14px; color: var(--text-primary);">#${id}</strong>
+                                ${badge}
+                            </div>
+                            <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">${itemsSummary.join(" | ") || "Items details"}</div>
+                        </div>
+                        <div style="font-size: 12px; color: var(--text-secondary);">
+                            ${order.timestamp ? new Date(order.timestamp).toLocaleTimeString() : "Fulfilled"}
+                        </div>
+                    `;
+                    historyDiv.appendChild(hCard);
+                });
+            }
+        }
     }
 
     // Keep track of focused element ID before rendering
@@ -924,10 +1335,14 @@
 
             // Draw stock table
             let tableHTML = `
-                <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 20px; background: rgba(216, 90, 48, 0.04); padding: 12px 20px; border-radius: 8px; border: 1px solid rgba(216, 90, 48, 0.15);">
+                <div style="display: flex; gap: 20px; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-bottom: 20px; background: rgba(216, 90, 48, 0.04); padding: 12px 20px; border-radius: 8px; border: 1px solid rgba(216, 90, 48, 0.15);">
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <label style="margin: 0; font-size: 14px; font-weight: 700; color: var(--text-primary);" for="price-${shoeId}">Model Price ($):</label>
                         <input id="price-${shoeId}" type="number" step="0.01" min="0" style="width: 100px; padding: 6px 10px; font-weight: 600; border-radius: 6px; border: 1px solid var(--glass-border); background: rgba(255, 255, 255, 0.9); color: var(--text-primary);" value="${shoe.price}" onchange="updatePriceValue('${shoeId}', this.value)">
+                    </div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button style="background: rgba(225, 90, 48, 0.12); color: var(--brand-primary); border: 1px solid rgba(225, 90, 48, 0.35); padding: 7px 14px; font-size: 13px; border-radius: 6px; cursor: pointer; font-weight: 700; transition: all 0.2s;" onmouseover="this.style.background='var(--brand-primary)'; this.style.color='white'" onmouseout="this.style.background='rgba(225, 90, 48, 0.12)'; this.style.color='var(--brand-primary)'" onclick="openAddColorModal('${shoeId}')">🎨 + Add Color</button>
+                        <button style="background: rgba(225, 90, 48, 0.12); color: var(--brand-primary); border: 1px solid rgba(225, 90, 48, 0.35); padding: 7px 14px; font-size: 13px; border-radius: 6px; cursor: pointer; font-weight: 700; transition: all 0.2s;" onmouseover="this.style.background='var(--brand-primary)'; this.style.color='white'" onmouseout="this.style.background='rgba(225, 90, 48, 0.12)'; this.style.color='var(--brand-primary)'" onclick="openAddSizeModal('${shoeId}')">📏 + Add Size</button>
                     </div>
                 </div>
                 <table>
@@ -951,7 +1366,7 @@
                 `;
                 shoe.sizes.forEach(size => {
                     const key = color + "_" + size;
-                    const stockVal = shoe.stock[key] !== undefined ? shoe.stock[key] : 0;
+                    const stockVal = (shoe.stock && shoe.stock[key] !== undefined) ? shoe.stock[key] : 0;
                     const inputId = `stock-${shoeId}-${color}-${size}`;
                     tableHTML += `
                         <td>
@@ -986,6 +1401,237 @@
         }
     }
 
+    // Helper to dynamically resolve any standard HTML/CSS color name using the browser engine
+    function colorNameToHex(colorName) {
+        const overrides = {
+            "mahogany": "#4A0E17",
+            "taupe": "#B38B6D",
+            "mocha": "#5C4033",
+            "wheat": "#D2B48C",
+            "rust_brown": "#8B4513",
+            "coral": "#FF6B6B",
+            "black": "#1A1A1A",
+            "white": "#EAEAEA",
+            "red": "#D32F2F",
+            "blue": "#378ADD",
+            "green": "#2E7D32",
+            "gold": "#FFD700",
+            "yellow": "#FBC02D",
+            "purple": "#7B1FA2",
+            "pink": "#E91E63",
+            "orange": "#FB8C00",
+            "grey": "#757575",
+            "gray": "#757575",
+            "navy": "#1A237E",
+            "brown": "#5D4037",
+            "olive": "#556B2F",
+            "teal": "#00897B",
+            "maroon": "#800000",
+            "burgundy": "#800020"
+        };
+        
+        const clean = (colorName || "").trim().toLowerCase();
+        if (overrides[clean]) {
+            return overrides[clean];
+        }
+
+        try {
+            const div = document.createElement('div');
+            div.style.color = clean;
+            document.body.appendChild(div);
+            const computed = window.getComputedStyle(div).color;
+            document.body.removeChild(div);
+            
+            const match = computed.match(/\d+/g);
+            if (match && match.length >= 3) {
+                const r = parseInt(match[0]);
+                const g = parseInt(match[1]);
+                const b = parseInt(match[2]);
+                return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+            }
+        } catch (e) {
+            console.error("Error parsing color: " + clean, e);
+        }
+        return "#888888"; // Fallback grey
+    }
+
+    function syncColorNameWithHex(name) {
+        const hex = colorNameToHex(name);
+        if (hex) {
+            document.getElementById('modal-color-hex').value = hex;
+            try {
+                document.getElementById('modal-color-picker').value = hex.startsWith('#') && hex.length === 7 ? hex : "#378ADD";
+            } catch(e) {}
+        }
+    }
+
+    let activeModalShoeId = null;
+
+    function openAddColorModal(shoeId) {
+        const shoe = mockData.catalog[shoeId];
+        if (!shoe) return;
+        activeModalShoeId = shoeId;
+        document.getElementById('add-color-title').innerText = `🎨 Add Color to ${shoe.brand} - ${shoe.name}`;
+        document.getElementById('modal-color-name').value = "";
+        document.getElementById('modal-color-hex').value = "#378ADD";
+        document.getElementById('modal-color-picker').value = "#378ADD";
+        document.getElementById('modal-color-stock').value = "10";
+
+        const modal = document.getElementById('add-color-modal');
+        const box = document.getElementById('add-color-modal-box');
+        modal.style.display = "flex";
+        modal.style.opacity = "0";
+        box.style.transform = "scale(0.9)";
+        modal.offsetHeight;
+        modal.style.opacity = "1";
+        box.style.transform = "scale(1)";
+        document.getElementById('modal-color-name').focus();
+    }
+
+    function closeAddColorModal() {
+        const modal = document.getElementById('add-color-modal');
+        const box = document.getElementById('add-color-modal-box');
+        modal.style.opacity = "0";
+        box.style.transform = "scale(0.9)";
+        setTimeout(() => { modal.style.display = "none"; }, 250);
+        activeModalShoeId = null;
+    }
+
+    function submitAddColorModal() {
+        if (!activeModalShoeId) return;
+        const shoe = mockData.catalog[activeModalShoeId];
+        if (!shoe) return;
+
+        const colorName = document.getElementById('modal-color-name').value.trim().toLowerCase();
+        let colorHex = document.getElementById('modal-color-hex').value.trim();
+        const initialStock = parseInt(document.getElementById('modal-color-stock').value) || 0;
+
+        if (!colorName) {
+            showToast("Please enter a color name.");
+            return;
+        }
+
+        if (shoe.colors.map(c => c.toLowerCase()).includes(colorName)) {
+            showToast(`Color "${colorName}" already exists for this shoe.`);
+            return;
+        }
+
+        if (!colorHex) {
+            colorHex = colorNameToHex(colorName);
+        }
+
+        // Add to local state
+        shoe.colors.push(colorName);
+        if (!shoe.colorHex) shoe.colorHex = {};
+        shoe.colorHex[colorName] = colorHex;
+        if (!shoe.stock) shoe.stock = {};
+
+        const stockUpdatesForStore = {};
+        shoe.sizes.forEach(size => {
+            const key = colorName + "_" + size;
+            shoe.stock[key] = initialStock;
+            stockUpdatesForStore[`locations/${currentStoreLocation}/stock/${activeModalShoeId}/${key}`] = initialStock;
+            stockUpdatesForStore[`catalog/${activeModalShoeId}/stock/${key}`] = initialStock;
+        });
+
+        if (isFirebaseConnected) {
+            const updates = {
+                [`catalog/${activeModalShoeId}/colors`]: shoe.colors,
+                [`catalog/${activeModalShoeId}/colorHex`]: shoe.colorHex,
+                ...stockUpdatesForStore
+            };
+            db.ref().update(updates).then(() => {
+                showToast(`Added color "${colorName}" to ${shoe.name}!`);
+            }).catch(err => {
+                showToast("Failed to save to database: " + err.message);
+            });
+        } else {
+            localStorage.setItem('shoe_catalog', JSON.stringify(mockData.catalog));
+            showToast(`Added color "${colorName}" to ${shoe.name}!`);
+        }
+
+        closeAddColorModal();
+        renderInventoryList();
+    }
+
+    function openAddSizeModal(shoeId) {
+        const shoe = mockData.catalog[shoeId];
+        if (!shoe) return;
+        activeModalShoeId = shoeId;
+        document.getElementById('add-size-title').innerText = `📏 Add Size to ${shoe.brand} - ${shoe.name}`;
+        document.getElementById('modal-size-num').value = "";
+        document.getElementById('modal-size-stock').value = "10";
+
+        const modal = document.getElementById('add-size-modal');
+        const box = document.getElementById('add-size-modal-box');
+        modal.style.display = "flex";
+        modal.style.opacity = "0";
+        box.style.transform = "scale(0.9)";
+        modal.offsetHeight;
+        modal.style.opacity = "1";
+        box.style.transform = "scale(1)";
+        document.getElementById('modal-size-num').focus();
+    }
+
+    function closeAddSizeModal() {
+        const modal = document.getElementById('add-size-modal');
+        const box = document.getElementById('add-size-modal-box');
+        modal.style.opacity = "0";
+        box.style.transform = "scale(0.9)";
+        setTimeout(() => { modal.style.display = "none"; }, 250);
+        activeModalShoeId = null;
+    }
+
+    function submitAddSizeModal() {
+        if (!activeModalShoeId) return;
+        const shoe = mockData.catalog[activeModalShoeId];
+        if (!shoe) return;
+
+        const sizeVal = parseFloat(document.getElementById('modal-size-num').value);
+        const initialStock = parseInt(document.getElementById('modal-size-stock').value) || 0;
+
+        if (isNaN(sizeVal) || sizeVal <= 0) {
+            showToast("Please enter a valid numeric shoe size.");
+            return;
+        }
+
+        if (shoe.sizes.includes(sizeVal)) {
+            showToast(`Size "${sizeVal}" already exists for this shoe.`);
+            return;
+        }
+
+        // Add to local state & sort sizes
+        shoe.sizes.push(sizeVal);
+        shoe.sizes.sort((a, b) => a - b);
+        if (!shoe.stock) shoe.stock = {};
+
+        const stockUpdatesForStore = {};
+        shoe.colors.forEach(color => {
+            const key = color.toLowerCase() + "_" + sizeVal;
+            shoe.stock[key] = initialStock;
+            stockUpdatesForStore[`locations/${currentStoreLocation}/stock/${activeModalShoeId}/${key}`] = initialStock;
+            stockUpdatesForStore[`catalog/${activeModalShoeId}/stock/${key}`] = initialStock;
+        });
+
+        if (isFirebaseConnected) {
+            const updates = {
+                [`catalog/${activeModalShoeId}/sizes`]: shoe.sizes,
+                ...stockUpdatesForStore
+            };
+            db.ref().update(updates).then(() => {
+                showToast(`Added size "${sizeVal}" to ${shoe.name}!`);
+            }).catch(err => {
+                showToast("Failed to save to database: " + err.message);
+            });
+        } else {
+            localStorage.setItem('shoe_catalog', JSON.stringify(mockData.catalog));
+            showToast(`Added size "${sizeVal}" to ${shoe.name}!`);
+        }
+
+        closeAddSizeModal();
+        renderInventoryList();
+    }
+
     // Add brand new shoe model to the catalog
     function addNewShoeModel() {
         const idRaw = document.getElementById('add-id').value.trim().toLowerCase().replace(/[^a-z0-9_]/g, '_');
@@ -1006,48 +1652,8 @@
         if (colors.length === 0) { showToast("At least one color is required."); return; }
 
         // Parse sizes
-        const sizes = sizesRaw.split(',').map(s => parseInt(s.trim())).filter(s => !isNaN(s));
+        const sizes = sizesRaw.split(',').map(s => parseFloat(s.trim())).filter(s => !isNaN(s));
         if (sizes.length === 0) { showToast("At least one size is required."); return; }
-
-        // Generate colorHex mapping automatically
-        // Helper to dynamically resolve any standard HTML/CSS color name using the browser engine
-        function colorNameToHex(colorName) {
-            const overrides = {
-                "mahogany": "#4A0E17",
-                "taupe": "#B38B6D",
-                "mocha": "#5C4033",
-                "wheat": "#D2B48C",
-                "rust_brown": "#8B4513",
-                "coral": "#FF6B6B", // Custom pinker coral
-                "black": "#1A1A1A",
-                "white": "#EAEAEA",
-                "red": "#D32F2F"
-            };
-            
-            const clean = colorName.trim().toLowerCase();
-            if (overrides[clean]) {
-                return overrides[clean];
-            }
-
-            try {
-                const div = document.createElement('div');
-                div.style.color = clean;
-                document.body.appendChild(div);
-                const computed = window.getComputedStyle(div).color;
-                document.body.removeChild(div);
-                
-                const match = computed.match(/\d+/g);
-                if (match && match.length >= 3) {
-                    const r = parseInt(match[0]);
-                    const g = parseInt(match[1]);
-                    const b = parseInt(match[2]);
-                    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
-                }
-            } catch (e) {
-                console.error("Error parsing color: " + clean, e);
-            }
-            return "#888888"; // Fallback grey
-        }
 
         const colorHex = {};
         colors.forEach(color => {
@@ -1161,17 +1767,21 @@
         }
     }
 
-    // Update Stock Value directly in database/simulator state
+    // Update Stock Value directly in database/simulator state (Scoped to currentStoreLocation)
     function updateStockValue(shoeId, color, size, val) {
         const numericVal = Math.max(0, parseInt(val) || 0);
         const key = color + "_" + size;
 
+        if (!mockData.catalog[shoeId].stock) {
+            mockData.catalog[shoeId].stock = {};
+        }
         mockData.catalog[shoeId].stock[key] = numericVal;
         localStorage.setItem('shoe_catalog', JSON.stringify(mockData.catalog));
 
         if (isFirebaseConnected) {
-            db.ref('catalog/' + shoeId + '/stock/' + key).set(numericVal).catch(e => {
-                console.warn("Firebase stock update failed, fallback to local storage.", e);
+            // Write strictly to locations/{storeLocation}/stock/{shoeId}/{key}
+            db.ref(`locations/${currentStoreLocation}/stock/${shoeId}/${key}`).set(numericVal).catch(e => {
+                console.warn("Location stock update failed.", e);
             });
         }
     }
@@ -1194,9 +1804,9 @@
     function manualDispatchManual() {
         const dest = document.getElementById('select-destination-manual').value;
         if (isFirebaseConnected) {
-            db.ref('location').set(dest);
-            db.ref('status').set("manual_override_to_" + dest);
-            showToast(`Manual override sent: navigating to '${dest}'`);
+            db.ref(`locations/${currentStoreLocation}/location`).set(dest);
+            db.ref(`locations/${currentStoreLocation}/status`).set("manual_override_to_" + dest);
+            showToast(`Manual override sent for [${currentStoreLocation.toUpperCase()}]: navigating to '${dest}'`);
         } else {
             mockData.location = dest;
             mockData.status = "manual_override_to_" + dest;
@@ -1221,7 +1831,8 @@
 
                 if (shoeId && color && size) {
                     if (isFirebaseConnected) {
-                        db.ref(`catalog/${shoeId}/stock/${key}`).transaction(curr => {
+                        // Refund strictly to this store's stock
+                        db.ref(`locations/${currentStoreLocation}/stock/${shoeId}/${key}`).transaction(curr => {
                             return (curr !== null && curr !== undefined ? curr : 0) + qty;
                         });
                     }
@@ -1234,7 +1845,7 @@
         }
 
         if (isFirebaseConnected) {
-            db.ref(`orders/${orderId}/status`).set("cancelled");
+            db.ref(`locations/${currentStoreLocation}/orders/${orderId}/status`).set("cancelled");
         }
         if (mockData.orders && mockData.orders[orderId]) {
             mockData.orders[orderId].status = "cancelled";
@@ -1253,30 +1864,30 @@
         }
 
         if (isFirebaseConnected) {
-            db.ref('location').set("none");
-            db.ref('status').set("idle");
-            db.ref('robot_state').set("idle");
-            db.ref('active_order_id').set("");
-            db.ref('current_delivering_round').set("");
-            showToast(refunded ? "Robot reset to idle & active order stock refunded!" : "Robot state reset successfully!");
+            // Reset to clean idle in place: preserve current location, wipe active order, set status to idle
+            const loc = (mockData.location && mockData.location !== "moving" && mockData.location !== "none") ? mockData.location : "showroom";
+            db.ref(`locations/${currentStoreLocation}/location`).set(loc);
+            db.ref(`locations/${currentStoreLocation}/status`).set("idle");
+            db.ref(`locations/${currentStoreLocation}/robot_state`).set("idle");
+            db.ref(`locations/${currentStoreLocation}/active_order_id`).set("");
+            showToast(refunded ? `[${currentStoreLocation.toUpperCase()}] Order cancelled & robot reset to idle!` : `[${currentStoreLocation.toUpperCase()}] Robot state reset to idle!`);
         } else {
-            mockData.location = "none";
             mockData.status = "idle";
             mockData.robot_state = "idle";
             mockData.active_order_id = "";
             mockData.current_delivering_round = "";
             updateUI();
-            showToast(refunded ? "[Simulator Mode] Robot reset & active order stock refunded!" : "[Simulator Mode] Mock robot state reset to idle!");
+            showToast(refunded ? "[Simulator Mode] Robot reset & order cancelled!" : "[Simulator Mode] Mock robot state reset to idle!");
         }
     }
 
     // Order Actions
     function startDelivery(orderId) {
         if (isFirebaseConnected) {
-            db.ref('active_order_id').set(orderId);
-            db.ref('orders/' + orderId + '/status').set("ongoing");
-            db.ref('location').set("stockroom");
-            db.ref('status').set("navigating_to_storeroom");
+            db.ref(`locations/${currentStoreLocation}/active_order_id`).set(orderId);
+            db.ref(`locations/${currentStoreLocation}/orders/${orderId}/status`).set("ongoing");
+            db.ref(`locations/${currentStoreLocation}/location`).set("stockroom");
+            db.ref(`locations/${currentStoreLocation}/status`).set("navigating_to_storeroom");
         } else {
             mockData.active_order_id = orderId;
             mockData.orders[orderId].status = "ongoing";
@@ -1289,10 +1900,10 @@
     // Complete delivery
     function completeOrder(orderId) {
         if (isFirebaseConnected) {
-            db.ref('orders/' + orderId + '/status').set("complete");
-            db.ref('active_order_id').set("");
-            db.ref('location').set("showroom");
-            db.ref('status').set("returning_to_pickup_zone");
+            db.ref(`locations/${currentStoreLocation}/orders/${orderId}/status`).set("complete");
+            db.ref(`locations/${currentStoreLocation}/active_order_id`).set("");
+            db.ref(`locations/${currentStoreLocation}/location`).set("showroom");
+            db.ref(`locations/${currentStoreLocation}/status`).set("returning_to_pickup_zone");
         } else {
             mockData.orders[orderId].status = "complete";
             mockData.active_order_id = "";
@@ -1330,7 +1941,35 @@
 
     // Main Init
     window.onload = () => {
-        // Pre-render local mockup catalog immediately so the UI is never blank
+        // Check URL parameters (e.g. admin.html?location=pune&pin=7821)
+        try {
+            const urlParams = new URLSearchParams(window.location.search);
+            const locParam = (urlParams.get('location') || urlParams.get('store') || "").toLowerCase().trim();
+            const pinParam = (urlParams.get('pin') || urlParams.get('key') || "").trim();
+
+            if (locParam && STORE_PIN_REGISTRY[locParam]) {
+                // If PIN is provided in URL and matches
+                if (pinParam && (pinParam === STORE_PIN_REGISTRY[locParam] || pinParam === `sec_${locParam}`)) {
+                    currentStoreLocation = locParam;
+                    sessionStorage.setItem('temi_store_location', locParam);
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                } else {
+                    // Pre-select location in dropdown for convenience
+                    const selectEl = document.getElementById('login-store-select');
+                    if (selectEl) selectEl.value = locParam;
+                }
+            }
+        } catch(e) {}
+
+        if (currentStoreLocation) {
+            document.getElementById('login-modal').style.display = 'none';
+            document.getElementById('app-container').style.display = 'block';
+            updateStoreHeaderUI();
+        } else {
+            document.getElementById('login-modal').style.display = 'flex';
+            document.getElementById('app-container').style.display = 'none';
+        }
+        // Pre-render local mockup catalog
         updateUI();
         initApp();
     };

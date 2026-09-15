@@ -28,6 +28,9 @@ public class FirebaseRepo {
     // Toggle this to enable actual Firebase Realtime Database
     private boolean useFirebase = true;
 
+    // Active Store Identifier (assigned via SharedPreferences on first boot)
+    private String storeLocationId = "";
+
     private DatabaseReference dbRef;
     private List<Shoe> localCatalog = new ArrayList<>();
     private final List<RobotStateCallback> robotStateCallbacks = new ArrayList<>();
@@ -43,6 +46,8 @@ public class FirebaseRepo {
     private final Handler mockHandler = new Handler(Looper.getMainLooper());
 
     private ValueEventListener catalogListener;
+    private ValueEventListener storeStockListener;
+    private ValueEventListener robotStateListener;
     private boolean rootListenerAttached = false;
 
     public interface CatalogCallback {
@@ -86,6 +91,45 @@ public class FirebaseRepo {
         return instance;
     }
 
+    public String getStoreLocationId() {
+        return storeLocationId;
+    }
+
+    public void setStoreLocationId(String newStoreLocationId) {
+        String oldStoreLocationId = this.storeLocationId;
+        if (newStoreLocationId == null || newStoreLocationId.trim().isEmpty()) {
+            this.storeLocationId = "pune";
+        } else {
+            this.storeLocationId = newStoreLocationId.trim().toLowerCase();
+        }
+        Log.d(TAG, "Active store location changed from [" + oldStoreLocationId + "] to: " + this.storeLocationId);
+        
+        // Re-bind listeners cleanly for new store location
+        if (useFirebase && dbRef != null) {
+            restartListeners(oldStoreLocationId);
+        }
+    }
+
+    private void restartListeners(String oldLoc) {
+        if (catalogListener != null && dbRef != null) {
+            dbRef.child("catalog").removeEventListener(catalogListener);
+            catalogListener = null;
+        }
+        if (storeStockListener != null && dbRef != null && oldLoc != null) {
+            dbRef.child("locations").child(oldLoc).child("stock").removeEventListener(storeStockListener);
+            storeStockListener = null;
+        }
+        if (robotStateListener != null && dbRef != null && oldLoc != null) {
+            dbRef.child("locations").child(oldLoc).removeEventListener(robotStateListener);
+            robotStateListener = null;
+        }
+        rootListenerAttached = false;
+        startCatalogRealtimeSync();
+        if (!robotStateCallbacks.isEmpty()) {
+            observeRobotState(null);
+        }
+    }
+
     public void setUseFirebase(boolean useFirebase) {
         this.useFirebase = useFirebase;
         if (useFirebase && dbRef == null) {
@@ -119,6 +163,7 @@ public class FirebaseRepo {
     private void startCatalogRealtimeSync() {
         if (!useFirebase || dbRef == null || catalogListener != null) return;
 
+        // 1. Listen to Global Product Catalog (Shared models, shapes, hex colors, prices)
         catalogListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -135,7 +180,10 @@ public class FirebaseRepo {
                     cachedCatalog.clear();
                     cachedCatalog.addAll(list);
                 }
-                notifyCatalogCallbacks(list);
+
+                // If store-specific stock is available, sync it immediately
+                syncStoreSpecificStock();
+                notifyCatalogCallbacks(cachedCatalog);
             }
 
             @Override
@@ -145,6 +193,91 @@ public class FirebaseRepo {
         };
 
         dbRef.child("catalog").addValueEventListener(catalogListener);
+
+        // 2. Listen to Location-specific stock (e.g. locations/pune/stock)
+        startStoreStockListener();
+    }
+
+    private void startStoreStockListener() {
+        if (!useFirebase || dbRef == null || storeLocationId == null || storeStockListener != null) return;
+
+        storeStockListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.exists()) return;
+
+                synchronized (cachedCatalog) {
+                    for (DataSnapshot shoeStockSnap : snapshot.getChildren()) {
+                        String shoeId = shoeStockSnap.getKey();
+                        if (shoeId == null) continue;
+
+                        for (Shoe shoe : cachedCatalog) {
+                            if (shoeId.equals(shoe.getId())) {
+                                Map<String, Integer> storeStockMap = new HashMap<>();
+                                for (DataSnapshot variantSnap : shoeStockSnap.getChildren()) {
+                                    String variantKey = variantSnap.getKey();
+                                    Integer qty = variantSnap.getValue(Integer.class);
+                                    if (variantKey != null && qty != null) {
+                                        storeStockMap.put(variantKey, qty);
+                                    }
+                                }
+                                if (!storeStockMap.isEmpty()) {
+                                    shoe.setStock(storeStockMap);
+                                }
+                            }
+                        }
+                    }
+                }
+                notifyCatalogCallbacks(cachedCatalog);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.w(TAG, "Store stock sync warning: " + error.getMessage());
+            }
+        };
+
+        dbRef.child("locations").child(storeLocationId).child("stock").addValueEventListener(storeStockListener);
+    }
+
+    private void syncStoreSpecificStock() {
+        if (dbRef == null || storeLocationId == null) return;
+        
+        dbRef.child("locations").child(storeLocationId).child("stock").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.exists()) return;
+
+                synchronized (cachedCatalog) {
+                    for (DataSnapshot shoeStockSnap : snapshot.getChildren()) {
+                        String shoeId = shoeStockSnap.getKey();
+                        if (shoeId == null) continue;
+
+                        for (Shoe shoe : cachedCatalog) {
+                            if (shoeId.equals(shoe.getId())) {
+                                Map<String, Integer> storeStockMap = new HashMap<>();
+                                for (DataSnapshot variantSnap : shoeStockSnap.getChildren()) {
+                                    String variantKey = variantSnap.getKey();
+                                    Integer qty = variantSnap.getValue(Integer.class);
+                                    if (variantKey != null && qty != null) {
+                                        storeStockMap.put(variantKey, qty);
+                                    }
+                                }
+                                if (!storeStockMap.isEmpty()) {
+                                    shoe.setStock(storeStockMap);
+                                }
+                            }
+                        }
+                    }
+                }
+                notifyCatalogCallbacks(cachedCatalog);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.d(TAG, "Single store stock sync ignored: " + error.getMessage());
+            }
+        });
     }
 
     // --- Catalog Loading ---
@@ -187,7 +320,7 @@ public class FirebaseRepo {
         }
     }
 
-    // --- Order Placement with Real-Time Stock Verification ---
+    // --- Order Placement with Store-Specific Real-Time Stock Verification ---
     public void submitOrder(final List<CartItem> items, final OrderCallback callback) {
         if (items == null || items.isEmpty()) {
             callback.onOrderFailed("Cart is empty");
@@ -199,14 +332,86 @@ public class FirebaseRepo {
             return;
         }
 
-        // Run stock check transaction ONLY on the "catalog" path to prevent root-node retry conflicts
         final String orderId = "ORD_" + System.currentTimeMillis();
-        
+        final String locationStockPath = "locations/" + storeLocationId + "/stock";
+
+        // Check if locations/{storeId}/stock exists in database
+        dbRef.child(locationStockPath).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    // Location-specific stock exists: run transaction on locations/{storeId}/stock
+                    runStoreStockTransaction(orderId, items, locationStockPath, callback);
+                } else {
+                    // Fallback to root /catalog transaction
+                    runLegacyCatalogTransaction(orderId, items, callback);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Fallback to root /catalog transaction
+                runLegacyCatalogTransaction(orderId, items, callback);
+            }
+        });
+    }
+
+    private void runStoreStockTransaction(final String orderId, final List<CartItem> items, final String stockPath, final OrderCallback callback) {
+        dbRef.child(stockPath).runTransaction(new Transaction.Handler() {
+            @NonNull
+            @Override
+            public Transaction.Result doTransaction(@NonNull MutableData currentData) {
+                if (currentData.getValue() == null) {
+                    return Transaction.success(currentData);
+                }
+
+                // Verify stock for all items
+                for (CartItem item : items) {
+                    String relStockPath = item.getShoeId() + "/" + item.getColor().toLowerCase() + "_" + item.getSize();
+                    MutableData stockVal = currentData.child(relStockPath);
+                    Integer currentStock = stockVal.getValue(Integer.class);
+                    if (currentStock == null) {
+                        stockVal.setValue(0);
+                        currentStock = 0;
+                    }
+                    if (currentStock < item.getQty()) {
+                        return Transaction.abort(); // Insufficient stock
+                    }
+                }
+
+                // Deduct stock
+                for (CartItem item : items) {
+                    String relStockPath = item.getShoeId() + "/" + item.getColor().toLowerCase() + "_" + item.getSize();
+                    MutableData stockVal = currentData.child(relStockPath);
+                    Integer currentStock = stockVal.getValue(Integer.class);
+                    if (currentStock == null) {
+                        stockVal.setValue(0);
+                        currentStock = 0;
+                    }
+                    stockVal.setValue(currentStock - item.getQty());
+                }
+
+                return Transaction.success(currentData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError error, boolean committed, DataSnapshot currentData) {
+                if (committed && error == null) {
+                    writeOrderAndStatesToFirebase(orderId, items, callback);
+                } else {
+                    String reason = error != null ? error.getMessage() : "Insufficient stock for this store.";
+                    Log.e(TAG, "Store order transaction failed: " + reason);
+                    callback.onOrderFailed(reason);
+                }
+            }
+        });
+    }
+
+    private void runLegacyCatalogTransaction(final String orderId, final List<CartItem> items, final OrderCallback callback) {
         dbRef.child("catalog").runTransaction(new Transaction.Handler() {
             @NonNull
             @Override
             public Transaction.Result doTransaction(@NonNull MutableData currentData) {
-                // If catalog snapshot is empty/null, let it proceed to allow server sync
                 if (currentData.getValue() == null) {
                     return Transaction.success(currentData);
                 }
@@ -217,12 +422,11 @@ public class FirebaseRepo {
                     MutableData stockVal = currentData.child(relStockPath);
                     Integer currentStock = stockVal.getValue(Integer.class);
                     if (currentStock == null) {
-                        // Write placeholder to force Firebase to fetch the real stock value from the server
                         stockVal.setValue(0);
                         currentStock = 0;
                     }
                     if (currentStock < item.getQty()) {
-                        return Transaction.abort(); // Insufficient stock
+                        return Transaction.abort();
                     }
                 }
 
@@ -244,16 +448,10 @@ public class FirebaseRepo {
             @Override
             public void onComplete(DatabaseError error, boolean committed, DataSnapshot currentData) {
                 if (committed && error == null) {
-                    // Stock transaction committed! Write order metadata directly to Firebase
                     writeOrderAndStatesToFirebase(orderId, items, callback);
                 } else {
-                    String reason;
-                    if (error != null) {
-                        reason = "Database error: " + error.getMessage();
-                    } else {
-                        reason = "Transaction aborted - stock check failed or database connection unavailable.";
-                    }
-                    Log.e(TAG, "Order transaction failed: " + reason);
+                    String reason = error != null ? error.getMessage() : "Transaction aborted - stock check failed.";
+                    Log.e(TAG, "Legacy order transaction failed: " + reason);
                     callback.onOrderFailed(reason);
                 }
             }
@@ -280,16 +478,15 @@ public class FirebaseRepo {
         orderMap.put("items", itemMaps);
         orderMap.put("status", "pending");
         orderMap.put("createdAt", System.currentTimeMillis());
+        orderMap.put("locationId", storeLocationId);
 
-        // Perform direct writes in a single updateChildren call to prevent transaction conflicts on unrelated keys
+        // Perform writes strictly under locations/{storeLocationId}/
         Map<String, Object> updates = new HashMap<>();
-        updates.put("orders/" + orderId, orderMap);
-        updates.put("active_order_id", orderId);
-        updates.put("location", "moving");
-        updates.put("status", "traveling_storeroom");
-        updates.put("robot_state", "moving");
-        updates.put("admin/notification_pending", true);
-        updates.put("admin/latest_order_id", orderId);
+        updates.put("locations/" + storeLocationId + "/orders/" + orderId, orderMap);
+        updates.put("locations/" + storeLocationId + "/active_order_id", orderId);
+        updates.put("locations/" + storeLocationId + "/location", "moving");
+        updates.put("locations/" + storeLocationId + "/status", "traveling_storeroom");
+        updates.put("locations/" + storeLocationId + "/robot_state", "moving");
 
         dbRef.updateChildren(updates, (databaseError, databaseReference) -> {
             if (databaseError == null) {
@@ -354,14 +551,18 @@ public class FirebaseRepo {
             return;
         }
 
-        dbRef.child("orders").child(orderId).child("items").addListenerForSingleValueEvent(new ValueEventListener() {
+        // Read strictly from locations/{storeLocationId}/orders/{orderId}/items
+        dbRef.child("locations").child(storeLocationId).child("orders").child(orderId).child("items")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 List<CartItem> list = new ArrayList<>();
-                for (DataSnapshot itemSnap : snapshot.getChildren()) {
-                    CartItem item = itemSnap.getValue(CartItem.class);
-                    if (item != null) {
-                        list.add(item);
+                if (snapshot.exists()) {
+                    for (DataSnapshot itemSnap : snapshot.getChildren()) {
+                        CartItem item = itemSnap.getValue(CartItem.class);
+                        if (item != null) {
+                            list.add(item);
+                        }
                     }
                 }
                 callback.onOrderDetailsLoaded(list);
@@ -376,19 +577,23 @@ public class FirebaseRepo {
 
     // --- Robot State Observation ---
     public void observeRobotState(final RobotStateCallback callback) {
-        if (callback == null) return;
-        robotStateCallbacks.add(callback);
-        
-        // Initial callback invocation
-        callback.onStateChanged(robotLocation, robotStatus, robotState, activeOrderId);
+        if (callback != null && !robotStateCallbacks.contains(callback)) {
+            robotStateCallbacks.add(callback);
+            callback.onStateChanged(robotLocation, robotStatus, robotState, activeOrderId);
+        }
 
         if (!useFirebase) return;
 
-        // Only attach the actual Firebase listener ONCE, ever
+        // Only attach the actual Firebase listener ONCE per store location
         if (rootListenerAttached) return;
         rootListenerAttached = true;
 
-        dbRef.addValueEventListener(new ValueEventListener() {
+        // Listen strictly to locations/{storeLocationId} node
+        if (robotStateListener != null && dbRef != null) {
+            dbRef.child("locations").child(storeLocationId).removeEventListener(robotStateListener);
+        }
+
+        robotStateListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 String loc = snapshot.child("location").getValue(String.class);
@@ -406,9 +611,11 @@ public class FirebaseRepo {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Log.e(TAG, "Error listening to robot state changes", error.toException());
+                Log.e(TAG, "Error listening to store robot state changes", error.toException());
             }
-        });
+        };
+
+        dbRef.child("locations").child(storeLocationId).addValueEventListener(robotStateListener);
     }
 
     public void removeRobotStateCallback(RobotStateCallback callback) {
@@ -423,18 +630,25 @@ public class FirebaseRepo {
 
         notifyRobotCallbacks();
 
-        if (useFirebase) {
+        if (useFirebase && dbRef != null) {
             Map<String, Object> updates = new HashMap<>();
-            updates.put("location", location);
-            updates.put("status", status);
-            updates.put("robot_state", state);
-            updates.put("active_order_id", activeOrdId);
+            updates.put("locations/" + storeLocationId + "/location", location);
+            updates.put("locations/" + storeLocationId + "/status", status);
+            updates.put("locations/" + storeLocationId + "/robot_state", state);
+            updates.put("locations/" + storeLocationId + "/active_order_id", activeOrdId);
             dbRef.updateChildren(updates);
         }
     }
 
+    public void updateOrderStatus(String orderId, String newStatus) {
+        if (orderId == null || orderId.trim().isEmpty()) return;
+        if (useFirebase && dbRef != null) {
+            dbRef.child("locations").child(storeLocationId).child("orders").child(orderId).child("status").setValue(newStatus);
+        }
+    }
+
     private void notifyRobotCallbacks() {
-        for (RobotStateCallback cb : robotStateCallbacks) {
+        for (RobotStateCallback cb : new ArrayList<>(robotStateCallbacks)) {
             cb.onStateChanged(robotLocation, robotStatus, robotState, activeOrderId);
         }
     }
