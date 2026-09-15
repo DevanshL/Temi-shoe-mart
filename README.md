@@ -55,7 +55,7 @@ The system runs on a **centralized single-backend multi-tenant architecture**. A
 ### Supported Showcase Centers (8 Active Locations):
 | City ID | Location Name | City ID | Location Name |
 | :--- | :--- | :--- | :--- |
-| `bengaluru` | Bengaluru Store (Working Hub) | `hyd_sez` | Hyd Sez Store |
+| `bengaluru` | Bengaluru Store | `hyd_sez` | Hyd Sez Store |
 | `mysore` | Mysore Store | `tvm` | TVM Store |
 | `chennai_sholinganallur` | Chennai - Shollinganallur Store | `pune` | Pune Store |
 | `chennai_mcity` | Chennai - Mcity Store | `noida` | Noida Store |
@@ -204,11 +204,10 @@ Store managers monitor robot movement, dispatch orders, and manage inventory via
 * Enter your location's **4-digit numeric PIN**.
 * Once authenticated, the dashboard locks into your specific store view (**`👟 Temi Shoe Store ({City})`**). Cross-store dropdowns are omitted to prevent accidental cross-store actions.
 
-#### 2. Live Orders Queue
-* **Incoming Stream**: Orders placed by customers on Temi appear in real time with model names, selected colors, sizes, and quantities.
-* **Start Round**: Dispatches Temi from the showroom to the stockroom.
-* **Complete Delivery**: Finalizes the order after customer pickup.
-* **Cancel & Refund**: Cancels the order and **automatically executes an atomic stock refund back into this store's inventory matrix**.
+#### 2. Orders Tab (Current Order & Order History)
+* **Current Order**: Shows the customer order Temi is actively fulfilling in real time, with model names, selected colors, sizes, quantities, and live delivery status (`En Route`, `At Stockroom`, `Order Placed`).
+* **Order History**: Logs all past completed and delivered orders with timestamps.
+* **Cancel & Refund**: In emergencies, allows the manager to cancel an active order and **automatically execute an atomic stock refund back into this store's inventory matrix**.
 
 #### 3. Real-Time Inventory & Price Matrix
 * Click any shoe model to expand its **Color × Size matrix**.
@@ -229,7 +228,7 @@ Store managers monitor robot movement, dispatch orders, and manage inventory via
 
 | Location Name | Login Selection | 4-Digit Security PIN |
 | :--- | :--- | :--- |
-| **Bengaluru** | `Bengaluru Store (Working Hub)` | **`4910`** |
+| **Bengaluru** | `Bengaluru Store` | **`4910`** |
 | **Mysore** | `Mysore Store` | **`5290`** |
 | **Chennai - Shollinganallur** | `Chennai - Shollinganallur Store` | **`3620`** |
 | **Chennai - Mcity** | `Chennai - Mcity Store` | **`3621`** |

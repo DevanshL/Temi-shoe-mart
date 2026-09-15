@@ -411,7 +411,7 @@
                 <label style="display: block; font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">1. Select Store Location</label>
                 <select id="login-store-select" required onchange="onLoginStoreChanged()" style="width: 100%; padding: 14px 16px; font-size: 15px; font-weight: 600; border: 1px solid var(--glass-border); border-radius: 12px; background: rgba(255,255,255,0.95); color: var(--text-primary); font-family: 'Outfit', sans-serif; cursor: pointer;">
                     <option value="" disabled selected>-- Choose Your Store Location --</option>
-                    <option value="bengaluru">Bengaluru Store (Working Hub)</option>
+                    <option value="bengaluru">Bengaluru Store</option>
                     <option value="mysore">Mysore Store</option>
                     <option value="chennai_sholinganallur">Chennai - Shollinganallur Store</option>
                     <option value="chennai_mcity">Chennai - Mcity Store</option>
@@ -448,7 +448,7 @@
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
             <!-- Tabs selection -->
             <div style="display: flex; gap: 8px;">
-                <button class="nav-btn active" id="btn-tab-orders" onclick="switchTab('orders')">Orders Queue</button>
+                <button class="nav-btn active" id="btn-tab-orders" onclick="switchTab('orders')">Orders</button>
                 <button class="nav-btn" id="btn-tab-inventory" onclick="switchTab('inventory')">Inventory Matrix</button>
             </div>
             
@@ -484,9 +484,16 @@
 
         <!-- TAB: ORDERS -->
         <section id="tab-orders" class="tab-panel active">
-            <h2>Incoming Orders Queue</h2>
+            <h2>Current Order</h2>
             <div id="orders-list">
                 <p style="color: var(--text-secondary);">No active orders at this time.</p>
+            </div>
+
+            <div style="margin-top: 36px;">
+                <h3 style="font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 14px; border-bottom: 1px solid var(--glass-border); padding-bottom: 8px;">Order History</h3>
+                <div id="orders-history-list">
+                    <p style="color: var(--text-secondary); font-size: 14px;">No past orders recorded yet.</p>
+                </div>
             </div>
         </section>
 
@@ -1042,69 +1049,115 @@
         });
     }
 
-    // Render incoming orders queue
+    // Render autonomous live orders queue and past order history
     function renderOrdersList() {
         const listDiv = document.getElementById('orders-list');
+        const historyDiv = document.getElementById('orders-history-list');
         listDiv.innerHTML = "";
+        if (historyDiv) historyDiv.innerHTML = "";
 
-        const ordersArr = Object.entries(mockData.orders);
+        const ordersArr = Object.entries(mockData.orders || {});
         
-        // Filter active/ongoing/placed/pending orders
+        // Active vs Past Orders
         const activeOrders = ordersArr.filter(([id, order]) => {
             const st = (order.status || "").toLowerCase();
             return st && !["complete", "completed", "cancelled", "canceled"].includes(st);
         });
 
+        const historyOrders = ordersArr.filter(([id, order]) => {
+            const st = (order.status || "").toLowerCase();
+            return st && ["complete", "completed", "cancelled", "canceled"].includes(st);
+        }).reverse(); // Most recent first
+
+        // 1. Render Active Orders
         if (activeOrders.length === 0) {
-            listDiv.innerHTML = `<p style="color: var(--text-secondary);">No active orders at this time.</p>`;
-            return;
-        }
-
-        activeOrders.forEach(([id, order]) => {
-            const card = document.createElement('div');
-            card.className = "order-card";
-
-            let itemsHTML = "";
-            if (order.items) {
-                Object.values(order.items).forEach(item => {
-                    const itemName = item.name || item.shoeName || "Unknown Shoe";
-                    itemsHTML += `<p>• ${itemName} (Color: ${item.color}, Size: ${item.size}) x ${item.qty}</p>`;
-                });
-            }
-
-            const isArrived = (order.status || "").toLowerCase() === "arrived";
-            const isOngoing = (order.status || "").toLowerCase() === "ongoing";
-
-            let actionButtonsHTML = "";
-            if (isArrived) {
-                actionButtonsHTML = `
-                    <button class="btn btn-secondary" onclick="completeOrder('${id}')">Complete Delivery</button>
-                    <button class="btn btn-secondary" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; margin-top: 6px;" onclick="cancelAndRefundOrder('${id}'); resetRobotState();">Cancel & Refund</button>
-                `;
-            } else if (!isOngoing) {
-                actionButtonsHTML = `
-                    <button class="btn" onclick="startDelivery('${id}')">Start Round</button>
-                    <button class="btn btn-secondary" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; margin-top: 6px;" onclick="cancelAndRefundOrder('${id}'); resetRobotState();">Cancel & Refund</button>
-                `;
-            } else {
-                actionButtonsHTML = `
-                    <span style="color: var(--brand-primary); font-weight: 600; font-size: 14px;">En Route...</span>
-                    <button class="btn btn-secondary" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; margin-top: 6px;" onclick="cancelAndRefundOrder('${id}'); resetRobotState();">Cancel & Refund</button>
-                `;
-            }
-
-            card.innerHTML = `
-                <div class="order-details">
-                    <h4>Order ID: ${id}</h4>
-                    <p style="margin-bottom: 8px;"><strong>Status:</strong> ${order.status.toUpperCase()}</p>
-                    ${itemsHTML}
-                </div>
-                <div class="order-actions" style="display: flex; flex-direction: column; align-items: flex-end;">
-                    ${actionButtonsHTML}
+            listDiv.innerHTML = `
+                <div style="padding: 24px; text-align: center; background: rgba(255, 255, 255, 0.25); border-radius: 12px; border: 1px dashed var(--glass-border);">
+                    <div style="font-size: 28px; margin-bottom: 8px;">🤖</div>
+                    <p style="color: var(--text-primary); font-weight: 600; font-size: 15px;">Temi Robot is Ready & Idle</p>
+                    <p style="color: var(--text-secondary); font-size: 13px; margin-top: 4px;">Orders placed by customers on Temi will stream here autonomously in real time.</p>
                 </div>
             `;
-            listDiv.appendChild(card);
-        });
+        } else {
+            activeOrders.forEach(([id, order]) => {
+                const card = document.createElement('div');
+                card.className = "order-card";
+                card.style.borderLeft = "4px solid var(--brand-primary)";
+
+                let itemsHTML = "";
+                let totalQty = 0;
+                if (order.items) {
+                    Object.values(order.items).forEach(item => {
+                        const itemName = item.name || item.shoeName || "Footwear";
+                        itemsHTML += `<div style="font-size: 14px; color: var(--text-primary); margin: 3px 0;">• <strong>${itemName}</strong> (Color: ${item.color}, Size: ${item.size}) <span style="color: var(--brand-primary); font-weight: 700;">x${item.qty}</span></div>`;
+                        totalQty += (parseInt(item.qty) || 1);
+                    });
+                }
+
+                const rawStatus = (order.status || "pending").toLowerCase();
+                let statusBadge = "";
+                if (rawStatus === "arrived" || rawStatus === "at_stockroom") {
+                    statusBadge = `<span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; background: rgba(59, 130, 246, 0.15); color: #2563eb; border: 1px solid rgba(59, 130, 246, 0.3);">📦 At Stockroom (Loading)</span>`;
+                } else if (rawStatus === "ongoing" || rawStatus === "navigating_to_storeroom" || rawStatus === "delivering") {
+                    statusBadge = `<span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; background: rgba(245, 158, 11, 0.15); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.3);">🚚 En Route</span>`;
+                } else {
+                    statusBadge = `<span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; background: rgba(216, 90, 48, 0.15); color: var(--brand-primary); border: 1px solid rgba(216, 90, 48, 0.3);">⚡ Order Placed</span>`;
+                }
+
+                card.innerHTML = `
+                    <div class="order-details" style="flex: 1;">
+                        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px;">
+                            <h4 style="margin: 0; font-size: 16px;">Order #${id}</h4>
+                            ${statusBadge}
+                        </div>
+                        <div style="margin-top: 8px;">${itemsHTML}</div>
+                        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">Total Items: <strong>${totalQty}</strong></div>
+                    </div>
+                    <div class="order-actions" style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center;">
+                        <button class="btn btn-secondary" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; font-size: 13px; padding: 8px 14px;" onclick="cancelAndRefundOrder('${id}'); resetRobotState();">Cancel & Refund</button>
+                    </div>
+                `;
+                listDiv.appendChild(card);
+            });
+        }
+
+        // 2. Render History Orders
+        if (historyDiv) {
+            if (historyOrders.length === 0) {
+                historyDiv.innerHTML = `<p style="color: var(--text-secondary); font-size: 14px;">No past orders recorded yet.</p>`;
+            } else {
+                historyOrders.forEach(([id, order]) => {
+                    const isComplete = ["complete", "completed"].includes((order.status || "").toLowerCase());
+                    const hCard = document.createElement('div');
+                    hCard.style.cssText = "background: rgba(255, 255, 255, 0.25); border: 1px solid var(--glass-border); border-radius: 10px; padding: 12px 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;";
+
+                    let itemsSummary = [];
+                    if (order.items) {
+                        Object.values(order.items).forEach(item => {
+                            itemsSummary.push(`${item.name || item.shoeName || "Shoe"} (${item.color}, Size ${item.size}) x${item.qty}`);
+                        });
+                    }
+
+                    const badge = isComplete 
+                        ? `<span style="padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; background: rgba(16, 185, 129, 0.15); color: #059669; border: 1px solid rgba(16, 185, 129, 0.3);">✅ Completed & Delivered</span>`
+                        : `<span style="padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; background: rgba(239, 68, 68, 0.15); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.3);">❌ Cancelled & Refunded</span>`;
+
+                    hCard.innerHTML = `
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <strong style="font-size: 14px; color: var(--text-primary);">#${id}</strong>
+                                ${badge}
+                            </div>
+                            <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">${itemsSummary.join(" | ") || "Items details"}</div>
+                        </div>
+                        <div style="font-size: 12px; color: var(--text-secondary);">
+                            ${order.timestamp ? new Date(order.timestamp).toLocaleTimeString() : "Fulfilled"}
+                        </div>
+                    `;
+                    historyDiv.appendChild(hCard);
+                });
+            }
+        }
     }
 
     // Keep track of focused element ID before rendering
