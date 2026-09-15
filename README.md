@@ -58,7 +58,7 @@ The platform operates on a **centralized single-backend multi-tenant architectur
 | :--- | :--- | :--- | :--- |
 | **Bengaluru** | `bengaluru` | `Bengaluru Store` | `4910` |
 | **Mysore** | `mysore` | `Mysore Store` | `5290` |
-| **Chennai - Shollinganallur** | `chennai_sholinganallur` | `Chennai - Shollinganallur Store` | `3620` |
+| **Chennai - Sholinganallur** | `chennai_sholinganallur` | `Chennai - Sholinganallur Store` | `3620` |
 | **Chennai - Mcity** | `chennai_mcity` | `Chennai - Mcity Store` | `3621` |
 | **Hyd Sez** | `hyd_sez` | `Hyd Sez Store` | `9154` |
 | **TVM** | `tvm` | `TVM Store` | `6418` |
@@ -71,10 +71,10 @@ The platform operates on a **centralized single-backend multi-tenant architectur
 
 | Parameter | Specification | Notes |
 | :--- | :--- | :--- |
-| **Target Hardware** | Temi Autonomous Robot (V2/V3) | Screen, LiDAR, 3D depth cameras, voice mic array, delivery tray |
-| **Operating System** | Android 7.0+ (API level 24 to 34) | Compatible with all commercial Temi OS releases |
+| **Target Hardware** | Temi Commercial Robotics Platform | Integrated display, LiDAR navigation, 3D depth sensors, microphone array, delivery tray |
+| **Operating System** | Android 7.0+ (API level 24 to 34) | Compatible with all commercial Temi robot OS releases |
 | **Language & Toolchain** | Java 11 / JDK 17, Gradle 8.2+ | Automated build via `./gradlew` wrapper |
-| **Robot SDK** | Robotemi SDK (`com.robotemi:sdk:1.138.0`) | Autonomous ROS navigation, TTS announcements, battery monitoring |
+| **Robot SDK** | Robotemi SDK (`com.robotemi:sdk:1.138.0`) | Autonomous ROS navigation, TTS voice synthesis, battery telemetry |
 | **Cloud Synchronization** | Firebase Realtime Database BoM `32.8.0` | Low-latency WebSockets with atomic transactions |
 | **Web Console** | HTML5 / Vanilla ES6 / Glassmorphic CSS3 | Zero-dependency, responsive across mobile, tablet, and desktop |
 
