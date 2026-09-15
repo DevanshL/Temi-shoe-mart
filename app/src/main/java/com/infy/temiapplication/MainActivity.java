@@ -199,7 +199,6 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
             // Kiosk is Idle: Show welcome screen
             containerWelcome.setVisibility(View.VISIBLE);
             containerTravelStatus.setVisibility(View.GONE);
-            lastSpokenStatus = ""; // Reset speech lock for new orders
             return;
         }
 
@@ -455,6 +454,14 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
             goToLocation(LOC_PICKUP);
             
         } else if ("arrived_pickup".equals(currentStatus)) {
+            lastSpokenStatus = "completed";
+            if (isTemiAvailable && robot != null) {
+                try {
+                    robot.cancelAllTtsRequests();
+                } catch (Exception e) {
+                    Log.e(TAG, "Error cancelling TTS requests", e);
+                }
+            }
             speakTTS(getString(R.string.tts_order_complete));
             
             // Mark order completed in database
@@ -557,14 +564,12 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
                 if (currentActiveOrderId == null || currentActiveOrderId.isEmpty()) {
                     repo.updateRobotStateInDatabase("none", "idle", "idle", "");
                 } else {
-                    speakTTSOnce(getString(R.string.tts_arrived_storeroom), "arrived_storeroom");
                     repo.updateRobotStateInDatabase(LOC_STOREROOM, "arrived_storeroom", "arrived_store_room", currentActiveOrderId);
                 }
             } else if (LOC_PICKUP.equalsIgnoreCase(resolvedLocation)) {
                 if (currentActiveOrderId == null || currentActiveOrderId.isEmpty()) {
                     repo.updateRobotStateInDatabase("none", "idle", "idle", "");
                 } else {
-                    speakTTSOnce(getString(R.string.tts_arrived_pickup), "arrived_pickup");
                     repo.updateRobotStateInDatabase(LOC_PICKUP, "arrived_pickup", "arrived_pickup_zone", currentActiveOrderId);
                 }
             } else if (LOC_HOME.equalsIgnoreCase(resolvedLocation)) {

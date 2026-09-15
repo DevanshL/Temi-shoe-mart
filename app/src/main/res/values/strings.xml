@@ -35,7 +35,7 @@
     <string name="tts_start_trip">Heading to the stockroom for loading.</string>
     <string name="tts_arrived_storeroom">Please load the shoes and tap OK when done.</string>
     <string name="tts_heading_to_pickup">Delivering shoes to the showroom.</string>
-    <string name="tts_arrived_pickup">Your shoes have arrived! Please collect your order.</string>
+    <string name="tts_arrived_pickup">Your shoes have arrived! Please collect your order and press OK.</string>
     <string name="tts_order_complete">Thank you for shopping!</string>
     
     <!-- Kiosk Warnings -->
