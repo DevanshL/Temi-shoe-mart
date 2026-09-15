@@ -529,13 +529,13 @@ public class ShoeDetailActivity extends AppCompatActivity {
                 quantity = 1;
             }
 
-            if (activeStock <= 3) {
-                // Low stock warning (Amazon Style)
-                layoutStockStatus.setBackgroundTintList(android.content.res.ColorStateList.valueOf(getResources().getColor(R.color.coral_light)));
-                textStockStatus.setTextColor(getResources().getColor(R.color.coral_dark));
-                textStockStatus.setText(String.format(Locale.US, "Only %d left in stock - order soon!", activeStock));
+            if (activeStock <= 2) {
+                // Low stock warning (<= 2: Red)
+                layoutStockStatus.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.parseColor("#FDEDED")));
+                textStockStatus.setTextColor(Color.parseColor("#D32F2F"));
+                textStockStatus.setText(String.format(Locale.US, "Only %d left in stock", activeStock));
             } else {
-                // Plentiful stock
+                // Plentiful stock (> 2: Green)
                 layoutStockStatus.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.parseColor("#EAF8EA")));
                 textStockStatus.setTextColor(Color.parseColor("#2E7D32"));
                 textStockStatus.setText(String.format(Locale.US, "In Stock (%d available)", activeStock));

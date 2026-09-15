@@ -104,4 +104,16 @@ public class Shoe implements Serializable {
         }
         return total;
     }
+
+    // Helper: Find total stock across all colors and sizes
+    public int getTotalStock() {
+        if (stock == null || stock.isEmpty()) return 0;
+        int total = 0;
+        for (Integer count : stock.values()) {
+            if (count != null && count > 0) {
+                total += count;
+            }
+        }
+        return total;
+    }
 }

@@ -77,6 +77,24 @@ public class ShoeCatalogAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             sHolder.textName.setText(shoe.getName());
             sHolder.textPrice.setText(String.format(Locale.US, "$%.2f", shoe.getPrice()));
 
+            // Stock Badge Logic: <= 2 show "Only X left" in Red, > 2 show "In Stock" in Green
+            if (sHolder.textStockBadge != null) {
+                int totalStock = shoe.getTotalStock();
+                if (totalStock <= 0) {
+                    sHolder.textStockBadge.setText("Out of Stock");
+                    sHolder.textStockBadge.setTextColor(Color.parseColor("#D32F2F"));
+                    sHolder.textStockBadge.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.parseColor("#FDEDED")));
+                } else if (totalStock <= 2) {
+                    sHolder.textStockBadge.setText(String.format(Locale.US, "Only %d left", totalStock));
+                    sHolder.textStockBadge.setTextColor(Color.parseColor("#D32F2F"));
+                    sHolder.textStockBadge.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.parseColor("#FDEDED")));
+                } else {
+                    sHolder.textStockBadge.setText("In Stock");
+                    sHolder.textStockBadge.setTextColor(Color.parseColor("#2E7D32"));
+                    sHolder.textStockBadge.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.parseColor("#EAF8EA")));
+                }
+            }
+
             // Resolve Vector Drawables based on shapeSet
             int fillResId = R.drawable.shoe_sneaker_low_side_fill;
             int detailsResId = R.drawable.shoe_sneaker_low_side_details;
@@ -194,6 +212,7 @@ public class ShoeCatalogAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         TextView textBrand;
         TextView textName;
         TextView textPrice;
+        TextView textStockBadge;
         ImageView imageFill;
         ImageView imageDetails;
 
@@ -202,6 +221,7 @@ public class ShoeCatalogAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             textBrand = itemView.findViewById(R.id.card_brand);
             textName = itemView.findViewById(R.id.card_name);
             textPrice = itemView.findViewById(R.id.card_price);
+            textStockBadge = itemView.findViewById(R.id.card_stock_badge);
             imageFill = itemView.findViewById(R.id.card_shoe_fill);
             imageDetails = itemView.findViewById(R.id.card_shoe_details);
         }
