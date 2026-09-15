@@ -201,7 +201,23 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
         boolean hasNoActiveOrder = (currentActiveOrderId == null || currentActiveOrderId.trim().isEmpty() || "none".equalsIgnoreCase(currentActiveOrderId));
 
         if (!isManualOverride && (isIdleStatus || hasNoActiveOrder)) {
-            // Kiosk is Idle: Show welcome screen
+            // Check if robot was traveling to stockroom when order got cancelled
+            if (LOC_STOREROOM.equalsIgnoreCase(lastNavigatedLocation)) {
+                // Command Temi to safely turn around and return to Showroom!
+                lastNavigatedLocation = "";
+                containerWelcome.setVisibility(View.GONE);
+                containerTravelStatus.setVisibility(View.VISIBLE);
+                progressTravel.setVisibility(View.VISIBLE);
+                imgArrived.setVisibility(View.GONE);
+                btnStatusOk.setVisibility(View.GONE);
+                textStatusTitle.setText("Order Cancelled");
+                textStatusInstructions.setText("Order was cancelled. Temi is returning to the showroom...");
+                speakTTSOnce("Order was cancelled. Returning to showroom.", "order_cancelled_return");
+                goToLocation(LOC_PICKUP);
+                return;
+            }
+
+            // Kiosk is Idle at Showroom / Base: Show welcome screen
             containerWelcome.setVisibility(View.VISIBLE);
             containerTravelStatus.setVisibility(View.GONE);
             return;
@@ -509,19 +525,25 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
             }, 1800);
         } else if ("blocked".equals(currentStatus)) {
             // Obstacle cleared, retry navigation to the target zone
-            String targetLoc = LOC_STOREROOM;
-            String nextStatus = "traveling_storeroom";
-            
-            // Check where the robot was heading before it got blocked
-            if (LOC_PICKUP.equalsIgnoreCase(targetLocationBeforeBlock) || 
-                "display area".equalsIgnoreCase(targetLocationBeforeBlock) || 
-                "pickup_zone".equalsIgnoreCase(targetLocationBeforeBlock)) {
-                targetLoc = LOC_PICKUP;
-                nextStatus = "traveling_pickup";
+            String targetLoc = LOC_PICKUP;
+            String nextStatus = "returning_staging";
+
+            if (currentActiveOrderId != null && !currentActiveOrderId.trim().isEmpty()) {
+                if (LOC_PICKUP.equalsIgnoreCase(targetLocationBeforeBlock) || 
+                    "display area".equalsIgnoreCase(targetLocationBeforeBlock) || 
+                    "pickup_zone".equalsIgnoreCase(targetLocationBeforeBlock)) {
+                    targetLoc = LOC_PICKUP;
+                    nextStatus = "traveling_pickup";
+                } else {
+                    targetLoc = LOC_STOREROOM;
+                    nextStatus = "traveling_storeroom";
+                }
+                speakTTS("Resuming delivery round.");
+            } else {
+                speakTTS("Resuming return to showroom.");
             }
-            
-            speakTTS("Resuming delivery round.");
-            repo.updateRobotStateInDatabase("moving", nextStatus, "moving", currentActiveOrderId);
+
+            repo.updateRobotStateInDatabase("moving", nextStatus, "moving", currentActiveOrderId != null ? currentActiveOrderId : "");
             goToLocation(targetLoc);
         }
     }
@@ -571,18 +593,21 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
             lastNavigatedLocation = ""; // Reset navigation cache upon arrival
             if (LOC_STOREROOM.equalsIgnoreCase(resolvedLocation)) {
                 if (currentActiveOrderId == null || currentActiveOrderId.isEmpty()) {
-                    repo.updateRobotStateInDatabase("none", "idle", "idle", "");
+                    // Arrived at stockroom but order was cancelled: immediately return to showroom!
+                    speakTTSOnce("No active order. Returning to showroom.", "return_showroom_no_order");
+                    repo.updateRobotStateInDatabase(LOC_STOREROOM, "returning_staging", "moving", "");
+                    goToLocation(LOC_PICKUP);
                 } else {
                     repo.updateRobotStateInDatabase(LOC_STOREROOM, "arrived_storeroom", "arrived_store_room", currentActiveOrderId);
                 }
             } else if (LOC_PICKUP.equalsIgnoreCase(resolvedLocation)) {
                 if (currentActiveOrderId == null || currentActiveOrderId.isEmpty()) {
-                    repo.updateRobotStateInDatabase("none", "idle", "idle", "");
+                    repo.updateRobotStateInDatabase(LOC_PICKUP, "idle", "idle", "");
                 } else {
                     repo.updateRobotStateInDatabase(LOC_PICKUP, "arrived_pickup", "arrived_pickup_zone", currentActiveOrderId);
                 }
             } else if (LOC_HOME.equalsIgnoreCase(resolvedLocation)) {
-                repo.updateRobotStateInDatabase("none", "idle", "idle", "");
+                repo.updateRobotStateInDatabase("home_base", "idle", "idle", "");
             }
         } else if ("abort".equalsIgnoreCase(status) || 
                    "reject".equalsIgnoreCase(status)) {
