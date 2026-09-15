@@ -435,6 +435,7 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
         if ("arrived_storeroom".equals(currentStatus)) {
             // Staff loaded shoes, ready to head to pickup
             speakTTS(getString(R.string.tts_heading_to_pickup));
+            repo.updateOrderStatus(currentActiveOrderId, "delivering");
             repo.updateRobotStateInDatabase("moving", "traveling_pickup", "moving", currentActiveOrderId);
             
             // Command physical robot to navigate
@@ -442,6 +443,9 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
             
         } else if ("arrived_pickup".equals(currentStatus)) {
             speakTTS(getString(R.string.tts_order_complete));
+            
+            // Mark order completed in database
+            repo.updateOrderStatus(currentActiveOrderId, "completed");
 
             // Check battery level to decide where to go
             int batteryPct = 100;
@@ -466,6 +470,8 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
                 repo.updateRobotStateInDatabase(LOC_PICKUP, "idle", "idle", "");
                 Toast.makeText(this, "Order completed!", Toast.LENGTH_LONG).show();
             }
+            
+            currentActiveOrderId = "";
 
             // Redirect back to catalog screen immediately so new users can browse
             Intent intent = new Intent(MainActivity.this, ShoeCatalogActivity.class);

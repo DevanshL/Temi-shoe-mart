@@ -635,9 +635,14 @@ public class FirebaseRepo {
             updates.put("locations/" + storeLocationId + "/location", location);
             updates.put("locations/" + storeLocationId + "/status", status);
             updates.put("locations/" + storeLocationId + "/robot_state", state);
-            updates.put("locations/" + storeLocationId + "/active_order_id", activeOrdId);
-
             dbRef.updateChildren(updates);
+        }
+    }
+
+    public void updateOrderStatus(String orderId, String newStatus) {
+        if (orderId == null || orderId.trim().isEmpty()) return;
+        if (useFirebase && dbRef != null) {
+            dbRef.child("locations").child(storeLocationId).child("orders").child(orderId).child("status").setValue(newStatus);
         }
     }
 

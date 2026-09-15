@@ -988,15 +988,35 @@
             activeListeners.push({ ref, event, callback });
         }
 
+        // Helper formatters for human-readable display
+        function formatLocation(loc) {
+            if (!loc || loc === "none") return "Showroom (Idle)";
+            if (loc === "showroom") return "Showroom";
+            if (loc === "stockroom") return "Stockroom";
+            if (loc === "home base" || loc === "home_base") return "Charging Dock";
+            return loc;
+        }
+
+        function formatStatus(st) {
+            if (!st || st === "idle") return "Idle";
+            if (st === "traveling_storeroom" || st === "navigating_to_storeroom") return "Heading to Stockroom";
+            if (st === "arrived_storeroom") return "At Stockroom (Loading)";
+            if (st === "traveling_pickup" || st === "delivering") return "Delivering to Showroom";
+            if (st === "arrived_pickup" || st === "arrived_showroom") return "At Showroom (Customer Pickup)";
+            if (st === "blocked") return "Path Blocked";
+            if (st === "returning_home") return "Returning to Dock";
+            return st;
+        }
+
         // Robot telemetry strictly for selected store location
         addTrackedListener(locRef.child('location'), 'value', (snap) => {
             mockData.location = snap.val() || "none";
-            document.getElementById('tel-location').innerText = mockData.location;
+            document.getElementById('tel-location').innerText = formatLocation(mockData.location);
         });
 
         addTrackedListener(locRef.child('status'), 'value', (snap) => {
             mockData.status = snap.val() || "idle";
-            document.getElementById('tel-status').innerText = mockData.status;
+            document.getElementById('tel-status').innerText = formatStatus(mockData.status);
         });
 
         addTrackedListener(locRef.child('robot_state'), 'value', (snap) => {
@@ -1114,7 +1134,7 @@
                         <div style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">Total Items: <strong>${totalQty}</strong></div>
                     </div>
                     <div class="order-actions" style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center;">
-                        <button class="btn btn-secondary" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; font-size: 13px; padding: 8px 14px;" onclick="cancelAndRefundOrder('${id}'); resetRobotState();">Cancel & Refund</button>
+                        <button class="btn btn-secondary" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; font-size: 13px; font-weight: 700; padding: 8px 18px; border-radius: 8px; cursor: pointer;" onclick="cancelAndRefundOrder('${id}'); resetRobotState();">Cancel</button>
                     </div>
                 `;
                 listDiv.appendChild(card);
