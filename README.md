@@ -1,7 +1,7 @@
 # Temi Shoe Mart 👟🤖
 ### Multi-Location Autonomous Retail & Delivery Platform
 
-**Temi Shoe Mart** is an autonomous in-store footwear retail and robotic fulfillment platform engineered for the **Temi Robot**. It couples an on-robot Android customer kiosk with a centralized, real-time store management console powered by **Firebase Realtime Database**, featuring **complete multi-location store isolation across 11 showcase centers in India**.
+**Temi Shoe Mart** is an autonomous in-store footwear retail and robotic fulfillment platform engineered for the **Temi Robot**. It couples an on-robot Android customer kiosk with a centralized, real-time store management console powered by **Firebase Realtime Database**, featuring **complete multi-location store isolation across 8 showcase centers in India**.
 
 ---
 
@@ -14,7 +14,7 @@
 5. [First-Boot Store Assignment](#5-first-boot-store-assignment)
 6. [Autonomous In-Store Customer & Delivery Flow](#6-autonomous-in-store-customer--delivery-flow)
 7. [Store Manager Web Console Guide (`admin.html`)](#7-store-manager-web-console-guide-adminhtml)
-8. [Store Manager PIN Directory (11 Locations)](#8-store-manager-pin-directory-11-locations)
+8. [Store Manager PIN Directory (8 Locations)](#8-store-manager-pin-directory-8-locations)
 9. [Data Isolation & Concurrency Architecture](#9-data-isolation--concurrency-architecture)
 10. [Field Operations & Troubleshooting Runbook](#10-field-operations--troubleshooting-runbook)
 
@@ -22,7 +22,7 @@
 
 ## 1. Architecture & Cloud Infrastructure Overview
 
-The system runs on a **centralized single-backend multi-tenant architecture**. All 11 regional showcase stores connect to the same central Firebase cloud instance, while maintaining strict, automated data isolation:
+The system runs on a **centralized single-backend multi-tenant architecture**. All 8 regional showcase stores connect to the same central Firebase cloud instance, while maintaining strict, automated data isolation:
 
 ```
                                   ┌──────────────────────────────────────────────┐
