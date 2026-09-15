@@ -1,11 +1,11 @@
-# Temi Shoe Mart 👟🤖
+# Temi Shoe Mart
 ### Multi-Location Autonomous Retail & Robotic Fulfillment Platform
 
 **Temi Shoe Mart** is an enterprise-grade autonomous in-store footwear retail and robotic fulfillment platform engineered for the **Temi Robot**. It bridges an on-robot Android customer kiosk with a centralized, real-time store management console powered by **Firebase Realtime Database**, featuring **complete multi-location store isolation across 8 showcase centers in India**.
 
 ---
 
-## 📑 Table of Contents
+## Table of Contents
 
 1. [Architecture & Cloud Infrastructure](#1-architecture--cloud-infrastructure)
 2. [Prerequisites & System Requirements](#2-prerequisites--system-requirements)
@@ -43,8 +43,8 @@ The platform operates on a **centralized single-backend multi-tenant architectur
 │────────────────────────────────────────────────────────│   │──────────────────────────────────────────│
 │ • Fullscreen Customer Retail Kiosk                     │   │ • PIN-Protected Store Manager Portal     │
 │ • Dynamic Vector Color Layering & Live Catalog         │   │ • Real-Time Robot Telemetry & Waypoints  │
-│ • Atomic In-Store Stock Validation & Instant Ordering  │   │ • In-Transit Lockout & Station Cancel    │
-│ • Autonomous Waypoint Navigation & TTS Voice Guidance  │   │ • Real-Time Color × Size Inventory Matrix│
+│ • Atomic In-Store Stock Validation & Instant Ordering  │   │ • Order Cancellation & Stock Refunds     │
+│ • Autonomous Waypoint Navigation & Voice Guidance      │   │ • Real-Time Color × Size Inventory Matrix│
 │ • Obstacle Detection & Self-Healing Path Recovery      │   │ • Dynamic Variant Creation (+Color/+Size)│
 │ • Secret In-App Staff PIN Store Switcher               │   │ • In-Place Reset & Manual Dispatch       │
 └────────────────────────────────────────────────────────┘   └──────────────────────────────────────────┘
@@ -181,20 +181,20 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 ### 1. Initial Setup (First Boot)
 When the app is opened for the first time on a freshly installed Temi:
-1. The **"📍 Initial Setup: Select Store"** modal appears.
+1. The **"Initial Setup: Select Store"** modal appears.
 2. Select your store location (e.g., **Pune Store**).
 3. A security prompt will ask for the **4-digit Security PIN** (e.g., `7821` for Pune).
 4. Enter the PIN and tap **Authorize**:
    - The store assignment is permanently saved to Android `SharedPreferences` (`temi_kiosk_prefs`).
    - The robot connects to its isolated database partition (`locations/pune/`).
-   - The welcome screen subtitle updates to: `📍 Pune Store • Touch screen to start`.
+   - The welcome screen subtitle updates to: `Pune Store • Touch screen to start`.
    - The dialog will **never appear again** on standard reboots or app launches.
 
 ### 2. Secret In-App Staff Store Switcher
 If a robot is reassigned to another store or the wrong store was selected by accident:
 - **No need to uninstall or clear app data!**
 - **Action**: **Long-press the "Temi Shoe Mart" brand title** on the welcome screen for 2 seconds.
-- The **"🔒 Staff Menu: Switch Store Location"** modal will appear.
+- The **"Staff Menu: Switch Store Location"** modal will appear.
 - Select the new store, enter that store's 4-digit PIN, and tap **Authorize**.
 - The robot immediately rebinds its Firebase listeners and telemetry to the newly selected store.
 
@@ -205,57 +205,37 @@ If a robot is reassigned to another store or the wrong store was selected by acc
 ```
 ┌────────────────────────────────────────────────────────┐
 │               Welcome Screen (Idle)                    │
-│          (Customer taps "Start Ordering")              │
-└──────────────────────────┬─────────────────────────────┘
-                           │ 🗣️ "Hi welcome! Please add items into cart and place order."
-                           ▼
-┌────────────────────────────────────────────────────────┐
-│                 Product Catalog Grid                   │
-│   (Filter by Brand, Category, & Live Store Stock)      │
+│          (Customer taps "Touch screen to start")       │
 └──────────────────────────┬─────────────────────────────┘
                            │
                            ▼
 ┌────────────────────────────────────────────────────────┐
-│             Shoe Detail & Interactive View             │
-│   • 3 Angles: Side / Top / Sole Vector Previews        │
-│   • Dynamic Color Swatches & Size Chips                │
-│   • Real-Time Stock Warning & Quantity Selector        │
-└──────────────────────────┬─────────────────────────────┘
-                           │
-                           ▼
-┌────────────────────────────────────────────────────────┐
-│               Cart & Checkout Screen                   │
-│   (Atomic Cloud Stock Check: Deducts Stock at Store)   │
-└──────────────────────────┬─────────────────────────────┘
-                           │
-                           ▼
-┌────────────────────────────────────────────────────────┐
-│            Temi Dispatches to Stockroom                │ ──► 🗣️ "Heading to the stock room for loading"
+│            Temi Dispatches to Stockroom                │ ──► "Heading to the stock room for loading"
 └──────────────────────────┬─────────────────────────────┘
                            │ (Arrives at 'stockroom')
                            ▼
 ┌────────────────────────────────────────────────────────┐
 │            Staff Loading Confirmation                  │ ──► Shows "Items to Load" preview
-│     (Staff loads shoes onto tray & taps "Shoes Loaded")│ ──► 🗣️ "Temi has arrived at the stock room.
+│     (Staff loads shoes onto tray & taps "Shoes Loaded")│ ──► "Temi has arrived at the stock room.
 └──────────────────────────┬─────────────────────────────┘        Please load the shoes and tap Shoes Loaded."
                            │
                            ▼
 ┌────────────────────────────────────────────────────────┐
-│            Temi Delivers to Showroom Area              │ ──► 🗣️ "Shoes loaded! Temi is traveling to the showroom"
+│            Temi Delivers to Showroom Area              │ ──► "Shoes loaded! Temi is traveling to the showroom"
 └──────────────────────────┬─────────────────────────────┘
                            │ (Arrives at 'showroom')
                            ▼
 ┌────────────────────────────────────────────────────────┐
 │            Customer Collection Confirmation            │ ──► Shows "Items to Collect" preview
-│     (Customer collects shoes & taps "Collect Shoes")   │ ──► 🗣️ "Your shoes have arrived! Please collect
+│     (Customer collects shoes & taps "Collect Shoes")   │ ──► "Your shoes have arrived! Please collect
 └──────────────────────────┬─────────────────────────────┘        your order and tap Collect Shoes."
                            │
                            ▼
 ┌────────────────────────────────────────────────────────┐
-│               Order Completion & Reset                 │ ──► 🗣️ "Thank you for shopping with us! Have a great day."
-│  • 1.8s audio delay ensures TTS is never cut off       │ ──► Battery Check:
-│  • Status resets to "idle"                             │     - If ≤ 30% ➔ Navigates to "home base" dock
-│  • Returns to Welcome Screen for next customer         │     - If > 30% ➔ Parks at "showroom"
+│               Order Completion & Reset                 │ ──► "Thank you for shopping with us! Have a great day."
+│  • Status resets to "idle"                             │ ──► Battery Check:
+│  • Returns to Welcome Screen for next customer         │     - If <= 30% -> Navigates to "home base" dock
+│                                                        │     - If > 30% -> Parks at "showroom"
 └────────────────────────────────────────────────────────┘
 ```
 
@@ -290,18 +270,17 @@ The Store Manager Web Console gives staff complete real-time oversight of robot 
   - If an active order was in progress, it cancels the order, **automatically refunds all shoe quantities back into stock**, and clears the active order ID.
 
 #### 4. Active Orders & Order History
-- **Live Order Card**: Displays customer order details, item names, color variants, sizes, quantities, and status badge (`⚡ Order Placed`, `📦 At Stockroom`, `🚚 En Route`).
-- **In-Transit Lockout**: When Temi is actively driving, the Cancel button displays `⏳ In Transit (Moving)` and is disabled to prevent conflicting navigation commands while moving.
-- **Station Cancellation**: When Temi is stationary at the stockroom, showroom, or blocked, clicking **Cancel** refunds inventory and resets the order safely.
-- **Order History**: Logs past completed (`✅ Completed`) and cancelled (`❌ Cancelled`) orders with timestamps.
+- **Live Order Card**: Displays customer order details, item names, color variants, sizes, quantities, and status badge (`Order Placed`, `At Stockroom`, `En Route`).
+- **Order Cancellation**: When Temi is at a station or blocked, clicking **Cancel** refunds inventory and resets the order safely.
+- **Order History**: Logs past completed (`Completed`) and cancelled (`Cancelled`) orders with timestamps.
 
 #### 5. Dynamic Inventory Matrix & Variant Creation
 - **Expandable Color × Size Matrix**: Click any shoe model header to open its stock grid.
 - **Direct Stock & Price Editing**: Change stock numbers or shoe prices inline — updates sync to Temi's screen in real time.
-- **`🎨 + Add Color` Feature**:
+- **`+ Add Color` Feature**:
   - Allows staff to add a brand new color variant to an existing shoe model.
   - Supports custom color names, hex codes, automatic CSS color-name resolution, visual color picker, and initial stock quantities.
-- **`📏 + Add Size` Feature**:
+- **`+ Add Size` Feature**:
   - Allows staff to add a new shoe size to an existing model.
   - Automatically sorts sizes numerically and initializes stock across all existing colors.
 - **`Delete Model`**: Deletes a shoe model from the store catalog with a custom confirmation modal.
@@ -335,19 +314,11 @@ The platform has been hardened against real-world retail edge cases:
   - Temi inspects `targetLocationBeforeBlock`.
   - It resumes its exact intended destination (whether delivering an active order, returning to showroom, or navigating under manual dispatch to the stockroom or dock).
 
-### 2. In-Transit Cancellation Protection
-- **Problem Prevented**: Cancelling an order while Temi is moving at full speed causes conflicting ROS path recalculations and robot confusion.
-- **Solution**: The Admin Console disables the Cancel button while `robot_state === 'moving'`, unlocking it only when Temi halts at a station (`stockroom`, `showroom`, or `blocked`).
-
-### 3. Order Cancelled While at Stockroom
+### 2. Order Cancelled While at Stockroom
 - If an order is cancelled while Temi is at the stockroom, `active_order_id` is wiped clean.
 - Temi detects that it is at `stockroom` with no active order, announces *"No active order. Returning to showroom."*, and autonomously drives back to the Showroom.
 
-### 4. Speech Cut-Off & Duplicate Speech Elimination
-- **Completion Speech Protection**: When a customer taps "Collect Shoes", a 1.8s delay ensures the speech *"Thank you for shopping with us! Have a great day."* finishes audibly before the activity transitions.
-- **Duplicate Speech Elimination**: Static `lastSpokenStatus` guards prevent repetitive TTS triggers caused by rapid Firebase value events.
-
-### 5. Manual Dispatch Parking vs Auto-Return
+### 3. Manual Dispatch Parking vs Auto-Return
 - When an admin dispatches Temi to the `stockroom` or `home base`, the `isManualOverrideActive` flag ensures Temi stays parked at that station upon arrival, rather than incorrectly assuming a cancelled order and returning to the showroom.
 
 ---
@@ -400,7 +371,7 @@ Firebase Realtime Database
 
 ---
 
-## 👨‍💻 Repository & Resource Links
+## Repository & Resource Links
 
 * **Repository**: [DevanshL/Temi-shoe-mart](https://github.com/DevanshL/Temi-shoe-mart)
 * **Active Branch**: `feature/multi-location`
