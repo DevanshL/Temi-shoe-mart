@@ -8,16 +8,17 @@
 ## 📑 Table of Contents
 
 1. [Architecture & Cloud Infrastructure](#1-architecture--cloud-infrastructure)
-2. [Hardware & Software Specifications](#2-hardware--software-specifications)
-3. [Physical Robot Waypoint Setup (On-Site Mapping)](#3-physical-robot-waypoint-setup-on-site-mapping)
-4. [Deployment & Installation (Android Studio & ADB)](#4-deployment--installation-android-studio--adb)
-5. [Robot Store Assignment & Secret Staff Switcher](#5-robot-store-assignment--secret-staff-switcher)
-6. [Autonomous Customer & Delivery Flow](#6-autonomous-customer--delivery-flow)
-7. [Store Manager Web Console Guide (`admin.html`)](#7-store-manager-web-console-guide-adminhtml)
-8. [Store Manager Security PIN Directory (8 Locations)](#8-store-manager-security-pin-directory-8-locations)
-9. [Edge Cases, Error Handling & Recovery Architecture](#9-edge-cases-error-handling--recovery-architecture)
-10. [Data Isolation & Concurrency Architecture](#10-data-isolation--concurrency-architecture)
-11. [Field Operations & Troubleshooting Runbook](#11-field-operations--troubleshooting-runbook)
+2. [Prerequisites & System Requirements](#2-prerequisites--system-requirements)
+3. [Hardware & Software Specifications](#3-hardware--software-specifications)
+4. [Physical Robot Waypoint Setup (On-Site Mapping)](#4-physical-robot-waypoint-setup-on-site-mapping)
+5. [Deployment & Installation (Android Studio & ADB)](#5-deployment--installation-android-studio--adb)
+6. [Robot Store Assignment & Secret Staff Switcher](#6-robot-store-assignment--secret-staff-switcher)
+7. [Autonomous Customer & Delivery Flow](#7-autonomous-customer--delivery-flow)
+8. [Store Manager Web Console Guide (`admin.html`)](#8-store-manager-web-console-guide-adminhtml)
+9. [Store Manager Security PIN Directory (8 Locations)](#9-store-manager-security-pin-directory-8-locations)
+10. [Edge Cases, Error Handling & Recovery Architecture](#10-edge-cases-error-handling--recovery-architecture)
+11. [Data Isolation & Concurrency Architecture](#11-data-isolation--concurrency-architecture)
+12. [Field Operations & Troubleshooting Runbook](#12-field-operations--troubleshooting-runbook)
 
 ---
 
@@ -51,7 +52,7 @@ The platform operates on a **centralized single-backend multi-tenant architectur
 
 > [!NOTE]
 > **Central Cloud Status: Fully Deployed**  
-> The Firebase Realtime Database schema and catalog seed are managed centrally. Local store staff and installers **do NOT need to configure Firebase, create accounts, or import database files**. Local teams only need to follow Sections 3, 4, and 5.
+> The Firebase Realtime Database schema and catalog seed are managed centrally. Local store staff and installers **do NOT need to configure Firebase, create accounts, or import database files**. Local teams only need to follow Sections 4, 5, and 6.
 
 ### Supported Showcase Centers (8 Active Locations)
 | Store Location | Database Node Key | Display Name in App & Admin | Default PIN |
@@ -67,7 +68,35 @@ The platform operates on a **centralized single-backend multi-tenant architectur
 
 ---
 
-## 2. Hardware & Software Specifications
+## 2. Prerequisites & System Requirements
+
+Before deploying and running the solution, verify that your development machine and robot meet the following requirements:
+
+### 1. Workstation & Development Environment
+* **Integrated Development Environment (IDE)**:
+  * **Android Studio** (Recommended: Hedgehog, Iguana, Jellyfish, Koala, Ladybug, or latest) — *Provides 1-click build, wireless target deployment, Logcat telemetry, and layout previews.*
+  * *Alternative*: Visual Studio Code (with Android & Java Extension Packs) or IntelliJ IDEA.
+* **Java Development Kit (JDK)**: **JDK 17** (or JDK 11) configured in system `JAVA_HOME` or bundled with Android Studio.
+* **Android SDK Packages** (Installed via Android Studio SDK Manager):
+  * **Android SDK Platform 34** (API 34 - Android 14)
+  * **Android SDK Build-Tools 34.0.0**
+  * **Android SDK Platform-Tools** (provides `adb` in your system `PATH`)
+* **Version Control**: Git 2.20+
+* **Web Browser**: Google Chrome, Microsoft Edge, Safari, or Mozilla Firefox for opening [`admin.html`](https://devanshl.github.io/Temi-shoe-mart/admin.html).
+
+### 2. Temi Robot Preparation
+* **Temi Operating System**: Standard commercial Temi OS.
+* **Enable Developer Mode & Wireless Debugging on Temi**:
+  1. On Temi's display, swipe down ➔ Tap **Settings** ➔ **About**.
+  2. Tap **Temi Version / Build Number** **7 times consecutively** until a notification confirms: *"You are now a developer!"*
+  3. Navigate to **Settings** ➔ **Developer Options**.
+  4. Enable **USB Debugging** and **ADB over Network (Port 5555)**.
+* **Network Connectivity**:
+  * Your development laptop and the Temi robot **must be connected to the same Wi-Fi network / subnet** (ensure router client-isolation is disabled, or connect both to a dedicated mobile hotspot).
+
+---
+
+## 3. Hardware & Software Specifications
 
 | Parameter | Specification | Notes |
 | :--- | :--- | :--- |
@@ -80,7 +109,7 @@ The platform operates on a **centralized single-backend multi-tenant architectur
 
 ---
 
-## 3. Physical Robot Waypoint Setup (On-Site Mapping)
+## 4. Physical Robot Waypoint Setup (On-Site Mapping)
 
 Before running the app, each regional Temi robot must have its physical retail floor mapped using Temi's native mapping tool.
 
@@ -101,7 +130,7 @@ Before running the app, each regional Temi robot must have its physical retail f
 
 ---
 
-## 4. Deployment & Installation (Android Studio & ADB)
+## 5. Deployment & Installation (Android Studio & ADB)
 
 ### Method A: Direct Run via Android Studio (Recommended for Developers)
 
@@ -136,7 +165,7 @@ Before running the app, each regional Temi robot must have its physical retail f
 
 ---
 
-## 5. Robot Store Assignment & Secret Staff Switcher
+## 6. Robot Store Assignment & Secret Staff Switcher
 
 ### 1. Initial Setup (First Boot)
 When the app is opened for the first time on a freshly installed Temi:
@@ -159,7 +188,7 @@ If a robot is reassigned to another store or the wrong store was selected by acc
 
 ---
 
-## 6. Autonomous Customer & Delivery Flow
+## 7. Autonomous Customer & Delivery Flow
 
 ```
 ┌────────────────────────────────────────────────────────┐
@@ -220,7 +249,7 @@ If a robot is reassigned to another store or the wrong store was selected by acc
 
 ---
 
-## 7. Store Manager Web Console Guide (`admin.html`)
+## 8. Store Manager Web Console Guide (`admin.html`)
 
 The Store Manager Web Console gives staff complete real-time oversight of robot telemetry, inventory matrices, order queues, and manual navigation.
 
@@ -268,7 +297,7 @@ The Store Manager Web Console gives staff complete real-time oversight of robot 
 
 ---
 
-## 8. Store Manager Security PIN Directory (8 Locations)
+## 9. Store Manager Security PIN Directory (8 Locations)
 
 | Location Name | Store Key | Console & Kiosk Security PIN |
 | :--- | :--- | :--- |
@@ -283,7 +312,7 @@ The Store Manager Web Console gives staff complete real-time oversight of robot 
 
 ---
 
-## 9. Edge Cases, Error Handling & Recovery Architecture
+## 10. Edge Cases, Error Handling & Recovery Architecture
 
 The platform has been hardened against real-world retail edge cases:
 
@@ -311,7 +340,7 @@ The platform has been hardened against real-world retail edge cases:
 
 ---
 
-## 10. Data Isolation & Concurrency Architecture
+## 11. Data Isolation & Concurrency Architecture
 
 ```
 Firebase Realtime Database
@@ -339,7 +368,7 @@ Firebase Realtime Database
 
 ---
 
-## 11. Field Operations & Troubleshooting Runbook
+## 12. Field Operations & Troubleshooting Runbook
 
 ### Q1: How do I change the store location on Temi if the wrong store was selected?
 - **Fast In-App Method**: Long-press the **"Temi Shoe Mart"** brand title on the welcome screen for 2 seconds. Select the correct store and enter its 4-digit PIN.
