@@ -130,38 +130,50 @@ Before running the app, each regional Temi robot must have its physical retail f
 
 ---
 
-## 5. Deployment & Installation (Android Studio & ADB)
+## 5. Deployment & Installation (Super Simple 3-Step Guide)
 
-### Method A: Direct Run via Android Studio (Recommended for Developers)
-
-1. Open the project root folder in **Android Studio**.
-2. Connect your laptop to the **same Wi-Fi network** as the Temi robot.
-3. Obtain Temi's IP address: On Temi, open **Settings** ➔ **About** (e.g., `192.168.1.105`).
-4. In Android Studio's bottom **Terminal** tab, run:
-   ```bash
-   adb connect 192.168.1.105:5555
-   ```
-5. Confirm connection: Android Studio's target device dropdown (top toolbar) will show `Temi - Android SDK`.
-6. Click the green **Play / Run Button (▶)** (or press `Shift + F10`). Android Studio will automatically compile, install, and launch the kiosk application on Temi.
+Installing the app onto your Temi robot takes less than 2 minutes. Follow these 3 simple steps:
 
 ---
 
-### Method B: Wireless Deployment via Terminal (ADB)
+### Step 1: Connect to the Same Wi-Fi
+1. Ensure your laptop and the Temi robot are connected to the **same Wi-Fi network**.
+2. On Temi's screen: Open **Settings** ➔ **About** ➔ Find and note the **IP Address** (e.g., `192.168.1.105`).
 
-1. Connect your computer to the **same Wi-Fi network** as Temi.
-2. Build the debug APK:
-   ```bash
-   ./gradlew assembleDebug
-   ```
-   *Generated output:* `app/build/outputs/apk/debug/app-debug.apk`
-3. Connect and install to Temi over Wi-Fi:
-   ```bash
-   # Connect to Temi's IP on port 5555
-   adb connect 192.168.1.105:5555
+---
 
-   # Install APK with replacement flag (-r)
-   adb install -r app/build/outputs/apk/debug/app-debug.apk
-   ```
+### Step 2: Connect Laptop to Temi via ADB
+Open your terminal (or the **Terminal** tab inside Android Studio) and run:
+```bash
+adb connect 192.168.1.105:5555
+```
+*(Replace `192.168.1.105` with your robot's actual IP address)*.  
+You will see: `connected to 192.168.1.105:5555`.
+
+---
+
+### Step 3: Run & Install the App (Choose Option A or Option B)
+
+#### Option A: Using Android Studio (1-Click Play Button)
+1. Open this project folder in **Android Studio**.
+2. In the top toolbar device dropdown, select your connected robot (`Temi - Android SDK`).
+3. Click the green **Play / Run Button (▶)** (or press `Shift + F10`).  
+   *Android Studio will build the app and launch it directly on Temi's screen.*
+
+#### Option B: Using Terminal (Command Line)
+If you prefer not using Android Studio UI, run these two commands in your project root folder:
+```bash
+# 1. Build the APK
+./gradlew assembleDebug
+
+# 2. Install onto Temi
+adb install -r app/build/outputs/apk/debug/app-debug.apk
+```
+
+> [!TIP]
+> **Troubleshooting Connection Issues**:
+> - If `adb connect` says *Connection Refused*, ensure **USB Debugging** and **ADB over Network** are enabled on Temi (see Section 2: Temi Robot Preparation).
+> - If `adb connect` times out, double check that both devices are on the exact same Wi-Fi subnet (turn off any VPN on your laptop).
 
 ---
 
