@@ -645,13 +645,13 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
             }, 1800);
         } else if ("blocked".equals(currentStatus)) {
             // Obstacle cleared, retry navigation to the target zone
-            String targetLoc = LOC_PICKUP;
+            String targetLoc = (targetLocationBeforeBlock != null && !targetLocationBeforeBlock.isEmpty()) ? targetLocationBeforeBlock : LOC_PICKUP;
             String nextStatus = "returning_staging";
 
             if (currentActiveOrderId != null && !currentActiveOrderId.trim().isEmpty()) {
-                if (LOC_PICKUP.equalsIgnoreCase(targetLocationBeforeBlock) || 
-                    "display area".equalsIgnoreCase(targetLocationBeforeBlock) || 
-                    "pickup_zone".equalsIgnoreCase(targetLocationBeforeBlock)) {
+                if (LOC_PICKUP.equalsIgnoreCase(targetLoc) || 
+                    "display area".equalsIgnoreCase(targetLoc) || 
+                    "pickup_zone".equalsIgnoreCase(targetLoc)) {
                     targetLoc = LOC_PICKUP;
                     nextStatus = "traveling_pickup";
                 } else {
@@ -660,7 +660,19 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
                 }
                 speakTTS("Resuming delivery round.");
             } else {
-                speakTTS("Resuming return to showroom.");
+                if (LOC_STOREROOM.equalsIgnoreCase(targetLoc)) {
+                    nextStatus = "manual_override_to_stockroom";
+                    isManualOverrideActive = true;
+                    speakTTS("Resuming trip to stockroom.");
+                } else if (LOC_HOME.equalsIgnoreCase(targetLoc)) {
+                    nextStatus = "manual_override_to_home_base";
+                    isManualOverrideActive = true;
+                    speakTTS("Resuming return to dock.");
+                } else {
+                    nextStatus = "manual_override_to_showroom";
+                    isManualOverrideActive = true;
+                    speakTTS("Resuming return to showroom.");
+                }
             }
 
             repo.updateRobotStateInDatabase("moving", nextStatus, "moving", currentActiveOrderId != null ? currentActiveOrderId : "");
