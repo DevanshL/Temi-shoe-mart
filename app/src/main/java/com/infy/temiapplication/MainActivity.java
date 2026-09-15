@@ -296,7 +296,22 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
 
         boolean hasNoActiveOrder = (currentActiveOrderId == null || currentActiveOrderId.trim().isEmpty() || "none".equalsIgnoreCase(currentActiveOrderId));
 
-        if (!isManualOverride && (isIdleStatus || hasNoActiveOrder)) {
+        if (isIdleStatus) {
+            lastNavigatedLocation = "";
+            isManualOverrideActive = false;
+            if (isTemiAvailable && robot != null) {
+                try {
+                    robot.stopMovement();
+                } catch (Exception e) {
+                    Log.e(TAG, "Error stopping movement on idle", e);
+                }
+            }
+            containerWelcome.setVisibility(View.VISIBLE);
+            containerTravelStatus.setVisibility(View.GONE);
+            return;
+        }
+
+        if (!isManualOverride && hasNoActiveOrder) {
             // Check if robot was traveling to stockroom for an order when order got cancelled
             if (!isManualOverrideActive && LOC_STOREROOM.equalsIgnoreCase(lastNavigatedLocation)) {
                 // Command Temi to safely turn around and return to Showroom!

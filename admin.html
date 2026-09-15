@@ -1864,14 +1864,14 @@
         }
 
         if (isFirebaseConnected) {
-            // Command Temi to safely return to Showroom if it was on a delivery trip
-            db.ref(`locations/${currentStoreLocation}/location`).set("showroom");
-            db.ref(`locations/${currentStoreLocation}/status`).set("manual_override_to_showroom");
-            db.ref(`locations/${currentStoreLocation}/robot_state`).set("moving");
+            // Reset to clean idle in place: preserve current location, wipe active order, set status to idle
+            const loc = (mockData.location && mockData.location !== "moving" && mockData.location !== "none") ? mockData.location : "showroom";
+            db.ref(`locations/${currentStoreLocation}/location`).set(loc);
+            db.ref(`locations/${currentStoreLocation}/status`).set("idle");
+            db.ref(`locations/${currentStoreLocation}/robot_state`).set("idle");
             db.ref(`locations/${currentStoreLocation}/active_order_id`).set("");
-            showToast(refunded ? `[${currentStoreLocation.toUpperCase()}] Order cancelled! Temi returning to Showroom.` : `[${currentStoreLocation.toUpperCase()}] Temi returning to Showroom.`);
+            showToast(refunded ? `[${currentStoreLocation.toUpperCase()}] Order cancelled & robot reset to idle!` : `[${currentStoreLocation.toUpperCase()}] Robot state reset to idle!`);
         } else {
-            mockData.location = "showroom";
             mockData.status = "idle";
             mockData.robot_state = "idle";
             mockData.active_order_id = "";
