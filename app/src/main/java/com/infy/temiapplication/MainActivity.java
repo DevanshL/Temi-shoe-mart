@@ -188,8 +188,14 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
 
     private void updateStatusUI() {
         boolean isManualOverride = currentStatus != null && currentStatus.startsWith("manual_override_to_");
+        boolean isIdleStatus = "idle".equalsIgnoreCase(currentStatus)
+                || "none".equalsIgnoreCase(currentStatus)
+                || currentStatus == null
+                || currentStatus.isEmpty();
 
-        if (!isManualOverride && (currentActiveOrderId == null || currentActiveOrderId.isEmpty())) {
+        boolean hasNoActiveOrder = (currentActiveOrderId == null || currentActiveOrderId.trim().isEmpty() || "none".equalsIgnoreCase(currentActiveOrderId));
+
+        if (!isManualOverride && (isIdleStatus || hasNoActiveOrder)) {
             // Kiosk is Idle: Show welcome screen
             containerWelcome.setVisibility(View.VISIBLE);
             containerTravelStatus.setVisibility(View.GONE);
@@ -311,6 +317,13 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
                 textStatusTitle.setText("Manual Override");
                 textStatusInstructions.setText("Temi is navigating to the Charging Dock under manual control...");
                 goToLocation(LOC_HOME);
+                break;
+
+            case "idle":
+            case "none":
+            case "":
+                containerWelcome.setVisibility(View.VISIBLE);
+                containerTravelStatus.setVisibility(View.GONE);
                 break;
 
             default:
