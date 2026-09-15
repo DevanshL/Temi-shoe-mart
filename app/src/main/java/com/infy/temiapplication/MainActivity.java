@@ -2,6 +2,8 @@ package com.infy.temiapplication;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -179,8 +181,11 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
      * Updates the Kiosk screen layout based on robot location and order status.
      */
     private void speakTTSOnce(String message, String statusKey) {
-        if (statusKey.equalsIgnoreCase(lastSpokenStatus)) {
+        if (statusKey == null || statusKey.equalsIgnoreCase(lastSpokenStatus)) {
             return;
+        }
+        if ("arrived_pickup".equalsIgnoreCase(statusKey) && "completed".equalsIgnoreCase(lastSpokenStatus)) {
+            return; // Order is already completed, do not repeat arrival speech
         }
         lastSpokenStatus = statusKey;
         speakTTS(message);
@@ -249,6 +254,9 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
                 break;
 
             case "arrived_pickup":
+                if ("completed".equalsIgnoreCase(lastSpokenStatus)) {
+                    return;
+                }
                 progressTravel.setVisibility(View.GONE);
                 imgArrived.setVisibility(View.VISIBLE);
                 btnStatusOk.setVisibility(View.VISIBLE);
@@ -455,17 +463,14 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
             
         } else if ("arrived_pickup".equals(currentStatus)) {
             lastSpokenStatus = "completed";
-            if (isTemiAvailable && robot != null) {
-                try {
-                    robot.cancelAllTtsRequests();
-                } catch (Exception e) {
-                    Log.e(TAG, "Error cancelling TTS requests", e);
-                }
-            }
+            currentStatus = "idle";
+            String completedOrderId = currentActiveOrderId;
+            currentActiveOrderId = "";
+
             speakTTS(getString(R.string.tts_order_complete));
             
             // Mark order completed in database
-            repo.updateOrderStatus(currentActiveOrderId, "completed");
+            repo.updateOrderStatus(completedOrderId, "completed");
 
             // Check battery level to decide where to go
             int batteryPct = 100;
@@ -490,14 +495,18 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
                 repo.updateRobotStateInDatabase(LOC_PICKUP, "idle", "idle", "");
                 Toast.makeText(this, "Order completed!", Toast.LENGTH_LONG).show();
             }
-            
-            currentActiveOrderId = "";
 
-            // Redirect back to catalog screen immediately so new users can browse
-            Intent intent = new Intent(MainActivity.this, ShoeCatalogActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
+            // Immediately switch UI to idle welcome state
+            containerWelcome.setVisibility(View.VISIBLE);
+            containerTravelStatus.setVisibility(View.GONE);
+
+            // Delay navigation slightly so Temi finishes speaking "Thank you for shopping!" without being cut off by activity destruction
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                Intent intent = new Intent(MainActivity.this, ShoeCatalogActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+            }, 1800);
         } else if ("blocked".equals(currentStatus)) {
             // Obstacle cleared, retry navigation to the target zone
             String targetLoc = LOC_STOREROOM;
