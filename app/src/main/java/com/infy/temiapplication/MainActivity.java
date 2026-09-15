@@ -518,8 +518,9 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
     }
 
     private void speakTTS(String message) {
-        if (isTemiAvailable) {
+        if (isTemiAvailable && robot != null) {
             try {
+                robot.cancelAllTtsRequests(); // Immediately cancel any lingering or ongoing speech
                 robot.speak(TtsRequest.create(message, false));
             } catch (Exception e) {
                 Log.e(TAG, "Error executing robot.speak", e);
