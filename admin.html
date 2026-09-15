@@ -1159,8 +1159,8 @@
                     }
 
                     const badge = isComplete 
-                        ? `<span style="padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; background: rgba(16, 185, 129, 0.15); color: #059669; border: 1px solid rgba(16, 185, 129, 0.3);">✅ Completed & Delivered</span>`
-                        : `<span style="padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; background: rgba(239, 68, 68, 0.15); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.3);">❌ Cancelled & Refunded</span>`;
+                        ? `<span style="padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; background: rgba(16, 185, 129, 0.15); color: #059669; border: 1px solid rgba(16, 185, 129, 0.3);">✅ Completed</span>`
+                        : `<span style="padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; background: rgba(239, 68, 68, 0.15); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.3);">❌ Cancelled</span>`;
 
                     hCard.innerHTML = `
                         <div>
@@ -1561,7 +1561,7 @@
             db.ref(`locations/${currentStoreLocation}/status`).set("idle");
             db.ref(`locations/${currentStoreLocation}/robot_state`).set("idle");
             db.ref(`locations/${currentStoreLocation}/active_order_id`).set("");
-            showToast(refunded ? `[${currentStoreLocation.toUpperCase()}] Robot reset to idle & stock refunded!` : `[${currentStoreLocation.toUpperCase()}] Robot state reset successfully!`);
+            showToast(refunded ? `[${currentStoreLocation.toUpperCase()}] Robot reset to idle & order cancelled!` : `[${currentStoreLocation.toUpperCase()}] Robot state reset successfully!`);
         } else {
             mockData.location = "none";
             mockData.status = "idle";
@@ -1569,7 +1569,7 @@
             mockData.active_order_id = "";
             mockData.current_delivering_round = "";
             updateUI();
-            showToast(refunded ? "[Simulator Mode] Robot reset & active order stock refunded!" : "[Simulator Mode] Mock robot state reset to idle!");
+            showToast(refunded ? "[Simulator Mode] Robot reset & order cancelled!" : "[Simulator Mode] Mock robot state reset to idle!");
         }
     }
 

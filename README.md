@@ -207,7 +207,7 @@ Store managers monitor robot movement, dispatch orders, and manage inventory via
 #### 2. Orders Tab (Current Order & Order History)
 * **Current Order**: Shows the customer order Temi is actively fulfilling in real time, with model names, selected colors, sizes, quantities, and live delivery status (`En Route`, `At Stockroom`, `Order Placed`).
 * **Order History**: Logs all past completed and delivered orders with timestamps.
-* **Cancel & Refund**: In emergencies, allows the manager to cancel an active order and **automatically execute an atomic stock refund back into this store's inventory matrix**.
+* **Cancel**: In emergencies, allows the manager to cancel an active order and **automatically restore inventory stock counts back into this store's stock matrix**.
 
 #### 3. Real-Time Inventory & Price Matrix
 * Click any shoe model to expand its **Color × Size matrix**.
@@ -279,7 +279,7 @@ Firebase Realtime Database
   3. Reopen **Temi Shoe Mart** ➔ The one-time store selection dialog will reappear.
 
 ### Q3: What happens to inventory if an order is cancelled or the robot is reset?
-* **Resolution**: The system executes an automatic transactional stock refund. The exact quantities of each size and color ordered are restored to the store's inventory matrix in real time.
+* **Resolution**: The system automatically restores the exact quantities of each size and color ordered back to the store's inventory matrix in real time.
 
 ---
 

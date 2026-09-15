@@ -28,8 +28,8 @@ public class FirebaseRepo {
     // Toggle this to enable actual Firebase Realtime Database
     private boolean useFirebase = true;
 
-    // Active Store / Living Lab Identifier (e.g. "pune", "bengaluru", "hyderabad", "chennai", "chandigarh", "mysuru")
-    private String storeLocationId = "pune";
+    // Active Store Identifier (assigned via SharedPreferences on first boot)
+    private String storeLocationId = "";
 
     private DatabaseReference dbRef;
     private List<Shoe> localCatalog = new ArrayList<>();
