@@ -137,8 +137,7 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
         };
 
         new androidx.appcompat.app.AlertDialog.Builder(this)
-            .setTitle("📍 Setup Robot Location (One-Time)")
-            .setMessage("Please select the showcase location for this Temi robot:")
+            .setTitle("📍 Select Robot Store Location")
             .setCancelable(false)
             .setItems(locationNames, (dialog, which) -> {
                 String chosenKey = locationKeys[which];
