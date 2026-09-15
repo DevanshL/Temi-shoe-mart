@@ -1,0 +1,22 @@
+{
+  "rules": {
+    "catalog": {
+      ".read": true,
+      ".write": true
+    },
+    "locations": {
+      "$storeId": {
+        ".read": true,
+        ".write": true,
+        "stock": {
+          ".read": true,
+          ".write": true
+        },
+        "orders": {
+          ".read": true,
+          ".write": true
+        }
+      }
+    }
+  }
+}

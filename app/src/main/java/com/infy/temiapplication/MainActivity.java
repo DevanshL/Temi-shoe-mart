@@ -53,6 +53,31 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
     private MaterialButton btnStatusOk;
     private MaterialButton btnStartOrdering;
 
+    private TextView textWelcomeDesc;
+
+    // Master Store PIN Registry (Synchronized with admin.html)
+    private static final java.util.Map<String, String> STORE_PIN_REGISTRY = new java.util.HashMap<>();
+    private static final java.util.Map<String, String> STORE_DISPLAY_NAMES = new java.util.HashMap<>();
+    static {
+        STORE_PIN_REGISTRY.put("bengaluru", "4910");
+        STORE_PIN_REGISTRY.put("mysore", "5290");
+        STORE_PIN_REGISTRY.put("chennai_sholinganallur", "3620");
+        STORE_PIN_REGISTRY.put("chennai_mcity", "3621");
+        STORE_PIN_REGISTRY.put("hyd_sez", "9154");
+        STORE_PIN_REGISTRY.put("tvm", "6418");
+        STORE_PIN_REGISTRY.put("pune", "7821");
+        STORE_PIN_REGISTRY.put("noida", "2013");
+
+        STORE_DISPLAY_NAMES.put("bengaluru", "Bengaluru Store");
+        STORE_DISPLAY_NAMES.put("mysore", "Mysore Store");
+        STORE_DISPLAY_NAMES.put("chennai_sholinganallur", "Chennai - Shollinganallur Store");
+        STORE_DISPLAY_NAMES.put("chennai_mcity", "Chennai - Mcity Store");
+        STORE_DISPLAY_NAMES.put("hyd_sez", "Hyd Sez Store");
+        STORE_DISPLAY_NAMES.put("tvm", "TVM Store");
+        STORE_DISPLAY_NAMES.put("pune", "Pune Store");
+        STORE_DISPLAY_NAMES.put("noida", "Noida Store");
+    }
+
     // Current State
     private String currentActiveOrderId = "";
     private static String lastSpokenStatus = "";
@@ -79,6 +104,16 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
         imgArrived = findViewById(R.id.img_status_arrived);
         btnStatusOk = findViewById(R.id.btn_status_ok);
         btnStartOrdering = findViewById(R.id.btn_start_ordering);
+        textWelcomeDesc = findViewById(R.id.text_welcome_desc);
+        TextView textBrandTitle = findViewById(R.id.text_brand_title);
+
+        // Secret Staff Store Switcher: Long-press brand title to re-assign store with PIN
+        if (textBrandTitle != null) {
+            textBrandTitle.setOnLongClickListener(v -> {
+                showStoreSetupDialog(false);
+                return true;
+            });
+        }
 
         // Initialize Temi Robot SDK safely
         try {
@@ -103,8 +138,9 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
         String savedLoc = prefs.getString("store_location_id", null);
         if (savedLoc != null && !savedLoc.trim().isEmpty()) {
             repo.setStoreLocationId(savedLoc);
+            updateWelcomeStoreBadge(savedLoc);
         } else {
-            showFirstTimeStoreSetupDialog(prefs);
+            showStoreSetupDialog(true);
         }
 
         // Setup Order Screen trigger
@@ -124,11 +160,19 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
         });
     }
 
+    private void updateWelcomeStoreBadge(String storeKey) {
+        if (textWelcomeDesc != null) {
+            String name = STORE_DISPLAY_NAMES.get(storeKey);
+            if (name == null) name = "Store Kiosk";
+            textWelcomeDesc.setText(String.format("📍 %s • Touch screen to start", name));
+        }
+    }
+
     /**
-     * Displayed ONLY ONCE when the APK is first launched on a fresh Temi robot.
-     * Once selected, it saves permanently to SharedPreferences and never prompts again.
+     * Displayed on fresh install or when staff long-presses "Temi Shoe Mart".
+     * Requires the 4-digit Security PIN for the chosen store to prevent unauthorized changes.
      */
-    private void showFirstTimeStoreSetupDialog(final android.content.SharedPreferences prefs) {
+    private void showStoreSetupDialog(final boolean isFirstTime) {
         final String[] locationKeys = {
             "bengaluru", "mysore", "chennai_sholinganallur", "chennai_mcity",
             "hyd_sez", "tvm", "pune", "noida"
@@ -138,14 +182,65 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
             "Hyd Sez Store", "TVM Store", "Pune Store", "Noida Store"
         };
 
-        new androidx.appcompat.app.AlertDialog.Builder(this)
-            .setTitle("📍 Select Robot Store Location")
-            .setCancelable(false)
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle(isFirstTime ? "📍 Initial Setup: Select Store" : "🔒 Staff Menu: Switch Store Location")
+            .setCancelable(!isFirstTime)
             .setItems(locationNames, (dialog, which) -> {
                 String chosenKey = locationKeys[which];
-                prefs.edit().putString("store_location_id", chosenKey).apply();
-                repo.setStoreLocationId(chosenKey);
-                Toast.makeText(MainActivity.this, "Robot assigned to " + locationNames[which] + "!", Toast.LENGTH_LONG).show();
+                String chosenName = locationNames[which];
+                promptStoreSecurityPin(chosenKey, chosenName, isFirstTime);
+                dialog.dismiss();
+            });
+
+        if (!isFirstTime) {
+            builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+        }
+        builder.show();
+    }
+
+    private void promptStoreSecurityPin(final String chosenKey, final String chosenName, final boolean isFirstTime) {
+        android.widget.EditText inputPin = new android.widget.EditText(this);
+        inputPin.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_VARIATION_PASSWORD);
+        inputPin.setHint("4-digit PIN");
+        inputPin.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        inputPin.setTextSize(22);
+        inputPin.setFilters(new android.text.InputFilter[] { new android.text.InputFilter.LengthFilter(4) });
+
+        android.widget.FrameLayout container = new android.widget.FrameLayout(this);
+        android.widget.FrameLayout.LayoutParams params = new android.widget.FrameLayout.LayoutParams(
+            android.view.ViewGroup.LayoutParams.MATCH_PARENT, 
+            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+        params.leftMargin = 50;
+        params.rightMargin = 50;
+        params.topMargin = 20;
+        inputPin.setLayoutParams(params);
+        container.addView(inputPin);
+
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("🔒 Enter PIN for " + chosenName)
+            .setMessage("Please enter the 4-digit Store Security PIN to authorize:")
+            .setView(container)
+            .setCancelable(!isFirstTime)
+            .setPositiveButton("Authorize", (dialog, which) -> {
+                String enteredPin = inputPin.getText().toString().trim();
+                String expectedPin = STORE_PIN_REGISTRY.get(chosenKey);
+
+                if (expectedPin != null && expectedPin.equals(enteredPin)) {
+                    android.content.SharedPreferences prefs = getSharedPreferences("temi_kiosk_prefs", MODE_PRIVATE);
+                    prefs.edit().putString("store_location_id", chosenKey).apply();
+                    repo.setStoreLocationId(chosenKey);
+                    updateWelcomeStoreBadge(chosenKey);
+                    Toast.makeText(MainActivity.this, "✅ Authenticated: Robot assigned to " + chosenName + "!", Toast.LENGTH_LONG).show();
+                    dialog.dismiss();
+                } else {
+                    Toast.makeText(MainActivity.this, "⛔ Incorrect Security PIN for " + chosenName + ". Access Denied.", Toast.LENGTH_LONG).show();
+                    if (isFirstTime) {
+                        showStoreSetupDialog(true); // Re-prompt on first boot
+                    }
+                }
+            })
+            .setNegativeButton(isFirstTime ? null : "Cancel", (dialog, which) -> {
                 dialog.dismiss();
             })
             .show();
