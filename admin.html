@@ -623,6 +623,103 @@
     </div>
 </div>
 
+<!-- Add Color Modal -->
+<div id="add-color-modal" style="
+    display: none; 
+    position: fixed; 
+    top: 0; left: 0; 
+    width: 100vw; height: 100vh; 
+    background: rgba(0, 0, 0, 0.45); 
+    backdrop-filter: blur(8px); 
+    z-index: 10000; 
+    justify-content: center; 
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+">
+    <div id="add-color-modal-box" style="
+        background: rgba(255, 255, 255, 0.98); 
+        border-radius: 16px; 
+        padding: 28px; 
+        width: 440px; 
+        max-width: 90%; 
+        box-shadow: 0 20px 45px rgba(0,0,0,0.18);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        transform: scale(0.9);
+        transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    ">
+        <h3 id="add-color-title" style="margin: 0 0 16px 0; color: #1E1E1E; font-size: 18px; font-weight: 800;">🎨 Add New Color Variant</h3>
+        
+        <div style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 22px;">
+            <div>
+                <label style="display: block; font-size: 13px; font-weight: 700; color: #4B4B4B; margin-bottom: 6px;">Color Name:</label>
+                <input id="modal-color-name" type="text" placeholder="e.g. green, burgundy, navy, gold" style="width: 100%; box-sizing: border-box; padding: 10px 14px; border-radius: 8px; border: 1px solid #D1D5DB; font-size: 14px; font-weight: 600;" oninput="syncColorNameWithHex(this.value)">
+            </div>
+            <div>
+                <label style="display: block; font-size: 13px; font-weight: 700; color: #4B4B4B; margin-bottom: 6px;">Color Swatch & Hex Code:</label>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="color" id="modal-color-picker" value="#378ADD" style="width: 44px; height: 40px; padding: 0; border: none; border-radius: 8px; cursor: pointer; background: transparent;" oninput="document.getElementById('modal-color-hex').value = this.value">
+                    <input id="modal-color-hex" type="text" value="#378ADD" placeholder="#378ADD" style="flex: 1; padding: 10px 14px; border-radius: 8px; border: 1px solid #D1D5DB; font-size: 14px; font-weight: 600;" oninput="document.getElementById('modal-color-picker').value = this.value">
+                </div>
+            </div>
+            <div>
+                <label style="display: block; font-size: 13px; font-weight: 700; color: #4B4B4B; margin-bottom: 6px;">Initial Stock (per size):</label>
+                <input id="modal-color-stock" type="number" min="0" max="999" value="10" style="width: 100%; box-sizing: border-box; padding: 10px 14px; border-radius: 8px; border: 1px solid #D1D5DB; font-size: 14px; font-weight: 600;">
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; justify-content: flex-end;">
+            <button onclick="closeAddColorModal()" style="background: #E5E5E5; color: #2E2E2E; border: none; padding: 10px 20px; font-weight: 700; border-radius: 8px; cursor: pointer; font-size: 14px;">Cancel</button>
+            <button onclick="submitAddColorModal()" style="background: var(--brand-primary); color: white; border: none; padding: 10px 22px; font-weight: 700; border-radius: 8px; cursor: pointer; font-size: 14px; box-shadow: 0 4px 10px rgba(225, 90, 48, 0.3);">Add Color</button>
+        </div>
+    </div>
+</div>
+
+<!-- Add Size Modal -->
+<div id="add-size-modal" style="
+    display: none; 
+    position: fixed; 
+    top: 0; left: 0; 
+    width: 100vw; height: 100vh; 
+    background: rgba(0, 0, 0, 0.45); 
+    backdrop-filter: blur(8px); 
+    z-index: 10000; 
+    justify-content: center; 
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+">
+    <div id="add-size-modal-box" style="
+        background: rgba(255, 255, 255, 0.98); 
+        border-radius: 16px; 
+        padding: 28px; 
+        width: 440px; 
+        max-width: 90%; 
+        box-shadow: 0 20px 45px rgba(0,0,0,0.18);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        transform: scale(0.9);
+        transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    ">
+        <h3 id="add-size-title" style="margin: 0 0 16px 0; color: #1E1E1E; font-size: 18px; font-weight: 800;">📏 Add New Size Variant</h3>
+        
+        <div style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 22px;">
+            <div>
+                <label style="display: block; font-size: 13px; font-weight: 700; color: #4B4B4B; margin-bottom: 6px;">Size (US Numeric):</label>
+                <input id="modal-size-num" type="number" step="0.5" min="1" max="25" placeholder="e.g. 12, 13, 6.5" style="width: 100%; box-sizing: border-box; padding: 10px 14px; border-radius: 8px; border: 1px solid #D1D5DB; font-size: 14px; font-weight: 600;">
+            </div>
+            <div>
+                <label style="display: block; font-size: 13px; font-weight: 700; color: #4B4B4B; margin-bottom: 6px;">Initial Stock (per color):</label>
+                <input id="modal-size-stock" type="number" min="0" max="999" value="10" style="width: 100%; box-sizing: border-box; padding: 10px 14px; border-radius: 8px; border: 1px solid #D1D5DB; font-size: 14px; font-weight: 600;">
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; justify-content: flex-end;">
+            <button onclick="closeAddSizeModal()" style="background: #E5E5E5; color: #2E2E2E; border: none; padding: 10px 20px; font-weight: 700; border-radius: 8px; cursor: pointer; font-size: 14px;">Cancel</button>
+            <button onclick="submitAddSizeModal()" style="background: var(--brand-primary); color: white; border: none; padding: 10px 22px; font-weight: 700; border-radius: 8px; cursor: pointer; font-size: 14px; box-shadow: 0 4px 10px rgba(225, 90, 48, 0.3);">Add Size</button>
+        </div>
+    </div>
+</div>
+
 <script>
     // Tab switching logic
     function switchTab(tabId) {
@@ -1222,10 +1319,14 @@
 
             // Draw stock table
             let tableHTML = `
-                <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 20px; background: rgba(216, 90, 48, 0.04); padding: 12px 20px; border-radius: 8px; border: 1px solid rgba(216, 90, 48, 0.15);">
+                <div style="display: flex; gap: 20px; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-bottom: 20px; background: rgba(216, 90, 48, 0.04); padding: 12px 20px; border-radius: 8px; border: 1px solid rgba(216, 90, 48, 0.15);">
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <label style="margin: 0; font-size: 14px; font-weight: 700; color: var(--text-primary);" for="price-${shoeId}">Model Price ($):</label>
                         <input id="price-${shoeId}" type="number" step="0.01" min="0" style="width: 100px; padding: 6px 10px; font-weight: 600; border-radius: 6px; border: 1px solid var(--glass-border); background: rgba(255, 255, 255, 0.9); color: var(--text-primary);" value="${shoe.price}" onchange="updatePriceValue('${shoeId}', this.value)">
+                    </div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button style="background: rgba(225, 90, 48, 0.12); color: var(--brand-primary); border: 1px solid rgba(225, 90, 48, 0.35); padding: 7px 14px; font-size: 13px; border-radius: 6px; cursor: pointer; font-weight: 700; transition: all 0.2s;" onmouseover="this.style.background='var(--brand-primary)'; this.style.color='white'" onmouseout="this.style.background='rgba(225, 90, 48, 0.12)'; this.style.color='var(--brand-primary)'" onclick="openAddColorModal('${shoeId}')">🎨 + Add Color</button>
+                        <button style="background: rgba(225, 90, 48, 0.12); color: var(--brand-primary); border: 1px solid rgba(225, 90, 48, 0.35); padding: 7px 14px; font-size: 13px; border-radius: 6px; cursor: pointer; font-weight: 700; transition: all 0.2s;" onmouseover="this.style.background='var(--brand-primary)'; this.style.color='white'" onmouseout="this.style.background='rgba(225, 90, 48, 0.12)'; this.style.color='var(--brand-primary)'" onclick="openAddSizeModal('${shoeId}')">📏 + Add Size</button>
                     </div>
                 </div>
                 <table>
@@ -1284,6 +1385,237 @@
         }
     }
 
+    // Helper to dynamically resolve any standard HTML/CSS color name using the browser engine
+    function colorNameToHex(colorName) {
+        const overrides = {
+            "mahogany": "#4A0E17",
+            "taupe": "#B38B6D",
+            "mocha": "#5C4033",
+            "wheat": "#D2B48C",
+            "rust_brown": "#8B4513",
+            "coral": "#FF6B6B",
+            "black": "#1A1A1A",
+            "white": "#EAEAEA",
+            "red": "#D32F2F",
+            "blue": "#378ADD",
+            "green": "#2E7D32",
+            "gold": "#FFD700",
+            "yellow": "#FBC02D",
+            "purple": "#7B1FA2",
+            "pink": "#E91E63",
+            "orange": "#FB8C00",
+            "grey": "#757575",
+            "gray": "#757575",
+            "navy": "#1A237E",
+            "brown": "#5D4037",
+            "olive": "#556B2F",
+            "teal": "#00897B",
+            "maroon": "#800000",
+            "burgundy": "#800020"
+        };
+        
+        const clean = (colorName || "").trim().toLowerCase();
+        if (overrides[clean]) {
+            return overrides[clean];
+        }
+
+        try {
+            const div = document.createElement('div');
+            div.style.color = clean;
+            document.body.appendChild(div);
+            const computed = window.getComputedStyle(div).color;
+            document.body.removeChild(div);
+            
+            const match = computed.match(/\d+/g);
+            if (match && match.length >= 3) {
+                const r = parseInt(match[0]);
+                const g = parseInt(match[1]);
+                const b = parseInt(match[2]);
+                return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+            }
+        } catch (e) {
+            console.error("Error parsing color: " + clean, e);
+        }
+        return "#888888"; // Fallback grey
+    }
+
+    function syncColorNameWithHex(name) {
+        const hex = colorNameToHex(name);
+        if (hex) {
+            document.getElementById('modal-color-hex').value = hex;
+            try {
+                document.getElementById('modal-color-picker').value = hex.startsWith('#') && hex.length === 7 ? hex : "#378ADD";
+            } catch(e) {}
+        }
+    }
+
+    let activeModalShoeId = null;
+
+    function openAddColorModal(shoeId) {
+        const shoe = mockData.catalog[shoeId];
+        if (!shoe) return;
+        activeModalShoeId = shoeId;
+        document.getElementById('add-color-title').innerText = `🎨 Add Color to ${shoe.brand} - ${shoe.name}`;
+        document.getElementById('modal-color-name').value = "";
+        document.getElementById('modal-color-hex').value = "#378ADD";
+        document.getElementById('modal-color-picker').value = "#378ADD";
+        document.getElementById('modal-color-stock').value = "10";
+
+        const modal = document.getElementById('add-color-modal');
+        const box = document.getElementById('add-color-modal-box');
+        modal.style.display = "flex";
+        modal.style.opacity = "0";
+        box.style.transform = "scale(0.9)";
+        modal.offsetHeight;
+        modal.style.opacity = "1";
+        box.style.transform = "scale(1)";
+        document.getElementById('modal-color-name').focus();
+    }
+
+    function closeAddColorModal() {
+        const modal = document.getElementById('add-color-modal');
+        const box = document.getElementById('add-color-modal-box');
+        modal.style.opacity = "0";
+        box.style.transform = "scale(0.9)";
+        setTimeout(() => { modal.style.display = "none"; }, 250);
+        activeModalShoeId = null;
+    }
+
+    function submitAddColorModal() {
+        if (!activeModalShoeId) return;
+        const shoe = mockData.catalog[activeModalShoeId];
+        if (!shoe) return;
+
+        const colorName = document.getElementById('modal-color-name').value.trim().toLowerCase();
+        let colorHex = document.getElementById('modal-color-hex').value.trim();
+        const initialStock = parseInt(document.getElementById('modal-color-stock').value) || 0;
+
+        if (!colorName) {
+            showToast("Please enter a color name.");
+            return;
+        }
+
+        if (shoe.colors.map(c => c.toLowerCase()).includes(colorName)) {
+            showToast(`Color "${colorName}" already exists for this shoe.`);
+            return;
+        }
+
+        if (!colorHex) {
+            colorHex = colorNameToHex(colorName);
+        }
+
+        // Add to local state
+        shoe.colors.push(colorName);
+        if (!shoe.colorHex) shoe.colorHex = {};
+        shoe.colorHex[colorName] = colorHex;
+        if (!shoe.stock) shoe.stock = {};
+
+        const stockUpdatesForStore = {};
+        shoe.sizes.forEach(size => {
+            const key = colorName + "_" + size;
+            shoe.stock[key] = initialStock;
+            stockUpdatesForStore[`locations/${currentStoreLocation}/stock/${activeModalShoeId}/${key}`] = initialStock;
+            stockUpdatesForStore[`catalog/${activeModalShoeId}/stock/${key}`] = initialStock;
+        });
+
+        if (isFirebaseConnected) {
+            const updates = {
+                [`catalog/${activeModalShoeId}/colors`]: shoe.colors,
+                [`catalog/${activeModalShoeId}/colorHex`]: shoe.colorHex,
+                ...stockUpdatesForStore
+            };
+            db.ref().update(updates).then(() => {
+                showToast(`Added color "${colorName}" to ${shoe.name}!`);
+            }).catch(err => {
+                showToast("Failed to save to database: " + err.message);
+            });
+        } else {
+            localStorage.setItem('shoe_catalog', JSON.stringify(mockData.catalog));
+            showToast(`Added color "${colorName}" to ${shoe.name}!`);
+        }
+
+        closeAddColorModal();
+        renderInventoryList();
+    }
+
+    function openAddSizeModal(shoeId) {
+        const shoe = mockData.catalog[shoeId];
+        if (!shoe) return;
+        activeModalShoeId = shoeId;
+        document.getElementById('add-size-title').innerText = `📏 Add Size to ${shoe.brand} - ${shoe.name}`;
+        document.getElementById('modal-size-num').value = "";
+        document.getElementById('modal-size-stock').value = "10";
+
+        const modal = document.getElementById('add-size-modal');
+        const box = document.getElementById('add-size-modal-box');
+        modal.style.display = "flex";
+        modal.style.opacity = "0";
+        box.style.transform = "scale(0.9)";
+        modal.offsetHeight;
+        modal.style.opacity = "1";
+        box.style.transform = "scale(1)";
+        document.getElementById('modal-size-num').focus();
+    }
+
+    function closeAddSizeModal() {
+        const modal = document.getElementById('add-size-modal');
+        const box = document.getElementById('add-size-modal-box');
+        modal.style.opacity = "0";
+        box.style.transform = "scale(0.9)";
+        setTimeout(() => { modal.style.display = "none"; }, 250);
+        activeModalShoeId = null;
+    }
+
+    function submitAddSizeModal() {
+        if (!activeModalShoeId) return;
+        const shoe = mockData.catalog[activeModalShoeId];
+        if (!shoe) return;
+
+        const sizeVal = parseFloat(document.getElementById('modal-size-num').value);
+        const initialStock = parseInt(document.getElementById('modal-size-stock').value) || 0;
+
+        if (isNaN(sizeVal) || sizeVal <= 0) {
+            showToast("Please enter a valid numeric shoe size.");
+            return;
+        }
+
+        if (shoe.sizes.includes(sizeVal)) {
+            showToast(`Size "${sizeVal}" already exists for this shoe.`);
+            return;
+        }
+
+        // Add to local state & sort sizes
+        shoe.sizes.push(sizeVal);
+        shoe.sizes.sort((a, b) => a - b);
+        if (!shoe.stock) shoe.stock = {};
+
+        const stockUpdatesForStore = {};
+        shoe.colors.forEach(color => {
+            const key = color.toLowerCase() + "_" + sizeVal;
+            shoe.stock[key] = initialStock;
+            stockUpdatesForStore[`locations/${currentStoreLocation}/stock/${activeModalShoeId}/${key}`] = initialStock;
+            stockUpdatesForStore[`catalog/${activeModalShoeId}/stock/${key}`] = initialStock;
+        });
+
+        if (isFirebaseConnected) {
+            const updates = {
+                [`catalog/${activeModalShoeId}/sizes`]: shoe.sizes,
+                ...stockUpdatesForStore
+            };
+            db.ref().update(updates).then(() => {
+                showToast(`Added size "${sizeVal}" to ${shoe.name}!`);
+            }).catch(err => {
+                showToast("Failed to save to database: " + err.message);
+            });
+        } else {
+            localStorage.setItem('shoe_catalog', JSON.stringify(mockData.catalog));
+            showToast(`Added size "${sizeVal}" to ${shoe.name}!`);
+        }
+
+        closeAddSizeModal();
+        renderInventoryList();
+    }
+
     // Add brand new shoe model to the catalog
     function addNewShoeModel() {
         const idRaw = document.getElementById('add-id').value.trim().toLowerCase().replace(/[^a-z0-9_]/g, '_');
@@ -1304,48 +1636,8 @@
         if (colors.length === 0) { showToast("At least one color is required."); return; }
 
         // Parse sizes
-        const sizes = sizesRaw.split(',').map(s => parseInt(s.trim())).filter(s => !isNaN(s));
+        const sizes = sizesRaw.split(',').map(s => parseFloat(s.trim())).filter(s => !isNaN(s));
         if (sizes.length === 0) { showToast("At least one size is required."); return; }
-
-        // Generate colorHex mapping automatically
-        // Helper to dynamically resolve any standard HTML/CSS color name using the browser engine
-        function colorNameToHex(colorName) {
-            const overrides = {
-                "mahogany": "#4A0E17",
-                "taupe": "#B38B6D",
-                "mocha": "#5C4033",
-                "wheat": "#D2B48C",
-                "rust_brown": "#8B4513",
-                "coral": "#FF6B6B", // Custom pinker coral
-                "black": "#1A1A1A",
-                "white": "#EAEAEA",
-                "red": "#D32F2F"
-            };
-            
-            const clean = colorName.trim().toLowerCase();
-            if (overrides[clean]) {
-                return overrides[clean];
-            }
-
-            try {
-                const div = document.createElement('div');
-                div.style.color = clean;
-                document.body.appendChild(div);
-                const computed = window.getComputedStyle(div).color;
-                document.body.removeChild(div);
-                
-                const match = computed.match(/\d+/g);
-                if (match && match.length >= 3) {
-                    const r = parseInt(match[0]);
-                    const g = parseInt(match[1]);
-                    const b = parseInt(match[2]);
-                    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
-                }
-            } catch (e) {
-                console.error("Error parsing color: " + clean, e);
-            }
-            return "#888888"; // Fallback grey
-        }
 
         const colorHex = {};
         colors.forEach(color => {
