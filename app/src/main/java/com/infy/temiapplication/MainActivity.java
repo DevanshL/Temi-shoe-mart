@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
 
     // Current State
     private String currentActiveOrderId = "";
-    private String lastSpokenStatus = "";
+    private static String lastSpokenStatus = "";
     private String currentStatus = "idle";
     private String currentRobotState = "idle";
     private String currentLocation = "none";

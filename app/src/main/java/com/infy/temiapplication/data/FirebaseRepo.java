@@ -635,6 +635,7 @@ public class FirebaseRepo {
             updates.put("locations/" + storeLocationId + "/location", location);
             updates.put("locations/" + storeLocationId + "/status", status);
             updates.put("locations/" + storeLocationId + "/robot_state", state);
+            updates.put("locations/" + storeLocationId + "/active_order_id", activeOrdId);
             dbRef.updateChildren(updates);
         }
     }
