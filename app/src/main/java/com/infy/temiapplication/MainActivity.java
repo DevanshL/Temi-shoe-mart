@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
         STORE_PIN_REGISTRY.put("tvm", "6418");
         STORE_PIN_REGISTRY.put("pune", "7821");
         STORE_PIN_REGISTRY.put("noida", "2013");
+        STORE_PIN_REGISTRY.put("tokyo", "8103");
 
         STORE_DISPLAY_NAMES.put("bengaluru", "Bengaluru Store");
         STORE_DISPLAY_NAMES.put("mysore", "Mysore Store");
@@ -76,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
         STORE_DISPLAY_NAMES.put("tvm", "TVM Store");
         STORE_DISPLAY_NAMES.put("pune", "Pune Store");
         STORE_DISPLAY_NAMES.put("noida", "Noida Store");
+        STORE_DISPLAY_NAMES.put("tokyo", "Tokyo Store");
     }
 
     // Current State
@@ -176,11 +178,11 @@ public class MainActivity extends AppCompatActivity implements OnGoToLocationSta
     private void showStoreSetupDialog(final boolean isFirstTime) {
         final String[] locationKeys = {
             "bengaluru", "mysore", "chennai_sholinganallur", "chennai_mcity",
-            "hyd_sez", "tvm", "pune", "noida"
+            "hyd_sez", "tvm", "pune", "noida", "tokyo"
         };
         final String[] locationNames = {
             "Bengaluru Store", "Mysore Store", "Chennai - Shollinganallur Store", "Chennai - Mcity Store",
-            "Hyd Sez Store", "TVM Store", "Pune Store", "Noida Store"
+            "Hyd Sez Store", "TVM Store", "Pune Store", "Noida Store", "Tokyo Store"
         };
 
         androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this)

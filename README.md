@@ -1,7 +1,7 @@
 # Temi Shoe Mart
 ### Multi-Location Autonomous Retail & Robotic Fulfillment Platform
 
-**Temi Shoe Mart** is an enterprise-grade autonomous in-store footwear retail and robotic fulfillment platform engineered for the **Temi Robot**. It bridges an on-robot Android customer kiosk with a centralized, real-time store management console powered by **Firebase Realtime Database**, featuring **complete multi-location store isolation across 8 showcase centers in India**.
+**Temi Shoe Mart** is an enterprise-grade autonomous in-store footwear retail and robotic fulfillment platform engineered for the **Temi Robot**. It bridges an on-robot Android customer kiosk with a centralized, real-time store management console powered by **Firebase Realtime Database**, featuring **complete multi-location store isolation across 9 global showcase centers**.
 
 ---
 
@@ -15,7 +15,7 @@
 6. [Robot Store Assignment & Secret Staff Switcher](#6-robot-store-assignment--secret-staff-switcher)
 7. [Autonomous Customer & Delivery Flow](#7-autonomous-customer--delivery-flow)
 8. [Store Manager Web Console Guide (`admin.html`)](#8-store-manager-web-console-guide-adminhtml)
-9. [Store Manager Security PIN Directory (8 Locations)](#9-store-manager-security-pin-directory-8-locations)
+9. [Store Manager Security PIN Directory (9 Locations)](#9-store-manager-security-pin-directory-9-locations)
 10. [Edge Cases, Error Handling & Recovery Architecture](#10-edge-cases-error-handling--recovery-architecture)
 11. [Data Isolation & Concurrency Architecture](#11-data-isolation--concurrency-architecture)
 12. [Field Operations & Troubleshooting Runbook](#12-field-operations--troubleshooting-runbook)
@@ -24,7 +24,7 @@
 
 ## 1. Architecture & Cloud Infrastructure
 
-The platform operates on a **centralized single-backend multi-tenant architecture**. All 8 regional showcase stores connect to the same central Firebase cloud instance while maintaining strict, real-time data isolation:
+The platform operates on a **centralized single-backend multi-tenant architecture**. All 9 regional showcase stores connect to the same central Firebase cloud instance while maintaining strict, real-time data isolation:
 
 ```
                                   ┌──────────────────────────────────────────────┐
@@ -33,7 +33,7 @@ The platform operates on a **centralized single-backend multi-tenant architectur
                                   ├──────────────────────────────────────────────┤
                                   │  • /catalog     (Shared Global Products)     │
                                   │  • /store_pins  (Central Authentication)     │
-                                  │  • /locations/  (8 Isolated Store Branches)  │
+                                  │  • /locations/  (9 Isolated Store Branches)  │
                                   └──────────────────────────────────────────────┘
                                            ▲                            ▲
                         (Isolated Live Sync)│                            │(Isolated Live Sync)
@@ -54,7 +54,7 @@ The platform operates on a **centralized single-backend multi-tenant architectur
 > **Central Cloud Status: Fully Deployed**  
 > The Firebase Realtime Database schema and catalog seed are managed centrally. Local store staff and installers **do NOT need to configure Firebase, create accounts, or import database files**. Local teams only need to follow Sections 4, 5, and 6.
 
-### Supported Showcase Centers (8 Active Locations)
+### Supported Showcase Centers (9 Active Locations)
 | Store Location | Database Node Key | Display Name in App & Admin | Default PIN |
 | :--- | :--- | :--- | :--- |
 | **Bengaluru** | `bengaluru` | `Bengaluru Store` | `4910` |
@@ -65,6 +65,7 @@ The platform operates on a **centralized single-backend multi-tenant architectur
 | **TVM** | `tvm` | `TVM Store` | `6418` |
 | **Pune** | `pune` | `Pune Store` | `7821` |
 | **Noida** | `noida` | `Noida Store` | `2013` |
+| **Tokyo** | `tokyo` | `Tokyo Store` | `8103` |
 
 ---
 
@@ -288,7 +289,7 @@ The Store Manager Web Console gives staff complete real-time oversight of robot 
 
 ---
 
-## 9. Store Manager Security PIN Directory (8 Locations)
+## 9. Store Manager Security PIN Directory (9 Locations)
 
 | Location Name | Store Key | Console & Kiosk Security PIN |
 | :--- | :--- | :--- |
@@ -300,6 +301,7 @@ The Store Manager Web Console gives staff complete real-time oversight of robot 
 | **TVM Store** | `tvm` | **`6418`** |
 | **Pune Store** | `pune` | **`7821`** |
 | **Noida Store** | `noida` | **`2013`** |
+| **Tokyo Store** | `tokyo` | **`8103`** |
 
 ---
 
@@ -339,11 +341,15 @@ Firebase Realtime Database
     │   ├── robot_state          <-- Real-time robot state ("idle", "moving", "blocked")
     │   └── active_order_id      <-- Active order ID currently being fulfilled
     │
+    ├── tokyo/                   <-- Isolated Tokyo branch
+    │   ├── orders/
+    │   └── stock/
+    │
     ├── bengaluru/               <-- Isolated Bengaluru branch
     │   ├── orders/
     │   └── stock/
     │
-    └── ...                      <-- Fully isolated branches for all 8 centers
+    └── ...                      <-- Fully isolated branches for all 9 centers
 ```
 
 - **Atomic Transactions (`runTransaction`)**: Inventory deductions and refunds use atomic Firebase transactions to eliminate race conditions during concurrent checkouts.
